@@ -1,0 +1,16 @@
+# Claude Code project-local settings
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Notebook run artifacts (regenerated when the notebooks run)
+checkpoints/
+data/
+*.pt
+*.pth
+*.onnx
