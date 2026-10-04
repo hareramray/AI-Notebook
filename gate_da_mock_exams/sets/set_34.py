@@ -155,21 +155,24 @@ assert out == [1, 2, 3, 4, 5, 6] and moved == int(ANSWER)
             'topic': 'Recurrences — master theorem',
             'text': 'Which of the following recurrences has/have the solution T(n) = Θ(n log n)? (T(1) = 1 in each case.)',
             'options': [
-                'T(n) = 2T(n/2) + n',
                 'T(n) = 4T(n/2) + n',
-                'T(n) = 2T(n/4) + √n',
                 'T(n) = 3T(n/3) + 5n',
+                'T(n) = 2T(n/2) + n',
+                'T(n) = 2T(n/4) + √n',
             ],
-            'answer': ['A', 'D'],
+            'answer': ['B', 'C'],
             'solution': '''**Master theorem** for T(n) = aT(n/b) + f(n): compare f(n) with n^{log_b a}.
 
-- (A) a = 2, b = 2: n^{log₂2} = n = f(n) → case 2 → Θ(n log n). **Yes.**
-- (B) a = 4, b = 2: n^{log₂4} = n² dominates f(n) = n → case 1 → Θ(n²). **No.**
-- (C) a = 2, b = 4: n^{log₄2} = n^{1/2} = √n = f(n) → case 2 → Θ(√n log n). **No** — it has a log factor but not n log n.
-- (D) a = 3, b = 3: n^{log₃3} = n, f(n) = 5n = Θ(n) → case 2 → Θ(n log n). **Yes** (the constant 5 does not matter).
+- (A) a = 4, b = 2: n^{log₂4} = n² dominates f(n) = n → case 1 → Θ(n²). **No.**
+- (B) a = 3, b = 3: n^{log₃3} = n, f(n) = 5n = Θ(n) → case 2 → Θ(n log n). **Yes** (the constant 5 does not matter).
+- (C) a = 2, b = 2: n^{log₂2} = n = f(n) → case 2 → Θ(n log n). **Yes.**
+- (D) a = 2, b = 4: n^{log₄2} = n^{1/2} = √n = f(n) → case 2 → Θ(√n log n). **No** — it has a log factor but not n log n.
 
-**Trap:** (C) looks like merge sort's 'balanced' case and indeed falls in case 2, but the critical exponent is ½, so the answer is √n log n.''',
-            'verify': '''
+**Trap:** (D) looks like merge sort's 'balanced' case and indeed falls in case 2, but the critical exponent is ½, so the answer is √n log n.''',
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import math
 from functools import lru_cache
 def mk(a, b, f):
@@ -348,17 +351,19 @@ assert A == sorted(A) and c[0] == int(ANSWER)
             'marks': 1,
             'topic': 'Graph theory — degree sequences',
             'text': 'Which of the following sequences is/are the degree sequence of some **simple** undirected graph (no loops, no multiple edges)?',
-            'options': ['3, 3, 3, 3, 2, 2', '4, 4, 3, 1, 1, 1', '5, 3, 3, 2, 2, 1', '5, 5, 4, 2, 1, 1'],
-            'answer': ['A', 'C'],
+            'options': ['3, 3, 3, 3, 2, 2', '5, 5, 4, 2, 1, 1', '4, 4, 3, 1, 1, 1', '5, 3, 3, 2, 2, 1'],
+            'answer': ['A', 'D'],
             'solution': '''**Tools.** The degree sum must be even (handshaking lemma), and the Havel–Hakimi test: remove the largest degree d, subtract 1 from the next d largest, repeat; the sequence is graphical iff this ends with all zeros.
 
 - (A) Sum 16. 3,3,3,3,2,2 → remove 3: 2,2,2,2,2 → remove 2: 1,1,2,2 → sort 2,2,1,1 → remove 2: 1,0,1 → 1,1,0 → remove 1: 0,0. **Graphical.**
-- (B) Sum 14 (even), but: the two vertices of degree 4 each need 4 neighbours among the other 5 vertices. Apart from each other they each need 3 more from {3, 1, 1, 1}; the three degree-1 vertices can each serve only one of them, so at most 1 + 3 = 4 slots are available for 6 demands. Havel–Hakimi: 4,4,3,1,1,1 → 3,2,0,0,1 → sort 3,2,1,0,0 → 1,0,−1 ✗. **Not graphical.**
-- (C) Sum 16. 5,3,3,2,2,1 → 2,2,1,1,0 → 1,0,1,0 → 1,1,0,0 → 0,0,0. **Graphical.**
-- (D) Sum 18 (even), but two vertices of degree 5 in a 6-vertex graph are adjacent to *all* other vertices, forcing every vertex to have degree ≥ 2 — yet two vertices have degree 1. **Not graphical.**
+- (B) Sum 18 (even), but two vertices of degree 5 in a 6-vertex graph are adjacent to *all* other vertices, forcing every vertex to have degree ≥ 2 — yet two vertices have degree 1. **Not graphical.**
+- (C) Sum 14 (even), but: the two vertices of degree 4 each need 4 neighbours among the other 5 vertices. Apart from each other they each need 3 more from {3, 1, 1, 1}; the three degree-1 vertices can each serve only one of them, so at most 1 + 3 = 4 slots are available for 6 demands. Havel–Hakimi: 4,4,3,1,1,1 → 3,2,0,0,1 → sort 3,2,1,0,0 → 1,0,−1 ✗. **Not graphical.**
+- (D) Sum 16. 5,3,3,2,2,1 → 2,2,1,1,0 → 1,0,1,0 → 1,1,0,0 → 0,0,0. **Graphical.**
 
 **Trap:** an even sum is necessary but not sufficient.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def hh(seq):
     s = sorted(seq, reverse=True)
     while s and s[0] > 0:
@@ -507,12 +512,12 @@ assert int("".join(map(str, L))) == int(ANSWER) == int(OUTPUT.strip())
 
 Which of the following statements is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)''',
             'options': [
+                'The in-order successor of 27 in T is 40',
                 'The pre-order traversal of T is 40, 15, 12, 27, 18, 20, 31, 48, 44, 52',
                 'The height of T is 4',
                 'T has exactly 5 leaves',
-                'The in-order successor of 27 in T is 40',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** In a BST's post-order, the last key is the root; the keys before it split into a prefix of keys smaller than the root (left subtree) and the following keys larger than it (right subtree). Recurse.
 
 **Reconstruction.**
@@ -521,10 +526,10 @@ Which of the following statements is/are TRUE? (Height = number of edges on the 
 - Right: root 48 with children 44 and 52.
 
 **Statements.**
-- (A) Pre-order: 40, 15, 12, 27, 18, 20, 31, 48, 44, 52. **True.**
-- (B) Longest path 40 → 15 → 27 → 18 → 20 has 4 edges. **True.**
-- (C) Leaves: 12, 20, 31, 44, 52 → 5. **True.**
-- (D) 27 has a right subtree {31}, so its successor is the minimum there, **31**. **False.**
+- (A) 27 has a right subtree {31}, so its successor is the minimum there, **31**. **False.**
+- (B) Pre-order: 40, 15, 12, 27, 18, 20, 31, 48, 44, 52. **True.**
+- (C) Longest path 40 → 15 → 27 → 18 → 20 has 4 edges. **True.**
+- (D) Leaves: 12, 20, 31, 44, 52 → 5. **True.**
 
 **Trap:** the successor of a node is an ancestor only when the node has *no* right subtree.''',
             'solution_diagrams': [
@@ -554,7 +559,10 @@ Which of the following statements is/are TRUE? (Height = number of edges on the 
                     'caption': 'The BST T',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def build(post):
     if not post: return None
     r = post[-1]; L = [x for x in post[:-1] if x < r]; R = [x for x in post[:-1] if x > r]
@@ -688,10 +696,10 @@ assert s == 2 ** 7 - 6 - 2 == int(ANSWER) == int(OUTPUT.strip())
             'options': [
                 'The distance Dijkstra reports for A is the true shortest distance',
                 'Dijkstra reports a distance of 7 for C',
-                'The true shortest distance from S to D is 7',
                 'The graph contains a negative-weight cycle',
+                'The true shortest distance from S to D is 7',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Dijkstra trace.**
 - Extract S (0): A = 4, B = 2.
 - Extract B (2): C = 2 + 5 = 7.
@@ -703,11 +711,12 @@ Reported: A 4, B 2, C 7, D 8.
 
 - (A) **True** — 4 is correct (no path into A other than S→A).
 - (B) **True** — Dijkstra reports 7 (wrong; the true value is 6).
-- (C) **True** — S→A→B→C→D = 4 − 3 + 5 + 1 = 7.
-- (D) **False** — there is no cycle at all; the only negative edge A→B lies on no cycle.
+- (C) **False** — there is no cycle at all; the only negative edge A→B lies on no cycle.
+- (D) **True** — S→A→B→C→D = 4 − 3 + 5 + 1 = 7.
 
 **Concept/Trap.** Dijkstra's greedy choice assumes that a path can only get longer when extended. A negative edge breaks this even without negative cycles; B was finalised at 2 before the cheaper route through A was discovered, and the error propagated to C and D. Bellman–Ford handles this graph correctly.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [("S", "A", 4), ("S", "B", 2), ("A", "B", -3), ("A", "C", 3), ("B", "C", 5),
      ("C", "D", 1)]
 V = "SABCD"; INF = float('inf')
@@ -831,20 +840,22 @@ def f(x):
             return 0''',
             'options': [
                 '`f(4)` returns 2 and appends exactly "t", "f" to `log`',
+                'If `log` is empty and `f(4)`, `f(-3)`, `f(0)` are called in this order, `len(log)` is 7 afterwards',
                 '`f(-3)` returns -1',
                 '`f(0)` raises ZeroDivisionError',
-                'If `log` is empty and `f(4)`, `f(-3)`, `f(0)` are called in this order, `len(log)` is 7 afterwards',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Concept.** A `finally` block always runs — after a `return`, after an exception is handled, and even while an unhandled exception is propagating. If the `finally` block itself executes `return`, that return value replaces whatever was pending, *including a pending exception*, which is silently discarded.
 
 - f(4): log gets "t"; returns 10 // 4 = 2 → finally appends "f"; x ≠ 0 so the pending return 2 stands. (A) **True.**
-- f(−3): "t"; ValueError raised and caught: "e", return −1 pending; finally appends "f". Returns −1. (B) **True.**
-- f(0): "t"; `10 // 0` raises ZeroDivisionError, which the `except ValueError` clause does not catch; on the way out, finally appends "f" and executes `return 0`, which swallows the exception. So f(0) **returns 0**. (C) **False.**
-- Log lengths: 2 + 3 + 2 = 7. (D) **True.**
+- f(−3): "t"; ValueError raised and caught: "e", return −1 pending; finally appends "f". Returns −1. (C) **True.**
+- f(0): "t"; `10 // 0` raises ZeroDivisionError, which the `except ValueError` clause does not catch; on the way out, finally appends "f" and executes `return 0`, which swallows the exception. So f(0) **returns 0**. (D) **False.**
+- Log lengths: 2 + 3 + 2 = 7. (B) **True.**
 
 **Trap:** a `return` (or `break`) inside `finally` hides errors — a notorious source of silent bugs.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 log.clear()
 a = f(4); la = list(log)
 b = f(-3)

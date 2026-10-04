@@ -144,19 +144,21 @@ assert sum(valid(c) for c in C) == int(ANSWER)
             'marks': 1,
             'topic': 'Deques — input-restricted deque',
             'text': 'The values 1, 2, 3, 4 arrive in this order and must be inserted at the **rear** of an input-restricted deque (insertion only at the rear, deletion at either end). Deletions may be interleaved with insertions and each deleted value is output. Which of the following output sequences are possible?',
-            'options': ['4 2 3 1', '4 1 3 2', '2 4 1 3', '4 2 1 3'],
-            'answer': ['B', 'C'],
+            'options': ['2 4 1 3', '4 1 3 2', '4 2 1 3', '4 2 3 1'],
+            'answer': ['A', 'B'],
             'solution': '''**Concept.** If 4 is output first, all of 1, 2, 3 are already inside, in order 1 2 3 from front to rear; afterwards only the two ends can be taken.
 
-- (A) 4 2 3 1: after removing 4 the deque is [1, 2, 3]; 2 is in the middle and cannot be removed. **Impossible.**
+- (A) 2 4 1 3: insert 1, 2; delete 2 from the rear; insert 3, 4; delete 4 from the rear; deque [1, 3] → 1 from front, then 3. **Possible.**
 - (B) 4 1 3 2: deque [1, 2, 3] → take 1 from the front → [2, 3] → take 3 from the rear → 2. **Possible.**
-- (C) 2 4 1 3: insert 1, 2; delete 2 from the rear; insert 3, 4; delete 4 from the rear; deque [1, 3] → 1 from front, then 3. **Possible.**
-- (D) 4 2 1 3: again 2 is in the middle of [1, 2, 3] when it is needed. **Impossible.**
+- (C) 4 2 1 3: again 2 is in the middle of [1, 2, 3] when it is needed. **Impossible.**
+- (D) 4 2 3 1: after removing 4 the deque is [1, 2, 3]; 2 is in the middle and cannot be removed. **Impossible.**
 
 In fact, of the 24 permutations of 1..4 exactly 22 are achievable; the two impossible ones are precisely 4 2 1 3 and 4 2 3 1.
 
 **Tip:** for an input-restricted deque the hard cases are those where a *middle* element must leave before both its neighbours.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 res = set()
 def rec(nxt, d, out):
     if len(out) == 4: res.add(tuple(out)); return
@@ -265,20 +267,22 @@ a = [3, 7, 7, 7, 12, 18, 18, 25]''',
             'text2': 'Which of the following statements is/are TRUE?',
             'options': [
                 '`lb(a, 7)` returns 1',
-                '`lb(a, 18) - lb(a, 12)` equals 1',
                 '`lb(a, 30)` returns 7',
                 'The `while` loop body executes exactly 3 times during `lb(a, 7)`',
+                '`lb(a, 18) - lb(a, 12)` equals 1',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'D'],
             'solution': '''**Concept.** `lb` returns the first index whose value is ≥ x (len(a) if none), on the half-open interval [lo, hi).
 
 - (A) First value ≥ 7 is at index 1. **TRUE.**
-- (B) lb(a, 18) = 5 and lb(a, 12) = 4 → difference 1 (= number of 12s). **TRUE.**
-- (C) No value is ≥ 30, so the function returns len(a) = **8**, not 7. **FALSE.**
-- (D) Trace for x = 7: (lo, hi) = (0, 8) → mid 4, 12 ≥ 7 → hi = 4; (0, 4) → mid 2, 7 ≥ 7 → hi = 2; (0, 2) → mid 1 → hi = 1; (0, 1) → mid 0, 3 < 7 → lo = 1. That is **4** iterations. **FALSE.**
+- (B) No value is ≥ 30, so the function returns len(a) = **8**, not 7. **FALSE.**
+- (C) Trace for x = 7: (lo, hi) = (0, 8) → mid 4, 12 ≥ 7 → hi = 4; (0, 4) → mid 2, 7 ≥ 7 → hi = 2; (0, 2) → mid 1 → hi = 1; (0, 1) → mid 0, 3 < 7 → lo = 1. That is **4** iterations. **FALSE.**
+- (D) lb(a, 18) = 5 and lb(a, 12) = 4 → difference 1 (= number of 12s). **TRUE.**
 
 **Trap:** on a half-open interval the size goes 8 → 4 → 2 → 1 → 0, so up to ⌊log₂ n⌋ + 1 = 4 iterations are needed — not log₂ 8 = 3.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def lbc(a, x):
     lo, hi, it = 0, len(a), 0
     while lo < hi:
@@ -298,20 +302,20 @@ assert [L for L, ok in zip('ABCD', res) if ok] == sorted(ANSWER)
 6 3 1 − / 4 2 ^ 5 * +
 using a stack of subtrees (an operand is pushed as a leaf; an operator pops its right child, then its left child, and pushes the new subtree). Which of the following statements is/are TRUE? (`^` denotes exponentiation.)''',
             'options': [
-                'The prefix form of the tree is + / 6 − 3 1 * ^ 4 2 5',
                 'The expression evaluates to 83',
                 'The tree has exactly 5 leaves',
                 'The stack never holds more than 3 subtrees during the construction',
+                'The prefix form of the tree is + / 6 − 3 1 * ^ 4 2 5',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept.** Postfix → tree is a direct stack simulation; the last operator becomes the root.
 
 Stack trace (sizes in brackets): 6 [1], 3 [2], 1 [3], − → (3−1) [2], / → 6/(3−1) [1], 4 [2], 2 [3], ^ → 4^2 [2], 5 [3], * → (4^2)*5 [2], + → root [1].
 
-- (A) Pre-order of the tree: + / 6 − 3 1 * ^ 4 2 5. **TRUE.**
-- (B) 6/(3−1) + 4^{2}·5 = 3 + 80 = 83. **TRUE.**
-- (C) Leaves are the operands 6, 3, 1, 4, 2, 5 → **6** leaves. **FALSE.**
-- (D) The maximum stack size is 3 (reached three times). **TRUE.**
+- (A) 6/(3−1) + 4^{2}·5 = 3 + 80 = 83. **TRUE.**
+- (B) Leaves are the operands 6, 3, 1, 4, 2, 5 → **6** leaves. **FALSE.**
+- (C) The maximum stack size is 3 (reached three times). **TRUE.**
+- (D) Pre-order of the tree: + / 6 − 3 1 * ^ 4 2 5. **TRUE.**
 
 **Trap:** the first popped subtree is the **right** child — swapping them would turn 3 − 1 into 1 − 3 and the value into −3 + 80.''',
             'solution_diagrams': [
@@ -328,7 +332,10 @@ Stack trace (sizes in brackets): 6 [1], 3 [2], 1 [3], − → (3−1) [2], / →
                     'caption': 'Expression tree',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 st = []; mx = 0
 for t in "6 3 1 - / 4 2 ^ 5 * +".split():
     if t.isdigit(): st.append(t)
@@ -593,12 +600,12 @@ assert got == [1, 2, 3, 4, 5] and c == int(ANSWER)
         st.append(i)
     return best, pops''',
             'options': [
+                'The function returns pops = 7',
                 'The function returns best = 12',
                 'Exactly one rectangle (one choice of height and contiguous range) attains the maximum area',
-                'The function returns pops = 7',
                 'When the bar of height 1 (index 5) is processed, exactly 3 bars are popped',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['A', 'B'],
             'solution': '''**Concept.** When bar t is popped, the current index i is the first bar to its right that is lower, and the new stack top is the nearest lower bar to its left; so H[t] × w is the largest rectangle using bar t as its *shortest* bar.
 
 Trace (pops with their areas):
@@ -608,9 +615,9 @@ Trace (pops with their areas):
 - i=7 (sentinel 0): pop 4 (w 1) → 4; pop 1 (w 7) → 7
 
 Option by option:
-- (A) best = 12. **TRUE.**
-- (B) Two different rectangles reach 12: height 4 over bars 1–3 and height 3 over bars 1–4. **FALSE.**
-- (C) Every one of the 7 real bars is pushed once and popped once (the sentinel is pushed but never popped) → pops = 7. **TRUE.**
+- (A) Every one of the 7 real bars is pushed once and popped once (the sentinel is pushed but never popped) → pops = 7. **TRUE.**
+- (B) best = 12. **TRUE.**
+- (C) Two different rectangles reach 12: height 4 over bars 1–3 and height 3 over bars 1–4. **FALSE.**
 - (D) At i = 5 the stack holds the bars of heights 2 and 3 only (5, 6, 4 were already popped earlier), so exactly **2** bars are popped. **FALSE.**
 
 **Trap:** in (D), counting all bars taller than 1 to the left (4 of them) instead of those still on the stack.''',
@@ -623,7 +630,9 @@ Option by option:
                     'caption': 'Bars 1–4: height 3 × width 4 = 12 (also height 4 × bars 1–3 = 12)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 b, p = largest([2, 5, 4, 6, 3, 1, 4])
 h = [2, 5, 4, 6, 3, 1, 4]; cnt = 0
 for i in range(7):
@@ -935,12 +944,12 @@ b = deq() + deq()
 enq(a + b)''',
             'text2': 'After the program finishes, which of the following statements is/are TRUE?',
             'options': [
-                '`tail.v == 27`',
-                '`tail.nxt.v == 16`',
                 'A further call `deq()` would return 23',
+                '`tail.nxt.v == 16`',
+                '`tail.v == 27`',
                 '`tail.nxt.nxt.v == 27`',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept.** With only a tail pointer, both enqueue (insert after tail, then advance tail) and dequeue (unlink tail.nxt) are O(1); the front is always `tail.nxt`.
 
 - enq 4, 8, 15 → circle 4 → 8 → 15 → (back to 4); tail = 15.
@@ -950,9 +959,9 @@ enq(a + b)''',
 - enq(a + b) = enq(27) → 16 → 23 → 27; tail = 27.
 
 Option by option:
-- (A) tail is the last enqueued node, 27. **TRUE.**
+- (A) The next dequeue returns the front, 16 — not 23. **FALSE.**
 - (B) The front (`tail.nxt`) is 16. **TRUE.**
-- (C) The next dequeue returns the front, 16 — not 23. **FALSE.**
+- (C) tail is the last enqueued node, 27. **TRUE.**
 - (D) `tail.nxt.nxt` is the second element, 23. **FALSE.**
 
 **Trap:** thinking that `a + b` is 4 + 8 = 12 — `b` is the sum of *two* dequeues (8 and 15).''',
@@ -965,7 +974,8 @@ Option by option:
                     'caption': 'Final circular list (tail = node 27)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 res = [tail.v == 27, tail.nxt.v == 16, tail.nxt.v == 23, tail.nxt.nxt.v == 27]
 assert [L for L, ok in zip('ABCD', res) if ok] == sorted(ANSWER)
 ''',

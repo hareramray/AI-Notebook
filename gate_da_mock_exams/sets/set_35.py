@@ -99,23 +99,25 @@ assert "".join(out) == "abcd-*efg^^/+h-" and mx == int(ANSWER)
             'topic': 'Trees — complete binary tree in an array',
             'text': 'A complete binary tree with 50 nodes is stored in an array T[1..50] in level order (the children of T[i] are T[2i] and T[2i + 1]). Height is the number of edges on the longest root-to-leaf path. Which of the following statements is/are TRUE?',
             'options': [
-                'The tree has exactly 25 leaves',
-                'The height of the tree is 5',
-                'The parent of T[37] is T[18]',
                 'T[26] is an internal node',
+                'The tree has exactly 25 leaves',
+                'The parent of T[37] is T[18]',
+                'The height of the tree is 5',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** In a 1-based array heap layout, node i has children 2i and 2i + 1 and parent ⌊i/2⌋. Node i is internal iff 2i ≤ n.
 
-- (A) Internal nodes are i = 1 … ⌊50/2⌋ = 25, so leaves are 26 … 50 → 25 leaves. **True.**
-- (B) Height = ⌊log₂ 50⌋ = 5 (levels hold 1, 2, 4, 8, 16 and then 19 nodes; 2⁵ = 32 ≤ 50 < 64). **True.**
+- (A) 2 × 26 = 52 > 50, so T[26] has no children — it is a leaf. **False.**
+- (B) Internal nodes are i = 1 … ⌊50/2⌋ = 25, so leaves are 26 … 50 → 25 leaves. **True.**
 - (C) parent(37) = ⌊37/2⌋ = 18. **True.**
-- (D) 2 × 26 = 52 > 50, so T[26] has no children — it is a leaf. **False.**
+- (D) Height = ⌊log₂ 50⌋ = 5 (levels hold 1, 2, 4, 8, 16 and then 19 nodes; 2⁵ = 32 ≤ 50 < 64). **True.**
 
 Note T[25] is the only node with exactly one child (T[50]), because n is even.
 
 **Trap:** using 0-based formulas (children 2i + 1, 2i + 2) on a 1-based array gives parent(37) = 18 by coincidence but breaks the leaf test.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 n = 50
 leaves = [i for i in range(1, n+1) if 2*i > n]
 height = 0
@@ -511,12 +513,12 @@ Output: `3 8 4 0` → (C).
             'topic': 'Heaps — successive insertions into a max-heap',
             'text': 'The keys 15, 22, 9, 40, 31, 27, 50, 12 are inserted one at a time, in this order, into an initially empty binary max-heap stored in an array (0-based). Each insertion appends the key and sifts it up, swapping with its parent while the parent is smaller. Which of the following statements is/are TRUE?',
             'options': [
-                'The final array is [50, 31, 40, 15, 22, 9, 27, 12]',
-                'The total number of swaps over all insertions is 7',
                 'Inserting 50 causes exactly 2 swaps',
+                'The final array is [50, 31, 40, 15, 22, 9, 27, 12]',
                 'In the final heap, 40 is the left child of the root',
+                'The total number of swaps over all insertions is 7',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** Insertion places the key at the next free leaf and sifts it up; the number of swaps is at most the depth of that leaf.
 
 Trace (array after each insertion, swaps in brackets):
@@ -533,8 +535,8 @@ Total swaps = 1 + 2 + 1 + 1 + 2 = 7.
 
 - (A) **True.**
 - (B) **True.**
-- (C) **True.**
-- (D) **False** — 40 is at index 2, the **right** child of the root; 31 is the left child.
+- (C) **False** — 40 is at index 2, the **right** child of the root; 31 is the left child.
+- (D) **True.**
 
 **Trap:** repeated insertion and bottom-up build-heap generally produce *different* heaps from the same keys; do not mix the two procedures.''',
             'solution_diagrams': [
@@ -544,7 +546,10 @@ Total swaps = 1 + 2 + 1 + 1 + 2 = 7.
                     'caption': 'Final max-heap',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 h, sw, per = [], 0, {}
 for k in [15, 22, 9, 40, 31, 27, 50, 12]:
     h.append(k); i = len(h) - 1; c = 0
@@ -588,11 +593,11 @@ assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
             ],
             'options': [
                 'Exactly 3 edges are back edges',
-                'C → B is a cross edge',
                 'C is discovered at time 5 and finished at time 8',
                 'A → C is a forward edge',
+                'C → B is a cross edge',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Concept.** For an edge u → v met during DFS: v undiscovered → tree edge; v discovered but not finished (on the recursion stack) → back edge; v finished and d[u] < d[v] → forward edge; v finished and d[u] > d[v] → cross edge.
 
 Trace:
@@ -603,12 +608,14 @@ Trace:
 Tree edges: A→B, B→D, D→F, F→C, C→E. Back: D→A, C→B, E→F. Forward: A→C. No cross edges.
 
 - (A) **True** — three back edges.
-- (B) **False** — when C → B is examined, B is still on the stack (it finishes at 11), so it is a back edge.
-- (C) **True** — d[C] = 5, f[C] = 8.
-- (D) **True.**
+- (B) **True** — d[C] = 5, f[C] = 8.
+- (C) **True.**
+- (D) **False** — when C → B is examined, B is still on the stack (it finishes at 11), so it is a back edge.
 
 **Trap:** B was discovered long before C, which tempts one to call C → B a cross edge; the deciding test is whether B is still active.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = {'A': ['B','C'], 'B': ['D'], 'C': ['B','E'], 'D': ['A','F'], 'E': ['F'], 'F': ['C']}
 t = [0]; d = {}; f = {}; cls = {}
 def dfs(u):
@@ -654,22 +661,22 @@ assert T(20) == int(ANSWER) and T(16) == 80
             'topic': 'Hashing — deletion with tombstones',
             'text': 'A hash table of size 10 uses h(k) = k mod 10 with linear probing. Keys 31, 41, 51, 22, 62 are inserted in that order. Then 41 is deleted by marking its slot DELETED (a tombstone). A search probes until it finds the key or an EMPTY slot (tombstones are skipped over). An insertion places the key in the first slot of its probe sequence that is EMPTY or DELETED. Which of the following statements is/are TRUE? (A probe = one slot examined.)',
             'options': [
-                'Searching for 51 after the deletion examines exactly 3 slots',
-                'An unsuccessful search for 72 after the deletion examines exactly 5 slots',
                 'If 71 is then inserted, it is placed in slot 2',
+                'Searching for 51 after the deletion examines exactly 3 slots',
                 'If slot 2 had instead been simply set to EMPTY, a search for 22 would still succeed',
+                'An unsuccessful search for 72 after the deletion examines exactly 5 slots',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** In open addressing, deleting by emptying a slot can break the probe chains of keys inserted after it. A tombstone keeps chains intact for searches and can be reused by insertions.
 
 Insertions: 31 → 1; 41 → 1 full → 2; 51 → 1, 2 full → 3; 22 → 2, 3 full → 4; 62 → 2, 3, 4 full → 5. Delete 41 → slot 2 = DEL.
 
-- (A) Search 51: slot 1 (31), slot 2 (DEL, continue), slot 3 (51) → 3 probes. **True.**
-- (B) Search 72: home 2 (DEL), 3 (51), 4 (22), 5 (62), 6 (EMPTY) → 5 probes. **True.**
-- (C) Insert 71: home 1 occupied, slot 2 is DELETED → 71 goes into slot 2. **True.**
-- (D) Search 22 with slot 2 EMPTY: the home slot 2 is empty → search stops and **fails**, although 22 is in slot 4. **False.**
+- (A) Insert 71: home 1 occupied, slot 2 is DELETED → 71 goes into slot 2. **True.**
+- (B) Search 51: slot 1 (31), slot 2 (DEL, continue), slot 3 (51) → 3 probes. **True.**
+- (C) Search 22 with slot 2 EMPTY: the home slot 2 is empty → search stops and **fails**, although 22 is in slot 4. **False.**
+- (D) Search 72: home 2 (DEL), 3 (51), 4 (22), 5 (62), 6 (EMPTY) → 5 probes. **True.**
 
-**Trap:** (D) is exactly why tombstones exist; many students assume emptying the slot is harmless.''',
+**Trap:** (C) is exactly why tombstones exist; many students assume emptying the slot is harmless.''',
             'solution_diagrams': [
                 {
                     'type': 'hashtable',
@@ -684,7 +691,10 @@ Insertions: 31 → 1; 41 → 1 full → 2; 51 → 1, 2 full → 3; 22 → 2, 3 f
                     'caption': 'Table after deleting 41 (tombstone in slot 2)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 EMPTY, DEL = None, "DEL"
 T = [EMPTY]*10
 def probe(k):
@@ -827,20 +837,21 @@ assert OUTPUT.strip() == str(brute) == '[9, -1, 5, 8, 8, -1, 7, -1]'
             'text': 'Assume quicksort uses the Lomuto partition with the **last** element as pivot (partitioning m elements costs m − 1 comparisons, and elements equal to the pivot go to the left part), and merge sort splits into ⌊n/2⌋ and ⌈n/2⌉ elements and stops comparing once a side is exhausted. Which of the following statements is/are TRUE?',
             'options': [
                 'Quicksort on 5 equal keys [4, 4, 4, 4, 4] makes exactly 10 comparisons',
-                'Merge sort on the sorted array [1, 2, …, 8] makes exactly 12 comparisons',
                 "If merge sort's merge takes from the right list whenever L[i] == R[j], it is still stable",
+                'Merge sort on the sorted array [1, 2, …, 8] makes exactly 12 comparisons',
                 'Quicksort on [3, 1, 2] makes exactly 3 comparisons',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'C'],
             'solution': '''**Concept.** Exact counts depend on how the splits fall. All-equal keys are a worst case for Lomuto (every key ≤ pivot), while sorted input is a best case for merge sort's merging.
 
 - (A) Equal keys: the pivot ends up at the far right every time, leaving m − 1 keys on the left. Comparisons 4 + 3 + 2 + 1 = 10. **True.**
-- (B) Sorted input: every merge of sizes p = q stops after p comparisons (left list empties first). Level 1: 4 merges × 1 = 4; level 2: 2 × 2 = 4; level 3: 1 × 4 = 4 → 12. **True.**
-- (C) Taking the right element on ties puts later equal keys before earlier ones → **not stable**. **False.**
+- (B) Taking the right element on ties puts later equal keys before earlier ones → **not stable**. **False.**
+- (C) Sorted input: every merge of sizes p = q stops after p comparisons (left list empties first). Level 1: 4 merges × 1 = 4; level 2: 2 × 2 = 4; level 3: 1 × 4 = 4 → 12. **True.**
 - (D) [3, 1, 2], pivot 2: 2 comparisons → [1, 2, 3], pivot index 1; the left part [1] and right part [3] have size 1 → no more comparisons. Total **2**. **False.**
 
-**Trap:** for (D), counting one comparison for the pivot with itself. For (C), stability lives entirely in the tie-breaking rule of the merge.''',
-            'verify': '''
+**Trap:** for (D), counting one comparison for the pivot with itself. For (B), stability lives entirely in the tie-breaking rule of the merge.''',
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 c = [0]
 def qs(A, lo, hi):
     if lo >= hi: return

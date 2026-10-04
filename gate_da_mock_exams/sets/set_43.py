@@ -103,21 +103,23 @@ assert len(res) == 42 and sum(p[0] == 3 for p in res) == int(ANSWER)
                 },
             ],
             'options': [
-                'Enqueue a new element at the rear',
                 'Dequeue the front element',
-                'Read the value of the front element',
+                'Enqueue a new element at the rear',
                 'Delete the rear element (the node pointed to by tail)',
+                'Read the value of the front element',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''With a circular list one pointer to the rear gives access to **both** ends: rear = tail, front = tail.next.
 
-- (A) new node z: z.next = tail.next; tail.next = z; tail = z. Θ(1). **True.**
-- (B) f = tail.next; tail.next = f.next (if f is the only node, set tail = None). Θ(1). **True.**
-- (C) tail.next.val. Θ(1). **True.**
-- (D) removing tail requires its **predecessor** (to become the new tail), which can only be found by walking around the circle: Θ(n). **False.**
+- (A) f = tail.next; tail.next = f.next (if f is the only node, set tail = None). Θ(1). **True.**
+- (B) new node z: z.next = tail.next; tail.next = z; tail = z. Θ(1). **True.**
+- (C) removing tail requires its **predecessor** (to become the new tail), which can only be found by walking around the circle: Θ(n). **False.**
+- (D) tail.next.val. Θ(1). **True.**
 
 **Trap:** keeping a pointer to the *front* instead would make enqueue Θ(n), because reaching the rear needs a full traversal. **Tip:** this is why queues built on circular lists keep the rear pointer.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class Nd:
     def __init__(s, v): s.v, s.next = v, None
 tail = None; ops = 0
@@ -345,22 +347,24 @@ assert cmp == int(ANSWER) and A == sorted(A)
             ],
             'options': [
                 'G has an Euler trail (a walk using every edge exactly once) but no Euler circuit',
+                'G is bipartite',
                 'G has exactly two vertices of odd degree',
                 'After deleting edge B–E, the resulting graph has an Euler circuit',
-                'G is bipartite',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'C'],
             'solution': '''Degrees: A 2, B 4 (A, C, D, E), C 3 (A, B, E), D 3 (B, E, F), E 4 (C, D, F, B), F 2. Sum = 18 = 2 × 9 edges. ✓
 
 Euler's theorem (connected graph): Euler circuit ⇔ all degrees even; Euler trail (not closed) ⇔ exactly two odd-degree vertices, and the trail runs between them.
 
-- (B) odd vertices: C and D → exactly two. **True.**
 - (A) hence an Euler trail from C to D exists, but no circuit. **True.** (e.g. C-A-B-C-E-B-D-E-F-D)
-- (C) deleting B–E makes B and E odd too → four odd vertices → no Euler circuit (not even a trail). **False.**
-- (D) A–B–C is a triangle (odd cycle). **False.**
+- (B) A–B–C is a triangle (odd cycle). **False.**
+- (C) odd vertices: C and D → exactly two. **True.**
+- (D) deleting B–E makes B and E odd too → four odd vertices → no Euler circuit (not even a trail). **False.**
 
 **Tip:** adding the edge C–D instead would make every degree even and create an Euler circuit.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [("A","B"),("A","C"),("B","C"),("B","D"),("C","E"),("D","E"),("D","F"),("E","F"),("B","E")]
 def degs(E):
     d = {}
@@ -503,10 +507,10 @@ assert nge(a) == brute and OUTPUT.strip() == ANSWER == str(sum(brute))
                 },
             ],
             'options': [
-                'slow and fast first meet at node 6',
-                'They first meet after exactly 4 iterations',
                 'The cycle contains exactly 5 nodes',
+                'They first meet after exactly 4 iterations',
                 'If one pointer is then reset to node 1 and both advance one step at a time, they next meet at node 4 after 3 steps',
+                'slow and fast first meet at node 6',
             ],
             'answer': ['A', 'C', 'D'],
             'solution': '''Tail length μ = 3 (nodes 1, 2, 3 before the cycle), cycle length λ = 5 (nodes 4–8).
@@ -518,10 +522,10 @@ Positions after each iteration (slow / fast):
 - 3: 4 / 7
 - 4: 5 / 4 (7 → 8 → 4)
 - 5: **6 / 6** → meet
-- (A) **True.**
+- (A) 4 → 5 → 6 → 7 → 8 → 4: λ = 5. **True.**
 - (B) they meet after **5** iterations. **False.**
-- (C) 4 → 5 → 6 → 7 → 8 → 4: λ = 5. **True.**
-- (D) Phase 2: from node 1 and node 6, one step each: (2, 7), (3, 8), (4, 4) → meet at the cycle entrance, node 4, after μ = 3 steps. **True.**
+- (C) Phase 2: from node 1 and node 6, one step each: (2, 7), (3, 8), (4, 4) → meet at the cycle entrance, node 4, after μ = 3 steps. **True.**
+- (D) **True.**
 
 Why phase 2 works: at the meeting point slow has walked k steps and fast 2k, so k is a multiple of λ; walking μ more steps from the meeting point lands exactly on the entrance.
 
@@ -545,7 +549,9 @@ Why phase 2 works: at the meeting point slow has walked k steps and fast 2k, so 
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 nxt = {i: i + 1 for i in range(1, 8)}; nxt[8] = 4
 s = f = 1; it = 0
 while True:
@@ -745,21 +751,23 @@ assert sig["1111"] == int(ANSWER) and dist["1111"] == 4
             'topic': 'Quicksort — input sensitivity',
             'text': 'Quicksort uses the Lomuto partition with the **last** element as pivot; a partition of a subarray of size s makes exactly s − 1 key comparisons, and subarrays of size ≤ 1 are not partitioned. Which of the following statements about sorting 6 distinct keys is/are TRUE?',
             'options': [
-                'On [1, 2, 3, 4, 5, 6] it makes 15 comparisons',
                 'On [6, 5, 4, 3, 2, 1] it makes 15 comparisons',
                 'On [2, 1, 4, 3, 6, 5] it makes 8 comparisons',
+                'On [1, 2, 3, 4, 5, 6] it makes 15 comparisons',
                 'On every permutation of 6 distinct keys it makes at least 8 comparisons',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Total comparisons = Σ (s − 1) over all partitioned subarrays; everything depends on how balanced the splits are.
 
-- (A) sorted input: the pivot is always the maximum → splits (5, 0), (4, 0), … → 5 + 4 + 3 + 2 + 1 = 15. **True.**
-- (B) reverse-sorted: first pivot 1 is the minimum → [1 | 5 4 3 2 6]; the next pivot 6 is the maximum, then 2 is the minimum, … every split is still (n−1, 0) → 15. **True.**
-- (C) [2, 1, 4, 3, 6, 5]: pivot 5 → 5 comparisons, split [2 1 4 3] | [6]; pivot 3 → 3, split [2 1] | [4]; pivot 1 → 1 → total 5 + 3 + 1 = **9**, not 8. **False.**
+- (A) reverse-sorted: first pivot 1 is the minimum → [1 | 5 4 3 2 6]; the next pivot 6 is the maximum, then 2 is the minimum, … every split is still (n−1, 0) → 15. **True.**
+- (B) [2, 1, 4, 3, 6, 5]: pivot 5 → 5 comparisons, split [2 1 4 3] | [6]; pivot 3 → 3, split [2 1] | [4]; pivot 1 → 1 → total 5 + 3 + 1 = **9**, not 8. **False.**
+- (C) sorted input: the pivot is always the maximum → splits (5, 0), (4, 0), … → 5 + 4 + 3 + 2 + 1 = 15. **True.**
 - (D) The first partition always costs 5. The best split of the remaining 5 elements is (2, 3) → 1 + 2 = 3 more (the 3-part costs 2 and splits 1|1), total 8; every other split costs more (e.g. (1, 4) → 0 + 3 + … ≥ 4). For example [3, 1, 2, 5, 6, 4] achieves 8. **True.**
 
 **Tip:** for n = 2^{k} − 1 a perfect pivot sequence gives the minimum; for other n the minimum is found by the best balanced split at each level.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def qc(arr):
     A = arr[:]; c = [0]
@@ -858,19 +866,20 @@ assert [c for c, f in zip("ABCD", fs) if full(f)] == [ANSWER]
             'options': [
                 "`sorted(words, key=len)[1:5]` equals `['kiwi', 'date', 'plum', 'pear']`",
                 "`sorted(words, key=lambda w: (-len(w), w))[1]` equals `'date'`",
-                "`sorted(words, key=len, reverse=True)[1]` equals `'pear'`",
                 "`min(words, key=lambda w: w[-1])` equals `'date'`",
+                "`sorted(words, key=len, reverse=True)[1]` equals `'pear'`",
             ],
             'answer': ['A', 'B'],
             'solution': '''`sorted` is **stable**: items with equal keys keep their original relative order — and this remains true with `reverse=True` (Python reverses the comparison, not the result). `min`/`max` return the **first** item with the extreme key.
 
 - (A) key=len: fig(3); then the four 4-letter words in input order kiwi, date, plum, pear; then apple(5). Slice [1:5] → ['kiwi', 'date', 'plum', 'pear']. **True.**
 - (B) key (−len, w): longest first, ties alphabetical → apple, date, kiwi, pear, plum, fig → index 1 is 'date'. **True.**
-- (C) reverse=True by length: apple, then the 4-letter words **still in input order** kiwi, date, plum, pear, then fig → index 1 is 'kiwi'. **False.**
-- (D) last letters: i, g, e, e, m, r → smallest 'e', first achieved by 'apple'. **False.**
+- (C) last letters: i, g, e, e, m, r → smallest 'e', first achieved by 'apple'. **False.**
+- (D) reverse=True by length: apple, then the 4-letter words **still in input order** kiwi, date, plum, pear, then fig → index 1 is 'kiwi'. **False.**
 
-**Trap:** (C) — many expect `reverse=True` to reverse the tie order as well (that would be `sorted(words, key=len)[::-1]`, which gives 'pear' at index 1).''',
-            'verify': '''
+**Trap:** (D) — many expect `reverse=True` to reverse the tie order as well (that would be `sorted(words, key=len)[::-1]`, which gives 'pear' at index 1).''',
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 words = ["kiwi", "fig", "apple", "date", "plum", "pear"]
 truth = [sorted(words, key=len)[1:5] == ['kiwi', 'date', 'plum', 'pear'],
          sorted(words, key=lambda w: (-len(w), w))[1] == 'date',

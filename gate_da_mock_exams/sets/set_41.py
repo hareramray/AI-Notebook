@@ -69,12 +69,12 @@ d = {0: 8, 1: 9, 2: 6, 3: 7}, so sum of values = 8 + 9 + 6 + 7 = **30**.
             'topic': 'Stacks — infix to postfix conversion',
             'text': 'The infix expression `a + b * (c - d) / e ^ f ^ g` is converted to postfix with the usual operator-stack algorithm. Precedence: `^` highest (right-associative), then `*` and `/` (left-associative), then `+` and `-` (left-associative). Which of the following statements is/are TRUE?',
             'options': [
-                'The postfix form is `a b c d - * e f g ^ ^ / +`',
                 'The operator stack never holds more than 3 symbols (counting `(`)',
-                'The prefix form is `+ a / * b - c d ^ e ^ f g`',
                 'If `^` were left-associative, the postfix form would not change',
+                'The prefix form is `+ a / * b - c d ^ e ^ f g`',
+                'The postfix form is `a b c d - * e f g ^ ^ / +`',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''Shunting-yard: operands go straight to the output; an incoming operator first pops operators of higher precedence (or equal precedence if it is left-associative); `(` is pushed and `)` pops back to it.
 
 - a → out. `+` → stack [+]. b → out.
@@ -87,13 +87,15 @@ d = {0: 8, 1: 9, 2: 6, 3: 7}, so sum of values = 8 + 9 + 6 + 7 = **30**.
 
 Postfix: a b c d − * e f g ^ ^ / +.
 
-- (A) **TRUE.**
-- (B) The stack reaches 4 symbols twice ([+, *, (, −] and [+, /, ^, ^]). **FALSE.**
+- (A) The stack reaches 4 symbols twice ([+, *, (, −] and [+, /, ^, ^]). **FALSE.**
+- (B) Left-associative `^` would pop the first `^` before pushing the second, giving … e f ^ g ^ …. **FALSE.**
 - (C) The tree is + (a, / (* (b, − (c, d)), ^ (e, ^ (f, g)))); its pre-order is + a / * b − c d ^ e ^ f g. **TRUE.**
-- (D) Left-associative `^` would pop the first `^` before pushing the second, giving … e f ^ g ^ …. **FALSE.**
+- (D) **TRUE.**
 
 **Trap:** e ^ f ^ g means e^(f^g) — right associativity is what keeps both `^` on the stack.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 P = {"+": 1, "-": 1, "*": 2, "/": 2, "^": 3}
 def conv(expr, right=("^",)):
     out, st, mx = [], [], 0
@@ -305,23 +307,24 @@ assert float(ANSWER[0]) <= round(a, 2) <= float(ANSWER[1])
             hi = mid
     return lo''',
             'options': [
-                '`find(a, 3)` terminates and returns 0',
                 '`find(a, 6)` terminates and returns 1',
+                '`find(a, 3)` terminates and returns 0',
                 '`find(a, 1)` terminates and returns 0',
                 '`find(a, 100)` terminates and returns 4',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'C'],
             'solution': '''The bug is `lo = mid` (instead of `mid + 1`). When hi = lo + 1, mid = lo; if a[lo] < x the assignment `lo = mid` changes nothing and the loop never ends.
 
 Once `lo` moves at all, a[lo] < x holds, so eventually the interval shrinks to [lo, lo + 1] with a[lo] < x → infinite loop. The only way to terminate is for `lo` never to move *and* a[0] ≥ x, so that `hi` keeps shrinking down to 0.
 
-- (A) x = 3: mids 2, 1, 0 all have a[mid] ≥ 3 → hi = 2, 1, 0 → returns 0. **TRUE.**
-- (B) x = 6: mid 2 (9 ≥ 6) → hi 2; mid 1 (6 ≥ 6) → hi 1; mid 0 (3 < 6) → lo = 0 again with hi = 1 → loops forever. **FALSE.**
-- (C) x = 1: like (A), returns 0. **TRUE.**
+- (A) x = 6: mid 2 (9 ≥ 6) → hi 2; mid 1 (6 ≥ 6) → hi 1; mid 0 (3 < 6) → lo = 0 again with hi = 1 → loops forever. **FALSE.**
+- (B) x = 3: mids 2, 1, 0 all have a[mid] ≥ 3 → hi = 2, 1, 0 → returns 0. **TRUE.**
+- (C) x = 1: like (B), returns 0. **TRUE.**
 - (D) x = 100: lo moves to 2, then 3; with lo = 3, hi = 4, mid = 3 → stuck. **FALSE.**
 
 **Tip:** with `mid = (lo + hi) // 2` (rounding down) the update that keeps mid must be `hi = mid`; the other must be `lo = mid + 1`.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def term(a, x, cap=100):
     lo, hi = 0, len(a) - 1; c = 0
     while lo < hi:
@@ -483,11 +486,11 @@ Option analysis:
             ],
             'options': [
                 'After build-heap, A = [40, 35, 27, 33, 18, 12, 9, 21]',
+                'After the two extraction steps, A[0 … 5] is a valid max-heap and A[6 … 7] holds the two largest keys in increasing order',
                 'After two extraction steps, A = [33, 21, 27, 9, 18, 12, 35, 40]',
                 'Build-heap performs exactly 4 parent–child swaps',
-                'After the two extraction steps, A[0 … 5] is a valid max-heap and A[6 … 7] holds the two largest keys in increasing order',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''Build-heap (sift-down swaps with the larger child):
 
 - i = 3 (40): child 33 is smaller → no swap.
@@ -500,9 +503,9 @@ Extraction 1: swap 40 ↔ 21 → [21, 35, 27, 33, 18, 12, 9 | 40]; sift 21: ↔3
 Extraction 2: swap 35 ↔ 9 → [9, 33, 27, 21, 18, 12 | 35, 40]; sift 9: ↔33, ↔21 → [33, 21, 27, 9, 18, 12 | 35, 40].
 
 - (A) **TRUE.**
-- (B) **TRUE.**
-- (C) Build-heap made **5** swaps (the root's 21 sank three levels). **FALSE.**
-- (D) The heap part [33, 21, 27, 9, 18, 12] satisfies the heap property, and the sorted tail is 35, 40. **TRUE.**
+- (B) The heap part [33, 21, 27, 9, 18, 12] satisfies the heap property, and the sorted tail is 35, 40. **TRUE.**
+- (C) **TRUE.**
+- (D) Build-heap made **5** swaps (the root's 21 sank three levels). **FALSE.**
 
 **Trap:** stopping sift-down after one swap; 21 must keep sinking while a child is larger.''',
             'solution_diagrams': [
@@ -512,7 +515,9 @@ Extraction 2: swap 35 ↔ 9 → [9, 33, 27, 21, 18, 12 | 35, 40]; sift 9: ↔33,
                     'caption': 'Max-heap after build-heap',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 sw = [0]
 def sift(a, i, n):
     while True:
@@ -733,22 +738,22 @@ assert up == 3 and d["T"] == 8 and ANSWER == "C"
             'topic': 'Hashing — deletion with tombstones',
             'text': 'A table with 10 slots uses h(k) = k mod 10 and linear probing. The keys 31, 41, 51, 22, 61 are inserted in that order, and then 41 is deleted by marking its slot DELETED (a tombstone). Searches skip over DELETED slots and stop at an EMPTY slot; an insertion places the key in the first EMPTY **or** DELETED slot on its probe sequence. Which of the following statements is/are TRUE?',
             'options': [
-                'A search for 61 now examines exactly 5 slots',
-                "If 41's slot had been made EMPTY instead of DELETED, a search for 51 would wrongly report that 51 is absent",
                 'Inserting 71 now stores it in slot 2',
                 'A search for 22 now examines exactly 2 slots',
+                'A search for 61 now examines exactly 5 slots',
+                "If 41's slot had been made EMPTY instead of DELETED, a search for 51 would wrongly report that 51 is absent",
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Insertions: 31 → 1; 41 → 1 taken → 2; 51 → 1, 2 taken → 3; 22 → 2, 3 taken → 4; 61 → 1, 2, 3, 4 taken → 5. Then slot 2 (41) becomes DELETED.
 
 Table: 1: 31, 2: DEL, 3: 51, 4: 22, 5: 61, rest EMPTY.
 
-- (A) Search 61: slots 1 (31), 2 (DEL, skip), 3 (51), 4 (22), 5 (61, found) → 5 slots. **TRUE.**
-- (B) Search 51 starts at slot 1 (31) and then reaches slot 2; if it were EMPTY, the search would stop and report “absent” although 51 sits in slot 3. This is exactly why tombstones are needed. **TRUE.**
-- (C) Insert 71: slot 1 occupied, slot 2 DELETED → stored in slot 2 (reusing the tombstone). **TRUE.**
-- (D) Search 22: slots 2 (DEL), 3 (51), 4 (22) → 3 slots, not 2. **FALSE.**
+- (A) Insert 71: slot 1 occupied, slot 2 DELETED → stored in slot 2 (reusing the tombstone). **TRUE.**
+- (B) Search 22: slots 2 (DEL), 3 (51), 4 (22) → 3 slots, not 2. **FALSE.**
+- (C) Search 61: slots 1 (31), 2 (DEL, skip), 3 (51), 4 (22), 5 (61, found) → 5 slots. **TRUE.**
+- (D) Search 51 starts at slot 1 (31) and then reaches slot 2; if it were EMPTY, the search would stop and report “absent” although 51 sits in slot 3. This is exactly why tombstones are needed. **TRUE.**
 
-**Trap:** in (D), forgetting that a tombstone still costs a probe. Tombstones keep searches correct but make them longer — tables with many deletions need periodic rehashing.''',
+**Trap:** in (B), forgetting that a tombstone still costs a probe. Tombstones keep searches correct but make them longer — tables with many deletions need periodic rehashing.''',
             'solution_diagrams': [
                 {
                     'type': 'hashtable',
@@ -763,7 +768,9 @@ Table: 1: 31, 2: DEL, 3: 51, 4: 22, 5: 61, rest EMPTY.
                     'caption': 'Table after deleting 41',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 EMPTY, DEL = None, "DEL"
 T = [EMPTY] * 10
 def ins(k):
@@ -847,23 +854,26 @@ assert first3 == sorted([(2,1,4,5),(2,1,5,4),(2,4,1,5),(2,4,5,1),(2,5,4,1),
                 },
             ],
             'options': [
+                'For a list with a single node, `f(h, 1)` raises an AttributeError',
+                'For the list shown, `f(h, 8)` returns the list 3 → 4 → 5 → 6 → 1 → 2',
                 'For the list shown, `f(h, 2)` returns the list 5 → 6 → 1 → 2 → 3 → 4',
                 'For the list shown, `f(h, 2)` executes the statement `prev, cur = cur, cur.nxt` exactly 12 times',
-                'For the list shown, `f(h, 8)` returns the list 3 → 4 → 5 → 6 → 1 → 2',
-                'For a list with a single node, `f(h, 1)` raises an AttributeError',
             ],
-            'answer': ['A', 'D'],
+            'answer': ['A', 'C'],
             'solution': '''Each iteration walks to the last node (keeping its predecessor), detaches it and makes it the new head: one **right rotation** by one position. k iterations rotate right by k.
 
-- (A) Two right rotations of 1…6: 6 1 2 3 4 5 → 5 6 1 2 3 4. **TRUE.**
-- (B) In each iteration the inner loop advances from the head to the last node: n − 1 = 5 steps. Two iterations → 10, not 12. **FALSE.**
-- (C) 8 right rotations of a 6-node list = 8 mod 6 = 2 rotations → 5 6 1 2 3 4. The stated list (3 4 5 6 1 2) is the result of rotating **left** by 2. **FALSE.**
-- (D) With one node, the while-loop body never runs, so `prev` stays None and `prev.nxt = None` raises AttributeError ('NoneType' object has no attribute 'nxt'). **TRUE.**
+- (A) With one node, the while-loop body never runs, so `prev` stays None and `prev.nxt = None` raises AttributeError ('NoneType' object has no attribute 'nxt'). **TRUE.**
+- (B) 8 right rotations of a 6-node list = 8 mod 6 = 2 rotations → 5 6 1 2 3 4. The stated list (3 4 5 6 1 2) is the result of rotating **left** by 2. **FALSE.**
+- (C) Two right rotations of 1…6: 6 1 2 3 4 5 → 5 6 1 2 3 4. **TRUE.**
+- (D) In each iteration the inner loop advances from the head to the last node: n − 1 = 5 steps. Two iterations → 10, not 12. **FALSE.**
 
 Cost: Θ(nk) overall. A better approach computes k mod n, finds the new tail in one pass and re-links in O(n).
 
-**Trap:** confusing a right rotation (tail to front) with a left rotation (head to back) in (C).''',
-            'verify': '''
+**Trap:** confusing a right rotation (tail to front) with a left rotation (head to back) in (B).''',
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class Nd:
     def __init__(s, v, n=None): s.v, s.nxt = v, n
 def mk(xs):

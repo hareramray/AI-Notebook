@@ -111,10 +111,10 @@ Full output: `fin try 2` → option **(D)**.
 a = C(1)
 b = C(2)''',
             'options': [
-                '`a.items is b.items` evaluates to `True`',
                 '`C.count == 0` evaluates to `True`',
-                '`a.count == 2` evaluates to `True`',
                 'After executing `a.items = [9]`, the expression `len(b.items) == 2` is `True`',
+                '`a.count == 2` evaluates to `True`',
+                '`a.items is b.items` evaluates to `True`',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''Attribute *lookup* searches the instance, then the class; attribute *assignment* (`self.x = …`, including augmented `self.x += …`) always writes to the instance.
@@ -123,13 +123,15 @@ b = C(2)''',
 - `self.count += 1` means `self.count = self.count + 1`: it reads `C.count` (0) and **creates an instance attribute** `count = 1`. The class attribute stays 0.
 
 Statements:
-- (A) Both names resolve to the class list. **True.**
-- (B) The class's `count` was never reassigned. **True.**
+- (A) The class's `count` was never reassigned. **True.**
+- (B) `a.items = [9]` creates an instance attribute on `a` only; `b.items` is still the class list `[1, 2]`. **True.**
 - (C) Each instance has its own `count == 1`. **False.**
-- (D) `a.items = [9]` creates an instance attribute on `a` only; `b.items` is still the class list `[1, 2]`. **True.**
+- (D) Both names resolve to the class list. **True.**
 
 **Trap:** treating `+=` on an immutable class attribute like `append` on a mutable one — the former rebinds on the instance, the latter mutates the shared object.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 r = {'A': a.items is b.items, 'B': C.count == 0, 'C': a.count == 2}
 a.items = [9]
 r['D'] = len(b.items) == 2
@@ -372,21 +374,23 @@ print(r, len(log))''',
                 },
             ],
             'options': [
+                'A, B, D, E, G, C, F',
                 'A, B, D, G, E, C, F',
                 'A, C, F, E, G, B, D',
-                'A, B, D, E, G, C, F',
                 'A, C, E, F, G, B, D',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'C'],
             'solution': '''In DFS, after visiting v the search must explore **all** vertices reachable from v through unvisited vertices before backtracking. So in a valid order, the vertex after v must be an unvisited out-neighbour of v if one exists; otherwise of the nearest ancestor that still has one.
 
-- (A) A→B→D→G (G has no out-edges; D done) → back to B → E (G already seen) → back to A → C → F (E seen). **Possible.**
-- (B) A→C→F→E→G → back to C (E seen) → back to A → B → D (G seen). **Possible.**
-- (C) After D, its out-neighbour G is still unvisited, so G must be next; jumping to E is **impossible.**
+- (A) After D, its out-neighbour G is still unvisited, so G must be next; jumping to E is **impossible.**
+- (B) A→B→D→G (G has no out-edges; D done) → back to B → E (G already seen) → back to A → C → F (E seen). **Possible.**
+- (C) A→C→F→E→G → back to C (E seen) → back to A → B → D (G seen). **Possible.**
 - (D) After E, G is an unvisited out-neighbour of E, so G must come before backtracking to C for F. **Impossible.**
 
 **Trap:** treating DFS like 'any order that respects edges'. The rule is stricter: you can only move to a neighbour of the *current* vertex or backtrack.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'A':'BC','B':'DE','C':'EF','D':'G','E':'G','F':'E','G':''}
 def all_dfs(u, seen):
     seen = seen | {u}
@@ -500,24 +504,25 @@ class C(A):
 class D(B, C):
     pass''',
             'options': [
-                'The method resolution order of D is D, B, C, A, object',
                 '`D().f()` returns 222',
+                'The method resolution order of D is D, B, C, A, object',
                 '`D().v` equals 1, because `C` has no `__init__` and so `A.__init__` is called last and resets v',
                 '`B().f()` returns 22',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''Python linearises the class hierarchy with **C3**; `super()` means 'the next class after the current one in the MRO of the *instance's* class', not 'my parent'.
 
-- (A) D(B, C) with B(A), C(A): MRO = D, B, C, A, object. **True.**
+- (B) D(B, C) with B(A), C(A): MRO = D, B, C, A, object. **True.**
 
-- (B) `D()` runs `B.__init__` (first in MRO with `__init__`). Its `super()` → next after B in D's MRO is C; C has no `__init__`, so lookup continues to A → v = 1. Back in B: v += 10 → v = 11. `D().f()` → `B.f` → `2 * super().f()`; super of B in D's MRO is **C**, so `C.f` returns 11 + 100 = 111 → result 222. **True.**
+- (A) `D()` runs `B.__init__` (first in MRO with `__init__`). Its `super()` → next after B in D's MRO is C; C has no `__init__`, so lookup continues to A → v = 1. Back in B: v += 10 → v = 11. `D().f()` → `B.f` → `2 * super().f()`; super of B in D's MRO is **C**, so `C.f` returns 11 + 100 = 111 → result 222. **True.**
 
 - (C) As traced, `A.__init__` runs *inside* `B.__init__`, before `+= 10`; v = 11. **False.**
 
 - (D) For a plain `B()`, the MRO is B, A, object: v = 1 + 10 = 11, `B.f` → 2 × `A.f()` = 22. **True.**
 
 **Trap:** assuming `super().f()` inside B always calls `A.f`. In a diamond, the same line of code dispatches to `C.f` for a D instance but to `A.f` for a B instance — so `D().f()` is 222, not 22.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 truth = {'A': [k.__name__ for k in D.__mro__] == ['D','B','C','A','object'],
          'B': D().f() == 222, 'C': D().v == 1, 'D': B().f() == 22}
 assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)
@@ -547,11 +552,11 @@ assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)
     return log''',
             'options': [
                 '`len(risky(4))` is 9',
-                "`risky(6)` ends with `'E'`",
-                "`risky(6).count('f')` is 5",
                 '`-2` appears in both `risky(4)` and `risky(6)`',
+                "`risky(6).count('f')` is 5",
+                "`risky(6)` ends with `'E'`",
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''Key rules: (1) `finally` runs whenever control leaves the `try` — normally, via `continue`, via `break`, or via an exception; (2) a loop's `else` runs only if the loop ends **without** `break`.
 
 `risky(4)` (i = 0..3):
@@ -566,12 +571,13 @@ assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)
 → [0, 'f', 1, 'f', −2, 'f', 3, 'f', 'f'] — five 'f'.
 
 - (A) 9 items. **True.**
-- (B) ends with 'f', not 'E'. **False.**
+- (B) −2 is logged at i = 2 in both calls. **True.**
 - (C) five 'f' entries (i = 0..4). **True.**
-- (D) −2 is logged at i = 2 in both calls. **True.**
+- (D) ends with 'f', not 'E'. **False.**
 
 **Trap:** thinking `break`/`continue` skip `finally`, or that loop-`else` means 'runs if the loop body never executed'.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 r4, r6 = risky(4), risky(6)
 truth = {'A': len(r4) == 9, 'B': r6[-1] == 'E', 'C': r6.count('f') == 5,
          'D': -2 in r4 and -2 in r6}
@@ -809,10 +815,10 @@ Compare: the worst case for n = 9 is 9·8/2 = 36 (already sorted input); the bes
                 },
             ],
             'options': [
-                'The shortest distance from P to V is 10',
+                'If the weight of edge P→Q were reduced from 6 to 4, the shortest distance to U would decrease by exactly 1',
                 'Vertices are extracted from the priority queue in the order P, R, Q, S, U, V',
                 'In the shortest-path tree, the parent of V is R',
-                'If the weight of edge P→Q were reduced from 6 to 4, the shortest distance to U would decrease by exactly 1',
+                'The shortest distance from P to V is 10',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''Dijkstra settles vertices in non-decreasing order of distance.
@@ -824,12 +830,12 @@ Compare: the worst case for n = 9 is 9·8/2 = 36 (already sorted input); the bes
 - Extract U (8): V = min(11, 10) = 10.
 - Extract V (10).
 
-- (A) d(V) = 10 via P→R→Q→S→U→V. **True.**
+- (A) With P→Q = 4: Q = min(4, 5) = 4, S = 6, U = 7 (was 8) → decrease of exactly 1. **True.**
 - (B) Extraction order P, R, Q, S, U, V. **True.**
 - (C) V's final distance comes from U (8 + 2), so its parent is **U**; the edge R→V gave only the temporary value 11. **False.**
-- (D) With P→Q = 4: Q = min(4, 5) = 4, S = 6, U = 7 (was 8) → decrease of exactly 1. **True.**
+- (D) d(V) = 10 via P→R→Q→S→U→V. **True.**
 
-**Trap:** in (D) it is tempting to say 'decrease by 2' because the edge got 2 cheaper — but the old best route to Q (via R, cost 5) was already 1 cheaper than the direct edge, so the saving is only 1.''',
+**Trap:** in (A) it is tempting to say 'decrease by 2' because the edge got 2 cheaper — but the old best route to Q (via R, cost 5) was already 1 cheaper than the direct edge, so the saving is only 1.''',
             'solution_diagrams': [
                 {
                     'type': 'graph',
@@ -865,7 +871,8 @@ Compare: the worst case for n = 9 is 9·8/2 = 36 (already sorted input); the bes
                     'caption': 'Shortest-path tree from P',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 def dij(E):
     G = {}

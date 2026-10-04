@@ -102,21 +102,23 @@ Output `[6, 5] [1, 4, 3, 7, 8, 2]` → (D).
                 },
             ],
             'options': [
-                '`p.prev.next = p.next; p.next.prev = p.prev`',
-                '`p.next.prev = p.prev; p.prev.next = p.next`',
                 '`p.prev.next = p.next; p.prev.next.prev = p.prev`',
+                '`p.next.prev = p.prev; p.prev.next = p.next`',
                 '`p.prev = p.next; p.next.prev = p.prev`',
+                '`p.prev.next = p.next; p.next.prev = p.prev`',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** Unlinking p needs two updates: x.next = y and y.prev = x, where x = p.prev and y = p.next. Order does not matter as long as each right-hand side still refers to the intended node at the time it is evaluated.
 
-- (A) x.next = y; y.prev = x. **Correct.**
+- (A) After the first statement, `p.prev.next` *is* y, so `p.prev.next.prev = p.prev` sets y.prev = x. **Correct** (just an indirect way to reach y).
 - (B) The same two assignments in the other order; p’s own fields are untouched, so both still refer to x and y. **Correct.**
-- (C) After the first statement, `p.prev.next` *is* y, so `p.prev.next.prev = p.prev` sets y.prev = x. **Correct** (just an indirect way to reach y).
-- (D) The first statement overwrites p.prev with y; the second sets y.prev = p.prev = y (a self-loop) and x.next still points to p. **Wrong.**
+- (C) The first statement overwrites p.prev with y; the second sets y.prev = p.prev = y (a self-loop) and x.next still points to p. **Wrong.**
+- (D) x.next = y; y.prev = x. **Correct.**
 
-**Trap:** modifying p’s *own* pointers before using them — as in (D) — loses the reference to a neighbour.''',
-            'verify': '''
+**Trap:** modifying p’s *own* pointers before using them — as in (C) — loses the reference to a neighbour.''',
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class N:
     def __init__(s, v): s.v, s.prev, s.next = v, None, None
 def make():
@@ -266,21 +268,24 @@ assert probes(52) + probes(72) == int(ANSWER)
             'topic': 'Elementary sorts on a reversed array',
             'text': 'The array 6, 5, 4, 3, 2, 1 is sorted into ascending order. Selection sort swaps only when the minimum is not already in place; bubble sort and insertion sort are the standard versions (insertion sort compares `A[j] > key` while j ≥ 0). Which of the following statements is/are TRUE?',
             'options': [
-                'Selection sort performs exactly 3 swaps',
                 'Bubble sort performs exactly 15 swaps',
                 'Insertion sort performs exactly 20 key comparisons',
                 'Selection sort performs exactly 15 key comparisons',
+                'Selection sort performs exactly 3 swaps',
             ],
-            'answer': ['A', 'B', 'D'],
-            'solution': '''- (A) Pass 0 swaps 6↔1 → 1 5 4 3 2 6; pass 1 swaps 5↔2 → 1 2 4 3 5 6; pass 2 swaps 4↔3 → sorted; passes 3 and 4 find the minimum already in place. **3 swaps — TRUE.**
-- (B) Every adjacent swap removes exactly one inversion; a reversed array of 6 has 6·5/2 = **15** inversions. **TRUE.**
-- (C) Each key 5, 4, 3, 2, 1 travels to index 0, comparing with every element to its left and then stopping because j < 0 (no extra comparison): 1 + 2 + 3 + 4 + 5 = **15**, not 20. **FALSE.**
-- (D) Selection sort always compares n(n−1)/2 = 15 times, whatever the input. **TRUE.**
+            'answer': ['A', 'C', 'D'],
+            'solution': '''- (A) Every adjacent swap removes exactly one inversion; a reversed array of 6 has 6·5/2 = **15** inversions. **TRUE.**
+- (B) Each key 5, 4, 3, 2, 1 travels to index 0, comparing with every element to its left and then stopping because j < 0 (no extra comparison): 1 + 2 + 3 + 4 + 5 = **15**, not 20. **FALSE.**
+- (C) Selection sort always compares n(n−1)/2 = 15 times, whatever the input. **TRUE.**
+- (D) Pass 0 swaps 6↔1 → 1 5 4 3 2 6; pass 1 swaps 5↔2 → 1 2 4 3 5 6; pass 2 swaps 4↔3 → sorted; passes 3 and 4 find the minimum already in place. **3 swaps — TRUE.**
 
 **Tip:** for reversed input, selection sort does ⌊n/2⌋ swaps because each swap fixes *two* positions at once.
 
-**Trap:** in (C), adding a “failing” comparison per pass — it never happens when the key reaches index 0.''',
-            'verify': '''
+**Trap:** in (B), adding a “failing” comparison per pass — it never happens when the key reaches index 0.''',
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [6, 5, 4, 3, 2, 1]
 a = A[:]; ss = sc = 0
 for i in range(5):
@@ -503,20 +508,20 @@ Sum = −1 + 10 + 99 + 2 = **110**.
                 },
             ],
             'options': [
-                'The left child of the root is 36',
                 '36 is the left child of 40',
+                'The left child of the root is 36',
                 'The height of the tree is 3',
                 'The pre-order traversal is 50, 33, 14, 40, 36, 45, 80, 62, 58, 70, 90, 95',
             ],
-            'answer': ['B', 'C', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept.** The in-order successor of a node with two children is the leftmost node of its right subtree; it has no left child, so removing it is a one-child (or leaf) deletion.
 
 **Delete 28:** right subtree is rooted at 40; its leftmost node is **33** (33 has a right child 36). Copy 33 into the node of 28, then remove the old 33 by linking its child 36 to 40’s left. Left subtree becomes 33 → (14, 40), 40 → (36, 45).
 
 **Delete 75:** successor = leftmost of the subtree at 90 = **80** (a leaf). Copy 80 up and remove the leaf. Right subtree becomes 80 → (62, 90), 62 → (58, 70), 90 → (–, 95).
 
-- (A) The root’s left child is 33, not 36 (36 would be the answer only if we had promoted the successor’s *child*). **FALSE.**
-- (B) 36 now hangs from 40 as its left child. **TRUE.**
+- (A) 36 now hangs from 40 as its left child. **TRUE.**
+- (B) The root’s left child is 33, not 36 (36 would be the answer only if we had promoted the successor’s *child*). **FALSE.**
 - (C) Longest paths, e.g. 50→33→40→36, have 3 edges (before the deletions the height was 4 via 28→40→33→36). **TRUE.**
 - (D) Pre-order: 50, 33, 14, 40, 36, 45, 80, 62, 58, 70, 90, 95. **TRUE.**
 
@@ -553,7 +558,8 @@ Sum = −1 + 10 + 99 + 2 = **110**.
                     'caption': 'After deleting 28 and 75',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins(t, k):
     if t is None: return [k, None, None]
     i = 1 if k < t[0] else 2; t[i] = ins(t[i], k); return t
@@ -787,17 +793,20 @@ assert sum(d.values()) == int(ANSWER)
                     },
                 },
             ],
-            'options': ['A B E G F C D', 'A B E C D F G', 'A D F G C E B', 'A C E B G F D'],
-            'answer': ['A', 'D'],
+            'options': ['A B E C D F G', 'A C E B G F D', 'A B E G F C D', 'A D F G C E B'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept.** In DFS, the next discovered vertex must be an unvisited neighbour of the **deepest** vertex on the current path that still has unvisited neighbours (backtracking only when the current vertex is exhausted).
 
-- (A) A→B→E→G→F (G–F) → C (F–C) → D: at C, its neighbours A, E, F are visited, so backtrack to F, whose unvisited neighbour D is next. **Valid.**
-- (B) A→B→E→C; now C still has an unvisited neighbour F, so the next vertex must be F — D is not adjacent to C. **Invalid.**
-- (C) A→D→F→G; G’s unvisited neighbour E must come next, but C is not adjacent to G. **Invalid.**
-- (D) A→C→E→B; B is exhausted → back to E → G → F (G–F) → D (F–D). **Valid.**
+- (A) A→B→E→C; now C still has an unvisited neighbour F, so the next vertex must be F — D is not adjacent to C. **Invalid.**
+- (B) A→C→E→B; B is exhausted → back to E → G → F (G–F) → D (F–D). **Valid.**
+- (C) A→B→E→G→F (G–F) → C (F–C) → D: at C, its neighbours A, E, F are visited, so backtrack to F, whose unvisited neighbour D is next. **Valid.**
+- (D) A→D→F→G; G’s unvisited neighbour E must come next, but C is not adjacent to G. **Invalid.**
 
-**Trap:** checking only that each vertex is adjacent to *some* earlier vertex — that is the condition for a valid *BFS-like or arbitrary-search* order, not for DFS. The backtracking rule is what (B) and (C) violate.''',
-            'verify': '''
+**Trap:** checking only that each vertex is adjacent to *some* earlier vertex — that is the condition for a valid *BFS-like or arbitrary-search* order, not for DFS. The backtracking rule is what (A) and (D) violate.''',
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'A':'BCD','B':'AE','C':'AEF','D':'AF','E':'BCG','F':'CDG','G':'EF'}
 def valid(order):
     order = order.split()
@@ -914,12 +923,12 @@ Output `3 2 1 6 5 4 7 8` → (C).
             'topic': 'Hashing — linear probing analysis',
             'text': 'Keys 8, 19, 13, 2, 25, 30, 6 are inserted in this order into an empty hash table with 11 slots (0–10) using h(k) = (2k + 3) mod 11 and linear probing (step +1, wrapping around). A *probe* is one slot examination; a successful first examination counts as 1 probe. Which of the following statements is/are TRUE?',
             'options': [
-                'Key 30 is stored in slot 1',
                 'The total number of probes over all seven insertions is 16',
                 'The longest run of consecutive occupied slots (with wrap-around) has length 6',
                 'If key 41 is inserted next, it is stored in slot 3',
+                'Key 30 is stored in slot 1',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept.** Compute the home slot, then step +1 mod 11 until an empty slot is found.
 
 - 8: (16+3) mod 11 = 8 → slot 8 (1 probe).
@@ -932,10 +941,10 @@ Output `3 2 1 6 5 4 7 8` → (C).
 
 Final table: 0:25, 1:30, 4:6, 7:13, 8:8, 9:19, 10:2.
 
-- (A) 30 is in slot 1. **TRUE.**
-- (B) Probes = 1+2+1+4+3+5+1 = **17**, not 16. **FALSE.**
-- (C) Slots 7, 8, 9, 10, 0, 1 form one wrapped cluster of length **6**. **TRUE.**
-- (D) h(41) = 85 mod 11 = 8 → 8, 9, 10, 0, 1 full → slot **2**, not 3. **FALSE.**
+- (A) Probes = 1+2+1+4+3+5+1 = **17**, not 16. **FALSE.**
+- (B) Slots 7, 8, 9, 10, 0, 1 form one wrapped cluster of length **6**. **TRUE.**
+- (C) h(41) = 85 mod 11 = 8 → 8, 9, 10, 0, 1 full → slot **2**, not 3. **FALSE.**
+- (D) 30 is in slot 1. **TRUE.**
 
 **Trap:** forgetting wrap-around — the cluster 7..10 continues into 0..1, which is exactly why 30 and 41 travel so far (primary clustering).''',
             'solution_diagrams': [
@@ -954,7 +963,10 @@ Final table: 0:25, 1:30, 4:6, 7:13, 8:8, 9:19, 10:2.
                     'caption': 'Final table',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 T = [None] * 11; tot = 0
 def put(k):
     global tot

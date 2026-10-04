@@ -152,20 +152,22 @@ assert A == [4, 1, 2, 6, 9, 11, 14, 6, 8] and r == 3 and ANSWER == "A"
                     'caption': 'Array after the first partition',
                 },
             ],
-            'options': ['9', '12', '18', '7'],
-            'answer': ['A', 'C'],
+            'options': ['9', '18', '7', '12'],
+            'answer': ['A', 'B'],
             'solution': '''**Concept:** after partitioning, the pivot is in its final place: every element to its left is smaller and every element to its right is larger. So x at index i is a candidate iff max(a[0..i−1]) < x < min(a[i+1..n−1]).
 
 Prefix maxima / suffix minima check:
 - (A) 9 at index 4: left {4, 2, 7, 5}, max 7 < 9; right {12, 10, 15, 13, 18}, min 10 > 9. **Possible.**
-- (B) 12 at index 5: right part contains 10 < 12. **Not possible.**
-- (C) 18 at index 9 (last): everything to its left is smaller and the right side is empty. **Possible** (e.g. Lomuto with the maximum as pivot).
-- (D) 7 at index 2: right part contains 5 < 7. **Not possible.**
+- (B) 18 at index 9 (last): everything to its left is smaller and the right side is empty. **Possible** (e.g. Lomuto with the maximum as pivot).
+- (C) 7 at index 2: right part contains 5 < 7. **Not possible.**
+- (D) 12 at index 5: right part contains 10 < 12. **Not possible.**
 
 Also 4, 2, 5, 15, 10, 13 fail; only 9 and 18 qualify.
 
 **Trap:** forgetting that a pivot can sit at an end of the array — an extreme pivot gives an empty side, which is exactly the worst case of quicksort.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 B = [4, 2, 7, 5, 9, 12, 10, 15, 13, 18]
 ok = {x for i, x in enumerate(B)
       if all(y < x for y in B[:i]) and all(y > x for y in B[i+1:])}
@@ -462,21 +464,23 @@ assert ", ".join(seen) == "A, B, E, F, C, G, D, H" and ANSWER == "A"
             'topic': 'Graph theory — graphical degree sequences',
             'text': 'Which of the following sequences is/are the degree sequence of some **simple** undirected graph (no self-loops, no multi-edges)?',
             'options': [
-                '(3, 3, 3, 3, 2, 2)',
                 '(5, 5, 4, 3, 2, 1)',
-                '(6, 2, 2, 2, 2, 2, 2)',
                 '(4, 4, 3, 2, 1, 0)',
+                '(6, 2, 2, 2, 2, 2, 2)',
+                '(3, 3, 3, 3, 2, 2)',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''**Concept:** the degree sum must be even (handshaking lemma), and the Havel–Hakimi test applies: remove the largest degree d and subtract 1 from the next d largest; the sequence is graphical iff this ends in all zeros.
 
-- (A) sum 16. HH: 3,3,3,3,2,2 → 2,2,2,2,2 → 1,1,2,2 → sort 2,2,1,1 → 1,0,1 → sort 1,1,0 → 0,0. **Graphical** (e.g. a 6-cycle plus two chords).
-- (B) sum 20 (even), but on 6 vertices two vertices of degree 5 are adjacent to *all* others, so every vertex has degree ≥ 2 — the 1 is impossible. **Not graphical.**
+- (A) sum 20 (even), but on 6 vertices two vertices of degree 5 are adjacent to *all* others, so every vertex has degree ≥ 2 — the 1 is impossible. **Not graphical.**
+- (B) drop the isolated vertex: (4, 4, 3, 2, 1) on 5 vertices; two degree-4 vertices force every other degree ≥ 2, contradicting the 1. **Not graphical.**
 - (C) sum 18. The degree-6 vertex is adjacent to all six others; each of those needs one more edge among themselves — a perfect matching on 6 vertices works. **Graphical.**
-- (D) drop the isolated vertex: (4, 4, 3, 2, 1) on 5 vertices; two degree-4 vertices force every other degree ≥ 2, contradicting the 1. **Not graphical.**
+- (D) sum 16. HH: 3,3,3,3,2,2 → 2,2,2,2,2 → 1,1,2,2 → sort 2,2,1,1 → 1,0,1 → sort 1,1,0 → 0,0. **Graphical** (e.g. a 6-cycle plus two chords).
 
-**Trap:** an even sum is necessary but not sufficient — (B) passes the parity test.''',
-            'verify': '''
+**Trap:** an even sum is necessary but not sufficient — (A) passes the parity test.''',
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def hh(d):
     d = sorted(d, reverse=True)
     while d and d[0] > 0:
@@ -590,21 +594,23 @@ assert A == sorted(A) and cmp == int(ANSWER)
             'topic': 'Quicksort — best/worst case and recurrences',
             'text': 'Which of the following statements is/are TRUE?',
             'options': [
-                'If every partition step splits its subarray in the ratio 1 : 9, quicksort runs in Θ(n log n) time',
                 'If the pivot is always the second-smallest element of its subarray, quicksort runs in Θ(n log n) time',
                 'Quicksort with the Lomuto partition (pivot = last, test `a[j] <= x`) makes exactly n(n − 1)/2 comparisons on an array of n equal keys',
+                'If every partition step splits its subarray in the ratio 1 : 9, quicksort runs in Θ(n log n) time',
                 'The recurrence T(n) = 2T(n/2) + c, T(1) = c, solves to Θ(n log n)',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept:** quicksort's cost depends on the *depth* of the recursion tree. Any constant-fraction split gives O(log n) depth and Θ(n) work per level; a split that removes only a constant number of elements gives Θ(n) depth.
 
-- (A) T(n) = T(n/10) + T(9n/10) + Θ(n). Every level of the recursion tree does at most cn work and the depth is log_{10/9} n = Θ(log n); the first log₁₀ n levels are full, so the total is Θ(n log n). **True.**
-- (B) Each partition removes the pivot and one element to its left: T(n) = T(n − 2) + T(1) + Θ(n) → Θ(n²). **False.**
-- (C) With all keys equal, `a[j] <= x` is always true, so the pivot lands at `hi` every time; subproblem sizes are n, n − 1, …, 2 with n − 1, n − 2, …, 1 comparisons — total n(n − 1)/2. **True.** (Hoare's scheme or three-way partitioning avoid this.)
+- (A) Each partition removes the pivot and one element to its left: T(n) = T(n − 2) + T(1) + Θ(n) → Θ(n²). **False.**
+- (B) With all keys equal, `a[j] <= x` is always true, so the pivot lands at `hi` every time; subproblem sizes are n, n − 1, …, 2 with n − 1, n − 2, …, 1 comparisons — total n(n − 1)/2. **True.** (Hoare's scheme or three-way partitioning avoid this.)
+- (C) T(n) = T(n/10) + T(9n/10) + Θ(n). Every level of the recursion tree does at most cn work and the depth is log_{10/9} n = Θ(log n); the first log₁₀ n levels are full, so the total is Θ(n log n). **True.**
 - (D) Master theorem: a = 2, b = 2, n^{log₂2} = n dominates f(n) = c → Θ(n). Exactly, T(n) = (2n − 1)c for n a power of 2. **False.**
 
-**Trap:** (B) 'looks' like a non-extreme pivot, but a split of (1, n − 2) is just as bad as (0, n − 1) asymptotically.''',
-            'verify': '''
+**Trap:** (A) 'looks' like a non-extreme pivot, but a split of (1, n − 2) is just as bad as (0, n − 1) asymptotically.''',
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import sys
 sys.setrecursionlimit(10000)
 from functools import lru_cache
@@ -851,12 +857,12 @@ assert ms([6, 2, 9, 4, 1, 8, 3, 7]) == [1, 2, 3, 4, 6, 7, 8, 9] and c == int(ANS
                 },
             ],
             'options': [
-                'The vertices are extracted (finalised) in the order S, B, A, D, C, T',
                 'The shortest-path distance from S to T is 11',
                 'There are exactly two distinct shortest paths from S to C',
+                'The vertices are extracted (finalised) in the order S, B, A, D, C, T',
                 'In the shortest-path tree produced, the parent of C is D',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'C'],
             'solution': '''**Concept:** Dijkstra finalises vertices in non-decreasing order of distance. Ties in path length do not change distances, but with strict updates the *first* vertex that achieves the best value stays as predecessor.
 
 Trace:
@@ -868,12 +874,12 @@ Trace:
 - Extract T (11).
 
 **Verdicts:**
-- (A) Order S, B, A, D, C, T. **True.**
-- (B) d(T) = 11 (S–B–A–C–T). **True.**
-- (C) Shortest S–C paths of length 8: S–B–A–C (1 + 2 + 5), S–B–D–C (1 + 6 + 1) and S–B–A–D–C (1 + 2 + 4 + 1) — **three**, not two. **False.**
+- (A) d(T) = 11 (S–B–A–C–T). **True.**
+- (B) Shortest S–C paths of length 8: S–B–A–C (1 + 2 + 5), S–B–D–C (1 + 6 + 1) and S–B–A–D–C (1 + 2 + 4 + 1) — **three**, not two. **False.**
+- (C) Order S, B, A, D, C, T. **True.**
 - (D) C's parent is A, because D offered only an equal distance. **False.**
 
-**Trap:** missing the path through the diagonal A–D in (C); and in (D) assuming the *last* equal offer wins.''',
+**Trap:** missing the path through the diagonal A–D in (B); and in (D) assuming the *last* equal offer wins.''',
             'solution_diagrams': [
                 {
                     'type': 'graph',
@@ -908,7 +914,9 @@ Trace:
                     'caption': 'Shortest-path tree produced (strict updates)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 E = [('S','A',4),('S','B',1),('A','B',2),('A','C',5),('B','D',6),('C','D',1),
      ('C','T',3),('D','T',6),('A','D',4)]
@@ -1067,12 +1075,12 @@ assert a == sorted(a) and opts["ABCD".index(ANSWER)] == (comps, shifts)
                 },
             ],
             'options': [
-                'There are exactly 8 shortest S–T paths',
                 'Every shortest S–T path passes through E',
+                'There are exactly 8 shortest S–T paths',
                 'Exactly 4 shortest S–T paths pass through D',
                 'In the BFS tree, the parent of T is F',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept:** in BFS, the number of shortest paths to v is the sum of the counts of its neighbours one level closer: σ(v) = Σ σ(u) over edges u–v with dist(u) = dist(v) − 1.
 
 Levels and counts σ:
@@ -1083,8 +1091,8 @@ Levels and counts σ:
 - level 4: T ← F, G, H (σ = 4 + 2 + 2 = **8**)
 
 **Verdicts:**
-- (A) **True** — 8 shortest paths of length 4.
-- (B) **False** — paths through D (e.g. S–A–D–G–T) avoid E.
+- (A) **False** — paths through D (e.g. S–A–D–G–T) avoid E.
+- (B) **True** — 8 shortest paths of length 4.
 - (C) Paths through D = σ(D) × (shortest D→T paths) = 2 × 2 (via F or G) = 4. **True.** (D and E are on the same level, so no shortest path uses both; the other 4 go through E.)
 - (D) Level-3 vertices are dequeued in the order F, G, H (F was discovered first, by D); F is the first to see T. **True.**
 
@@ -1104,7 +1112,8 @@ Levels and counts σ:
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from collections import deque
 E = [('S','A'),('S','B'),('S','C'),('A','D'),('B','D'),('B','E'),('C','E'),('D','F'),
      ('E','F'),('D','G'),('F','T'),('G','T'),('E','H'),('H','T')]

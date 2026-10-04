@@ -266,20 +266,20 @@ assert (f, r, Q[f]) == (3, 2, 'd') and ANSWER == 'A'
                 },
             ],
             'options': [
-                'The in-order successor of 35 is 45',
+                'T has exactly 4 leaves',
                 'The height of T is 4',
                 'If 22 is deleted by replacing it with its in-order successor, 26 becomes the left child of 45',
-                'T has exactly 4 leaves',
+                'The in-order successor of 35 is 45',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''In a BST the in-order successor of a node with no right child is the nearest ancestor of which the node lies in the *left* subtree.
 
-- (A) 35 has no right child. Walking up: 35 is the right child of 30, 30 is the right child of 22, 22 is the **left** child of 45 → successor = 45. **True.**
+- (A) Leaves are 11, 26, 35, 60, 89 → 5 leaves. **False.**
 - (B) Longest paths: 45→22→30→26, 45→22→30→35, 45→67→56→60 — each has 3 edges. Height = 3, not 4. **False.**
 - (C) 22 has two children; its successor is the minimum of its right subtree (rooted at 30) = 26. 26 replaces 22, so 26 becomes the left child of 45. **True.**
-- (D) Leaves are 11, 26, 35, 60, 89 → 5 leaves. **False.**
+- (D) 35 has no right child. Walking up: 35 is the right child of 30, 30 is the right child of 22, 22 is the **left** child of 45 → successor = 45. **True.**
 
-**Trap:** in (D) it is easy to miss 60, which hangs as the *right* child of 56 and makes 56 an internal node.''',
+**Trap:** in (A) it is easy to miss 60, which hangs as the *right* child of 56 and makes 56 an internal node.''',
             'solution_diagrams': [
                 {
                     'type': 'bintree',
@@ -308,7 +308,8 @@ assert (f, r, Q[f]) == (3, 2, 'd') and ANSWER == 'A'
                     'caption': 'T after deleting 22 (successor 26 moved up)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins(t, k):
     if t is None: return [k, None, None]
     if k < t[0]: t[1] = ins(t[1], k)
@@ -502,16 +503,16 @@ Final list 23 → 15 → 4, printed as `[23, 15, 4]` → option **(B)**.
                     },
                 },
             ],
-            'options': ['P, Q, R, S, T, U', 'P, R, Q, T, S, U', 'P, Q, R, T, S, U', 'P, R, S, Q, T, U'],
-            'answer': ['A', 'B'],
+            'options': ['P, R, S, Q, T, U', 'P, R, Q, T, S, U', 'P, Q, R, T, S, U', 'P, Q, R, S, T, U'],
+            'answer': ['B', 'D'],
             'solution': '''BFS visits vertices level by level, and *within* a level the order is fixed by the order in which their parents were dequeued.
 
 Levels from P: L1 = {Q, R}, L2 = {S, T}, L3 = {U}.
 
-- (A) Q first: Q enqueues S; then R enqueues T (S already seen). Order P Q R S T U. **Possible.**
+- (A) S is at level 2 but appears before Q (level 1). **Impossible.**
 - (B) R first: R enqueues T then S (any order allowed); Q adds nothing new. Order P R Q T S U. **Possible.**
 - (C) Q is dequeued before R, so S (discovered by Q) must precede T (discovered only by R). T before S is **impossible.**
-- (D) S is at level 2 but appears before Q (level 1). **Impossible.**
+- (D) Q first: Q enqueues S; then R enqueues T (S already seen). Order P Q R S T U. **Possible.**
 
 **Trap:** checking only the level sets. A sequence can respect levels yet violate the FIFO parent order, as in (C).''',
             'solution_diagrams': [
@@ -546,7 +547,8 @@ Levels from P: L1 = {Q, R}, L2 = {S, T}, L3 = {U}.
                     'caption': 'BFS tree for order (A)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from itertools import permutations
 G = {'P':'QR','Q':'PS','R':'PST','S':'QRU','T':'RU','U':'ST'}
 orders = set()
@@ -706,12 +708,12 @@ assert ANSWER == 'A'
                 },
             ],
             'options': [
-                '34, 42, 23, 52, 33, 46',
-                '42, 23, 52, 34, 33, 46',
                 '23, 34, 42, 52, 33, 46',
+                '42, 23, 52, 34, 33, 46',
                 '42, 34, 23, 52, 46, 33',
+                '34, 42, 23, 52, 33, 46',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['A', 'D'],
             'solution': '''Derive *precedence constraints* from where each key sits relative to its home slot: a key displaced from home h to slot s needs slots h … s−1 to be occupied when it arrives.
 
 - 42, 23, 34 sit at their homes (2, 3, 4) → each must arrive before any other key spills into its slot.
@@ -721,13 +723,15 @@ assert ANSWER == 'A'
 
 So the valid orders are: {42, 23, 34} in any order, then 52, then 33, then 46 (3! = 6 sequences).
 
-- (A) 34, 42, 23 | 52 | 33 | 46 — fits. **Possible.**
+- (A) 23, 34, 42 | 52 | 33 | 46 — fits. **Possible.**
 - (B) 52 arrives before 34, so 52 probes 2, 3 and lands in **4**; then 34 is displaced. **Not possible.**
-- (C) 23, 34, 42 | 52 | 33 | 46 — fits. **Possible.**
-- (D) 46 arrives before 33 and finds its home 6 empty → 46 at 6, 33 later goes to 7. **Not possible.**
+- (C) 46 arrives before 33 and finds its home 6 empty → 46 at 6, 33 later goes to 7. **Not possible.**
+- (D) 34, 42, 23 | 52 | 33 | 46 — fits. **Possible.**
 
 **Tip:** simulate only the options that pass the constraint check — it saves time in the exam.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 target = {2:42, 3:23, 4:34, 5:52, 6:33, 7:46}
 def build(seq):
     T = [None]*10
@@ -808,25 +812,25 @@ Output `3 False` → option **(C)**.
             'topic': 'Merge sort — comparison counts',
             'text': 'Top-down merge sort splits an array of length n into a left half of length ⌊n/2⌋ and a right half, sorts both recursively (arrays of length ≤ 1 are returned unchanged) and merges them; the merge compares the two current front elements until one half is exhausted. Which of the following statements is/are TRUE?',
             'options': [
-                'On [5, 9, 2, 7, 1, 8, 3, 6] the algorithm makes exactly 17 element comparisons',
                 'On the already sorted array [1, 2, …, 8] it makes exactly 12 comparisons',
-                'No array of 8 distinct elements needs more than 17 comparisons',
                 'The recurrence C(n) = 2C(n/2) + n − 1, C(1) = 0 gives C(8) = 24',
+                'No array of 8 distinct elements needs more than 17 comparisons',
+                'On [5, 9, 2, 7, 1, 8, 3, 6] the algorithm makes exactly 17 element comparisons',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Merging lists of sizes p and q costs between min(p, q) (one list runs out early) and p + q − 1 (they interleave to the very end) comparisons.
 
-(A) [5, 9, 2, 7, 1, 8, 3, 6]:
+(D) [5, 9, 2, 7, 1, 8, 3, 6]:
 - Size-1 merges: (5|9), (2|7), (1|8), (3|6) → 1 each = 4.
 - Size-2 merges: [5,9]+[2,7] → 2,5,7,9 needs 3; [1,8]+[3,6] → 1,3,6,8 needs 3 → 6.
 - Final: [2,5,7,9]+[1,3,6,8] fully interleaves → 7.
 Total 4 + 6 + 7 = 17. **True.**
 
-(B) Sorted input: every merge stops as soon as the left half is exhausted → 4·1 + 2·2 + 1·4 = 12. **True.**
+(A) Sorted input: every merge stops as soon as the left half is exhausted → 4·1 + 2·2 + 1·4 = 12. **True.**
 
-(C) The worst case equals C(8) with C(n) = 2C(n/2) + n − 1: C(2) = 1, C(4) = 5, C(8) = 17 = n log₂ n − n + 1. The array in (A) already achieves it, and nothing can exceed it. **True.**
+(C) The worst case equals C(8) with C(n) = 2C(n/2) + n − 1: C(2) = 1, C(4) = 5, C(8) = 17 = n log₂ n − n + 1. The array in (D) already achieves it, and nothing can exceed it. **True.**
 
-(D) As just computed, C(8) = 17, not 24 (24 = n log₂ n would need n comparisons per merge level). **False.**
+(B) As just computed, C(8) = 17, not 24 (24 = n log₂ n would need n comparisons per merge level). **False.**
 
 **Trap:** using n log₂ n as the exact count — each merge of total size s needs at most s − 1 comparisons, not s.''',
             'solution_diagrams': [
@@ -842,7 +846,9 @@ Total 4 + 6 + 7 = 17. **True.**
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from itertools import permutations
 def ms(a, c):
     if len(a) <= 1: return a
@@ -1007,12 +1013,12 @@ assert sum(d[v] for v in 'BCDEF') == int(ANSWER)
             'topic': 'Binary heaps — insertion and delete-max',
             'text': 'The keys 19, 42, 7, 33, 58, 25, 61, 12 are inserted one at a time, in that order, into an initially empty binary **max**-heap stored in an array (0-based; children of index i are 2i+1 and 2i+2). Each insertion appends the key and sifts it up by swapping with its parent while it is larger. Which of the following statements is/are TRUE?',
             'options': [
-                'The root is 61 and its right child is 58',
-                'A total of 7 swaps are performed during the eight insertions',
                 'The level-order sequence of the final heap is 61, 58, 42, 33, 19, 25, 7, 12',
                 'After one delete-max (last element moved to the root, then sift-down) the array is [58, 42, 25, 19, 33, 7, 12]',
+                'A total of 7 swaps are performed during the eight insertions',
+                'The root is 61 and its right child is 58',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''Heap insertion: place at the next free index, then swap upward while the parent is smaller.
 
 - 19 → [19]
@@ -1026,10 +1032,10 @@ assert sum(d[v] for v in 'BCDEF') == int(ANSWER)
 
 Final array: [61, 42, 58, 19, 33, 7, 25, 12].
 
-- (A) Root 61, right child (idx 2) 58. **True.**
-- (B) 7 swaps in total. **True.**
-- (C) The level order *is* the array order 61, 42, 58, … — the statement swaps 42 and 58 and is otherwise wrong too. **False.**
-- (D) Move 12 to the root: [12, 42, 58, 19, 33, 7, 25]. 12 swaps with larger child 58 → [58, 42, 12, 19, 33, 7, 25]; then with 25 → [58, 42, 25, 19, 33, 7, 12]. **True.**
+- (A) The level order *is* the array order 61, 42, 58, … — the statement swaps 42 and 58 and is otherwise wrong too. **False.**
+- (B) Move 12 to the root: [12, 42, 58, 19, 33, 7, 25]. 12 swaps with larger child 58 → [58, 42, 12, 19, 33, 7, 25]; then with 25 → [58, 42, 25, 19, 33, 7, 12]. **True.**
+- (C) 7 swaps in total. **True.**
+- (D) Root 61, right child (idx 2) 58. **True.**
 
 **Trap:** in sift-down always swap with the *larger* child; swapping with 42 here would break the heap.''',
             'solution_diagrams': [
@@ -1044,7 +1050,10 @@ Final array: [61, 42, 58, 19, 33, 7, 25, 12].
                     'caption': 'After one delete-max',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 a = []; sw = 0
 for k in [19,42,7,33,58,25,61,12]:
     a.append(k); i = len(a) - 1

@@ -90,16 +90,16 @@ Trace (stack bottom → top | queue front → rear):
             'text': 'A singly linked list of n nodes is maintained with both a `head` and a `tail` pointer (each node stores only a value and a `next` pointer). Which of the following operations can be performed in O(1) worst-case time, independent of n?',
             'options': [
                 'Insert a new node at the front',
-                'Delete the last node (and update `tail`)',
                 'Insert a new node at the end',
+                'Delete the last node (and update `tail`)',
                 'Concatenate a second such list (with its own head and tail) to the end of this one',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept:** an O(1) operation may only touch a constant number of nodes reachable from the stored pointers. A singly linked node cannot reach its predecessor.
 
 - (A) new.next = head; head = new. **O(1).**
-- (B) After removing the last node, `tail` must point to the *second-to-last* node, and the only way to find it is to walk from `head` — Θ(n). **Not O(1).**
-- (C) tail.next = new; tail = new. **O(1).**
+- (B) tail.next = new; tail = new. **O(1).**
+- (C) After removing the last node, `tail` must point to the *second-to-last* node, and the only way to find it is to walk from `head` — Θ(n). **Not O(1).**
 - (D) tail₁.next = head₂; tail₁ = tail₂. **O(1).** (This is why linked lists, unlike arrays, concatenate cheaply.)
 
 **Trap:** assuming the tail pointer makes *deletion* at the tail cheap. It would require a doubly linked list (a `prev` pointer) — then all four operations are O(1).''',
@@ -314,19 +314,21 @@ assert opts["ABCD".index(ANSWER)] == a
                     ],
                 },
             ],
-            'options': ['G has 7 edges', 'G contains exactly 3 triangles', '(A²)[1][4] = 2', '(A³)[1][1] = 1'],
-            'answer': ['A', 'B', 'C'],
+            'options': ['G has 7 edges', '(A³)[1][1] = 1', 'G contains exactly 3 triangles', '(A²)[1][4] = 2'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept:** (A^{k})[i][j] counts walks of length k from i to j. In particular (A²)[i][j] (i ≠ j) counts common neighbours, and (A³)[i][i] = 2 × (number of triangles through i), since each triangle can be walked in two directions.
 
 Edges (upper triangle): 1–2, 1–3, 2–3, 2–4, 3–4, 3–5, 4–5.
 
 - (A) 7 ones above the diagonal → **7 edges**. True.
-- (B) Triangles: {1, 2, 3}, {2, 3, 4}, {3, 4, 5}. ({1, 3, 4}? 1–4 missing. {2, 4, 5}? 2–5 missing.) Exactly **3**. True.
-- (C) N(1) = {2, 3}, N(4) = {2, 3, 5}: common neighbours {2, 3} → 2. True.
-- (D) Vertex 1 lies on one triangle (1–2–3), giving the closed walks 1→2→3→1 and 1→3→2→1 → (A³)[1][1] = **2**. False.
+- (B) Vertex 1 lies on one triangle (1–2–3), giving the closed walks 1→2→3→1 and 1→3→2→1 → (A³)[1][1] = **2**. False.
+- (C) Triangles: {1, 2, 3}, {2, 3, 4}, {3, 4, 5}. ({1, 3, 4}? 1–4 missing. {2, 4, 5}? 2–5 missing.) Exactly **3**. True.
+- (D) N(1) = {2, 3}, N(4) = {2, 3, 5}: common neighbours {2, 3} → 2. True.
 
-**Trap:** in (D), forgetting that each triangle yields two closed walks (one per direction). Total triangles = trace(A³)/6.''',
-            'verify': '''
+**Trap:** in (B), forgetting that each triangle yields two closed walks (one per direction). Total triangles = trace(A³)/6.''',
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [[0,1,1,0,0],[1,0,1,1,0],[1,1,0,1,1],[0,1,1,0,1],[0,0,1,1,0]]
 def mul(X, Y): return [[sum(X[i][k]*Y[k][j] for k in range(5)) for j in range(5)] for i in range(5)]
 A2 = mul(A, A); A3 = mul(A2, A)
@@ -549,12 +551,12 @@ assert ipl(T) == 16
                 },
             ],
             'options': [
-                'The vertices are finalised in the order S, B, A, C, D, E',
                 'The shortest distance from S to E is 9',
-                'Before E is finalised, its tentative distance takes exactly two distinct finite values',
                 'The shortest path from S to E uses exactly 4 edges',
+                'The vertices are finalised in the order S, B, A, C, D, E',
+                'Before E is finalised, its tentative distance takes exactly two distinct finite values',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'C'],
             'solution': '''**Concept:** each extraction finalises the closest unfinished vertex and may lower the tentative distances of its out-neighbours.
 
 Trace (changes in tentative distances):
@@ -566,10 +568,10 @@ Trace (changes in tentative distances):
 - Extract E (9).
 
 **Verdicts:**
-- (A) Order S, B, A, C, D, E. **True.**
-- (B) d(E) = 9. **True.**
-- (C) E's tentative value goes 14 → 12 → 9: **three** finite values. **False.**
-- (D) Path: S → B → A → C → D → E (2 + 3 + 1 + 2 + 1 = 9) has **5** edges. **False.**
+- (A) d(E) = 9. **True.**
+- (B) Path: S → B → A → C → D → E (2 + 3 + 1 + 2 + 1 = 9) has **5** edges. **False.**
+- (C) Order S, B, A, C, D, E. **True.**
+- (D) E's tentative value goes 14 → 12 → 9: **three** finite values. **False.**
 
 **Trap:** the direct-looking edges (S → A = 6, B → E = 12, C → E = 6) are all beaten by detours; shortest paths minimise weight, not the number of edges.''',
             'solution_diagrams': [
@@ -588,7 +590,10 @@ Trace (changes in tentative distances):
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 W = {'S':[('A',6),('B',2)], 'B':[('A',3),('C',7),('E',12)], 'A':[('C',1),('D',5)],
      'C':[('D',2),('E',6)], 'D':[('E',1)], 'E':[]}
@@ -748,23 +753,25 @@ assert p.v == 4
             'topic': 'Elementary sorts — exact comparison counts',
             'text': 'For an array of n distinct keys, consider these standard implementations: insertion sort (inner loop `while j >= 0 and a[j] > key`), selection sort (scan the unsorted suffix for the minimum), bubble sort with early exit (stop after a pass with no swap), and top-down merge sort. Which of the following statements is/are TRUE?',
             'options': [
-                'Insertion sort makes exactly n − 1 key comparisons on an already-sorted array',
                 'Selection sort makes exactly n(n − 1)/2 key comparisons on every input',
                 'Merge sort, as usually implemented on arrays, sorts in place using O(1) extra memory',
+                'Insertion sort makes exactly n − 1 key comparisons on an already-sorted array',
                 'Bubble sort with early exit makes exactly n(n − 1)/2 key comparisons on a reverse-sorted array',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept:** count comparisons per pass.
 
-- (A) Sorted input: each key is compared once with its left neighbour, the test fails, and the loop exits → 1 comparison for each of i = 1..n − 1 → n − 1 total. **True** (the best case, Θ(n)).
-- (B) Pass i scans n − 1 − i elements regardless of the data: (n − 1) + (n − 2) + … + 1 = n(n − 1)/2. **True** — selection sort is not adaptive.
-- (C) The standard array merge needs an auxiliary array of Θ(n). **False.**
+- (A) Pass i scans n − 1 − i elements regardless of the data: (n − 1) + (n − 2) + … + 1 = n(n − 1)/2. **True** — selection sort is not adaptive.
+- (B) The standard array merge needs an auxiliary array of Θ(n). **False.**
+- (C) Sorted input: each key is compared once with its left neighbour, the test fails, and the loop exits → 1 comparison for each of i = 1..n − 1 → n − 1 total. **True** (the best case, Θ(n)).
 - (D) Reverse-sorted input: every pass swaps, so all n − 1 passes are needed, with n − 1, n − 2, …, 1 comparisons → n(n − 1)/2. Early exit never triggers. **True.**
 
 For n = 8: insertion (sorted) 7; selection 28; bubble (reversed) 28.
 
 **Trap:** in (D), thinking the early-exit flag saves a final pass — it only helps when the array becomes sorted before the last pass, which cannot happen with reversed input (the smallest element moves left only one position per pass).''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins_c(a):
     a = a[:]; c = 0
     for i in range(1, len(a)):
@@ -944,20 +951,20 @@ assert good == [ANSWER]
             'topic': 'Graph theory — edges, components and connectivity',
             'text': 'Consider simple undirected graphs (no loops, no multi-edges). Which of the following statements is/are TRUE?',
             'options': [
-                'The maximum number of edges in a graph with 10 vertices and exactly 3 connected components is 28',
-                'Every graph with 10 vertices and 37 edges is connected',
-                'Every graph with 6 vertices in which every vertex has degree at least 2 is connected',
                 'A forest (acyclic graph) with 10 vertices and 3 connected components has exactly 8 edges',
+                'Every graph with 6 vertices in which every vertex has degree at least 2 is connected',
+                'Every graph with 10 vertices and 37 edges is connected',
+                'The maximum number of edges in a graph with 10 vertices and exactly 3 connected components is 28',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['C', 'D'],
             'solution': '''**Concept:** to maximise edges with k components on n vertices, make k − 1 components single vertices and the last one a complete graph K_{n−k+1}. A forest with c components on n vertices has n − c edges.
 
-- (A) K₈ plus two isolated vertices: C(8, 2) = 28 edges. Any more balanced split has fewer edges (e.g. 6 + 2 + 2 vertices → 15 + 1 + 1). **True.**
-- (B) The maximum number of edges in a *disconnected* graph on 10 vertices is C(9, 2) = 36 (K₉ plus an isolated vertex). So 37 edges force connectivity. **True.**
-- (C) Two disjoint triangles: 6 vertices, all of degree 2, yet 2 components. **False.** (Minimum degree ≥ (n − 1)/2 = 2.5, i.e. ≥ 3, would guarantee connectivity.)
-- (D) A forest with 10 vertices and 3 trees has 10 − 3 = **7** edges. **False.**
+- (A) A forest with 10 vertices and 3 trees has 10 − 3 = **7** edges. **False.**
+- (B) Two disjoint triangles: 6 vertices, all of degree 2, yet 2 components. **False.** (Minimum degree ≥ (n − 1)/2 = 2.5, i.e. ≥ 3, would guarantee connectivity.)
+- (C) The maximum number of edges in a *disconnected* graph on 10 vertices is C(9, 2) = 36 (K₉ plus an isolated vertex). So 37 edges force connectivity. **True.**
+- (D) K₈ plus two isolated vertices: C(8, 2) = 28 edges. Any more balanced split has fewer edges (e.g. 6 + 2 + 2 vertices → 15 + 1 + 1). **True.**
 
-**Trap:** in (A), splitting the vertices evenly feels natural but minimises, not maximises, the edge count, because C(m, 2) is convex.''',
+**Trap:** in (D), splitting the vertices evenly feels natural but minimises, not maximises, the edge count, because C(m, 2) is convex.''',
             'solution_diagrams': [
                 {
                     'type': 'graph',
@@ -982,7 +989,9 @@ assert good == [ANSWER]
                     'caption': 'Counterexample to (C): degree 2 everywhere, but disconnected',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from math import comb
 from itertools import combinations_with_replacement
 best = max(sum(comb(x, 2) for x in p) for p in combinations_with_replacement(range(1, 11), 3) if sum(p) == 10)

@@ -93,12 +93,12 @@ For the fourth tuple, `zip` asks its first argument for an item and receives 70;
             'topic': 'Stacks — postfix evaluation',
             'text': 'The postfix expression `9 4 2 - 3 * + 6 2 / -` is evaluated with a stack: an operand is pushed; an operator pops the right operand, then the left operand, and pushes the result (`/` is exact division here). Which of the following statements is/are TRUE?',
             'options': [
-                'The final result is 12',
-                'The maximum number of items on the stack at any time is 3',
                 'At some moment the value 6 is on top of the stack',
+                'The maximum number of items on the stack at any time is 3',
                 'At some moment the stack holds 4 items',
+                'The final result is 12',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''Trace the stack (bottom → top) after each token:
 
 - 9 → [9]
@@ -113,10 +113,10 @@ For the fourth tuple, `zip` asks its first argument for an item and receives 70;
 - / → 6 / 2 = 3 → [15, 3]
 - − → 15 − 3 = 12 → [12]
 
-- (A) **True** — result 12.
+- (A) **True** — 6 is on top after `*` and again when the operand 6 is pushed.
 - (B) **True** — depth 3 is reached (after the first 2, after 3, after the second 2) and never exceeded.
-- (C) **True** — 6 is on top after `*` and again when the operand 6 is pushed.
-- (D) **False** — the depth never reaches 4.
+- (C) **False** — the depth never reaches 4.
+- (D) **True** — result 12.
 
 **Trap:** operand order — for `−` and `/` the *first* pop is the right operand. Popping in the wrong order gives 2 − 4 and 2 / 6.''',
             'solution_diagrams': [
@@ -126,7 +126,9 @@ For the fourth tuple, `zip` asks its first argument for an item and receives 70;
                     'label': 'Stack just before `/`',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 st = []; tops = []; mx = 0
 for tok in "9 4 2 - 3 * + 6 2 / -".split():
     if tok in "+-*/":
@@ -300,21 +302,23 @@ for x in range(3):
 print(x)
 y = [i for i in range(3)]''',
             'options': [
-                'The first `print` outputs `outer`',
-                'The second `print` outputs `2`',
                 '`sq` is `[0, 2, 4]`',
+                'The second `print` outputs `2`',
                 'After the last line, the name `i` is defined at module level',
+                'The first `print` outputs `outer`',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''In Python 3 a comprehension runs in its **own scope**: its loop variable does not leak into the enclosing scope. An ordinary `for` loop, by contrast, binds its variable in the current scope, and the variable keeps its last value after the loop.
 
-- (A) **True** — the comprehension's `x` is local to it, so the module-level `x` is still `'outer'`.
+- (A) **True** — inside the comprehension `x` is an int, so `x * 2` is 0, 2, 4 (not string repetition).
 - (B) **True** — the `for` loop rebinds the module-level `x`; after the loop it is 2.
-- (C) **True** — inside the comprehension `x` is an int, so `x * 2` is 0, 2, 4 (not string repetition).
-- (D) **False** — `i` exists only inside the comprehension; referring to `i` afterwards raises `NameError`.
+- (C) **False** — `i` exists only inside the comprehension; referring to `i` afterwards raises `NameError`.
+- (D) **True** — the comprehension's `x` is local to it, so the module-level `x` is still `'outer'`.
 
 **Trap:** Python 2 list comprehensions *did* leak their variable; Python 3 does not. Do not carry that habit over to `for` loops, which still leak.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 assert OUTPUT.split() == ['outer', '2'] and sq == [0, 2, 4] and 'i' not in globals()
 assert sorted(ANSWER) == ['A', 'B', 'C']
 ''',
@@ -900,17 +904,18 @@ assert max(r) - min(r) < 0.05 and ANSWER == 'B'
             'options': [
                 "`{len(w): w for w in words}[4] == 'pear'`",
                 "`sorted(words, key=len)[1] == 'kiwi'`",
-                '`len({w[0] for w in words}) == 7`',
                 "`sorted(words, key=lambda w: (-len(w), w))[2] == 'date'`",
+                '`len({w[0] for w in words}) == 7`',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''- (A) In a dict comprehension a repeated key is **overwritten**; the last word of length 4 in the list is 'pear' (kiwi, date, plum, pear in order). **True.**
 - (B) `sorted` is **stable**: equal keys keep their original relative order. By length: fig(3), then kiwi, date, plum, pear (4, original order), apple(5), banana(6). Index 1 is 'kiwi'. **True.**
-- (C) First letters: k, f, a, d, p, p, b → as a set {k, f, a, d, p, b} has **6** elements. **False.**
-- (D) Key (−len, word): longest first, ties alphabetical → banana, apple, date, kiwi, pear, plum, fig. Index 2 is 'date'. **True.**
+- (C) Key (−len, word): longest first, ties alphabetical → banana, apple, date, kiwi, pear, plum, fig. Index 2 is 'date'. **True.**
+- (D) First letters: k, f, a, d, p, p, b → as a set {k, f, a, d, p, b} has **6** elements. **False.**
 
-**Trap:** in (A) assuming the *first* occurrence wins (it would give 'kiwi'); in (C) forgetting that sets drop duplicates; in (D) applying stability instead of the secondary key — the tuple key makes the original order irrelevant.''',
-            'verify': '''
+**Trap:** in (A) assuming the *first* occurrence wins (it would give 'kiwi'); in (D) forgetting that sets drop duplicates; in (C) applying stability instead of the secondary key — the tuple key makes the original order irrelevant.''',
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 words = ['kiwi', 'fig', 'apple', 'date', 'plum', 'pear', 'banana']
 vals = [{len(w): w for w in words}[4] == 'pear',
         sorted(words, key=len)[1] == 'kiwi',

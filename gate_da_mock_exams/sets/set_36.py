@@ -170,21 +170,24 @@ assert pos <= set(range(1, 7)) and len(pos) == int(ANSWER)
             'topic': 'Hashing — probe sequences that cover the table',
             'text': 'For a key with home slot h, an open-addressing scheme examines slots s_{i} = (h + g(i)) mod m for i = 0, 1, …, m − 1. For which of the following choices are **all m slots** guaranteed to be examined?',
             'options': [
-                'm = 12, g(i) = 5i',
                 'm = 12, g(i) = 4i',
                 'm = 11, g(i) = i^{2}',
                 'm = 16, g(i) = i(i + 1)/2',
+                'm = 12, g(i) = 5i',
             ],
-            'answer': ['A', 'D'],
+            'answer': ['C', 'D'],
             'solution': '''A linear step c covers the whole table iff gcd(c, m) = 1. Quadratic sequences are subtler.
 
-- (A) gcd(5, 12) = 1 → 5i mod 12 runs through all 12 residues. **True.**
-- (B) gcd(4, 12) = 4 → only offsets 0, 4, 8 are reached (3 slots). **False.**
-- (C) i^{2} mod 11 takes only the quadratic residues {0, 1, 3, 4, 5, 9}: 6 = (m+1)/2 distinct slots. **False.** (Quadratic probing with prime m is guaranteed to find a free slot only when the table is at most half full.)
-- (D) Triangular numbers i(i+1)/2 mod 2^{k} are a permutation of 0 … 2^{k} − 1; for m = 16 the offsets are 0, 1, 3, 6, 10, 15, 5, 12, 4, 13, 7, 2, 14, 11, 9, 8 — all 16. **True.**
+- (A) gcd(4, 12) = 4 → only offsets 0, 4, 8 are reached (3 slots). **False.**
+- (B) i^{2} mod 11 takes only the quadratic residues {0, 1, 3, 4, 5, 9}: 6 = (m+1)/2 distinct slots. **False.** (Quadratic probing with prime m is guaranteed to find a free slot only when the table is at most half full.)
+- (C) Triangular numbers i(i+1)/2 mod 2^{k} are a permutation of 0 … 2^{k} − 1; for m = 16 the offsets are 0, 1, 3, 6, 10, 15, 5, 12, 4, 13, 7, 2, 14, 11, 9, 8 — all 16. **True.**
+- (D) gcd(5, 12) = 1 → 5i mod 12 runs through all 12 residues. **True.**
 
 **Tip:** this is why practical quadratic probing often uses triangular offsets with a power-of-two table size.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def cover(m, g): return len({g(i) % m for i in range(m)})
 truth = {'A': cover(12, lambda i: 5 * i) == 12, 'B': cover(12, lambda i: 4 * i) == 12,
          'C': cover(11, lambda i: i * i) == 11, 'D': cover(16, lambda i: i * (i + 1) // 2) == 16}
@@ -295,23 +298,25 @@ assert best == 28 and ANSWER == 'A'
 for w in "the cat sat on the mat the end".split():
     d[w] = d.get(w, 0) + 1''',
             'options': [
-                "`list(d)[0] == 'the'`",
-                "`max(d, key=d.get) == 'the'`",
-                "`len(set('banana') - set('ban')) > 0`",
                 "`sorted(d.items(), key=lambda kv: -kv[1])[1][0] == 'cat'`",
+                "`len(set('banana') - set('ban')) > 0`",
+                "`max(d, key=d.get) == 'the'`",
+                "`list(d)[0] == 'the'`",
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Since Python 3.7 dictionaries preserve **insertion order**; `sorted` is **stable**.
 
 The dictionary is {'the': 3, 'cat': 1, 'sat': 1, 'on': 1, 'mat': 1, 'end': 1} (in this order).
 
-- (A) The first key inserted is 'the'. **True.**
-- (B) 'the' has the largest count, 3. **True.**
-- (C) set('banana') = {'b', 'a', 'n'} = set('ban'); the difference is empty → length 0. **False.**
-- (D) Sorting by −count puts 'the' first; all others tie at 1 and keep their insertion order, so the second item is ('cat', 1). **True.**
+- (A) Sorting by −count puts 'the' first; all others tie at 1 and keep their insertion order, so the second item is ('cat', 1). **True.**
+- (B) set('banana') = {'b', 'a', 'n'} = set('ban'); the difference is empty → length 0. **False.**
+- (C) 'the' has the largest count, 3. **True.**
+- (D) The first key inserted is 'the'. **True.**
 
-**Trap:** for (D), one might think ties are broken alphabetically ('end') — they are not; a stable sort keeps the original order.''',
-            'verify': '''
+**Trap:** for (A), one might think ties are broken alphabetically ('end') — they are not; a stable sort keeps the original order.''',
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 truth = {'A': list(d)[0] == 'the', 'B': max(d, key=d.get) == 'the',
          'C': len(set('banana') - set('ban')) > 0,
          'D': sorted(d.items(), key=lambda kv: -kv[1])[1][0] == 'cat'}
@@ -473,20 +478,20 @@ assert [L for L in opts if bld(opts[L]) == base] == [ANSWER]
                 },
             ],
             'options': [
-                'After the first delete-max the array is [85, 72, 80, 40, 68, 61, 33, 15, 27]',
+                'After both deletions the key 27 is at index 5',
                 'After both deletions the children of the root are 72 and 61',
                 'The two deletions perform 3 swaps in total',
-                'After both deletions the key 27 is at index 5',
+                'After the first delete-max the array is [85, 72, 80, 40, 68, 61, 33, 15, 27]',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''**Delete 90:** move 61 (last) to the root → [61, 72, 85, 40, 68, 80, 33, 15, 27]. 61 vs children 72, 85 → swap with 85 (index 2). Children of index 2: 80, 33 → swap with 80 (index 5), a leaf. Result [85, 72, 80, 40, 68, 61, 33, 15, 27] (2 swaps).
 
 **Delete 85:** move 27 to the root → [27, 72, 80, 40, 68, 61, 33, 15]. Swap with 80 (index 2); children 61, 33 → swap with 61 (index 5); leaf. Result [80, 72, 61, 40, 68, 27, 33, 15] (2 swaps).
 
-- (A) **True.**
+- (A) 27 ends at index 5. **True.**
 - (B) Root 80 has children 72 (index 1) and 61 (index 2). **True.**
 - (C) 2 + 2 = **4** swaps. **False.**
-- (D) 27 ends at index 5. **True.**
+- (D) **True.**
 
 **Trap:** swapping with the *left* child by default (72) would violate the heap property because 85 > 72.''',
             'solution_diagrams': [
@@ -497,7 +502,8 @@ assert [L for L in opts if bld(opts[L]) == base] == [ANSWER]
                     'caption': 'After two delete-max operations',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 H = [90, 72, 85, 40, 68, 80, 33, 15, 27, 61]; sw = 0
 def delmax():
     global sw
@@ -703,23 +709,25 @@ assert succ == int(ANSWER) and d['E'] == 9
                 },
             ],
             'options': [
-                'B, E, A, D, C, G, F',
                 'A, B, D, C, E, G, F',
                 'A, E, B, D, C, F, G',
+                'B, E, A, D, C, G, F',
                 'A, C, F, B, D, E, G',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'C'],
             'solution': '''An ordering is topological iff for **every** edge u → v, u appears before v. Check each option against the 8 edges A→C, A→D, B→D, B→E, C→F, D→F, D→G, E→G.
 
-- (A) B, E, A, D, C, G, F: B<D, B<E, A<C, A<D, C<F, D<F, D<G, E<G all hold. **Valid.**
-- (B) A, B, D, C, E, G, F: all hold (E before G, C and D before F). **Valid.**
-- (C) E comes before B, violating B → E. **Invalid.**
+- (A) A, B, D, C, E, G, F: all hold (E before G, C and D before F). **Valid.**
+- (B) E comes before B, violating B → E. **Invalid.**
+- (C) B, E, A, D, C, G, F: B<D, B<E, A<C, A<D, C<F, D<F, D<G, E<G all hold. **Valid.**
 - (D) F comes before D, violating D → F. **Invalid.**
 
 (In total this DAG has 42 topological orderings.)
 
 **Tip:** scan each option once, maintaining the set of already-placed vertices, and verify that all in-neighbours of the current vertex are already placed.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from itertools import permutations
 DG = {'A': 'CD', 'B': 'DE', 'C': 'F', 'D': 'FG', 'E': 'G', 'F': '', 'G': ''}
 def ok(p):
@@ -852,12 +860,12 @@ b.tags = ["z"]
 print(Counter.total, a.total, b.total,
       len(a.tags), len(Counter.tags), b.tags)''',
             'options': [
-                'The first value printed is 2',
-                'The second value printed is 4',
                 'The fourth value printed is 1',
                 "The last value printed is `['z']`, and `Counter.tags` is not affected by that assignment",
+                'The second value printed is 4',
+                'The first value printed is 2',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''Attribute **lookup** on an instance falls back to the class; attribute **assignment** on an instance always creates/updates an instance attribute. Mutating a class-level list through an instance changes the shared list.
 
 - Two constructions: `Counter.total` = 2; `self.tags.append` mutates the **shared** class list → Counter.tags = ['x', 'y'].
@@ -867,12 +875,15 @@ print(Counter.total, a.total, b.total,
 
 Output: `2 4 2 2 2 ['z']`.
 
-- (A) **True.** (B) **True.**
-- (C) a.tags is the shared class list of length **2**. **False.**
-- (D) **True** — rebinding `b.tags` does not touch `Counter.tags`.
+- (A) a.tags is the shared class list of length **2**. **False.**
+- (B) **True** — rebinding `b.tags` does not touch `Counter.tags`.
+- (D) **True.** (C) **True.**
 
 **Trap:** `self.x += 1` on an immutable class attribute *shadows* it, while `self.lst.append()` on a mutable class attribute *shares* it.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 vals = OUTPUT.split(maxsplit=5)
 assert vals[:5] == ['2', '4', '2', '2', '2'] and vals[5].strip() == "['z']"
 truth = {'A': vals[0] == '2', 'B': vals[1] == '4', 'C': vals[3] == '1',

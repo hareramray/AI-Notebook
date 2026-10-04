@@ -99,21 +99,23 @@ Output `[3, 3, 3, 3] 3` → option **(A)**.
             'marks': 1,
             'topic': 'Bipartite graphs — parity argument',
             'text': 'For a set D of positive integers, let G_{D} be the graph on vertices {1, 2, …, 12} in which distinct i and j are adjacent iff |i − j| ∈ D. For which of the following choices of D is G_{D} bipartite?',
-            'options': ['D = {1, 3}', 'D = {2, 3}', 'D = {2, 4}', 'D = {3, 5}'],
-            'answer': ['A', 'D'],
+            'options': ['D = {2, 4}', 'D = {1, 3}', 'D = {2, 3}', 'D = {3, 5}'],
+            'answer': ['B', 'D'],
             'solution': '''A graph is bipartite iff it has no odd cycle.
 
 - If every d ∈ D is **odd**, each edge joins an odd label to an even label, so the parity of the label is a valid 2-colouring → bipartite.
 - Otherwise look for an odd cycle: a closed walk uses steps ±d whose signed sum is 0; an odd number of steps with sum 0 gives an odd closed walk, hence an odd cycle.
 
 Options:
-- (A) {1, 3}: both odd → **bipartite**.
-- (B) {2, 3}: 2 + 2 + 2 − 3 − 3 = 0 uses 5 steps: 1 → 3 → 5 → 7 → 4 → 1 is a 5-cycle → **not bipartite**.
-- (C) {2, 4}: 2 + 2 − 4 = 0 uses 3 steps: 1 → 3 → 5 → 1 is a triangle → **not bipartite** (all edges stay within one parity class, but that does not help).
+- (A) {2, 4}: 2 + 2 − 4 = 0 uses 3 steps: 1 → 3 → 5 → 1 is a triangle → **not bipartite** (all edges stay within one parity class, but that does not help).
+- (B) {1, 3}: both odd → **bipartite**.
+- (C) {2, 3}: 2 + 2 + 2 − 3 − 3 = 0 uses 5 steps: 1 → 3 → 5 → 7 → 4 → 1 is a 5-cycle → **not bipartite**.
 - (D) {3, 5}: both odd → **bipartite**.
 
-**Trap:** in (C) the graph splits into an 'odd' and an 'even' component, which looks bipartite-like, but each component contains triangles.''',
-            'verify': '''
+**Trap:** in (A) the graph splits into an 'odd' and an 'even' component, which looks bipartite-like, but each component contains triangles.''',
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def bip(D, n=12):
     col = {}
     for s in range(1, n+1):
@@ -546,12 +548,12 @@ assert OUTPUT.strip() == ANSWER
                 },
             ],
             'options': [
+                'The edge U–V is a bridge',
                 'R is a cut vertex',
                 'S is a cut vertex',
                 'U is a cut vertex',
-                'The edge U–V is a bridge',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'C'],
             'solution': '''Group the graph into *blocks* (maximal pieces with no cut vertex). A vertex shared by two blocks is a cut vertex; a block consisting of a single edge is a bridge.
 
 Cycles present:
@@ -561,13 +563,16 @@ Cycles present:
 
 Blocks: {P, Q, R}, {R, S}, {S, T, U, V, W, X}.
 
-- (A) R joins blocks {P,Q,R} and {R,S}: removing R isolates {P, Q}. **True.**
-- (B) S joins {R,S} and the big block: removing S separates {P,Q,R} from the rest. **True.**
-- (C) Removing U: S still reaches T, T reaches W via the edge T–W, and W reaches V, X. Graph stays connected. **False.**
-- (D) U–V lies on the cycle U–V–W–T–U. Not a bridge. **False.**
+- (A) U–V lies on the cycle U–V–W–T–U. Not a bridge. **False.**
+- (B) R joins blocks {P,Q,R} and {R,S}: removing R isolates {P, Q}. **True.**
+- (C) S joins {R,S} and the big block: removing S separates {P,Q,R} from the rest. **True.**
+- (D) Removing U: S still reaches T, T reaches W via the edge T–W, and W reaches V, X. Graph stays connected. **False.**
 
 **Trap:** without the chord T–W, U and V *would* be cut vertices and U–V a bridge; one extra edge merges three blocks into one.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 N = "PQRSTUVWX"
 E = [('P','Q'),('Q','R'),('R','P'),('R','S'),('S','T'),('T','U'),('U','S'),('U','V'),
      ('V','W'),('W','X'),('X','V'),('T','W')]
@@ -670,10 +675,10 @@ def two_colour(adj, s):
                 },
             ],
             'options': [
-                '`two_colour(adj, 1)` returns `None` as its first component',
                 'The conflicting edge it reports is `(4, 8)`',
-                'Deleting only the edge 3–8 makes G bipartite',
                 'Deleting only the edge 4–8 makes G bipartite',
+                'Deleting only the edge 3–8 makes G bipartite',
+                '`two_colour(adj, 1)` returns `None` as its first component',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''BFS colours each newly discovered vertex opposite to its parent; a non-tree edge between two vertices of the same colour proves an odd cycle.
@@ -687,13 +692,15 @@ Trace (colour in brackets):
 - u=5 [0]: 4 [1] ok, 6 ok, 8 [1] ok.
 - u=4 [1]: 3 ok, 5 ok, **8 [1] — same colour** → return `(None, (4, 8))`.
 
-- (A) G is not bipartite and the function detects it. **True.**
-- (B) Reported pair is (4, 8). **True.**
+- (A) Reported pair is (4, 8). **True.**
+- (B) Every odd cycle uses 4–8 (triangles 3–4–8 and 4–5–8, etc.). Without it the colouring {1,3,5,7} vs {2,4,6,8} is proper. **True.**
 - (C) Removing 3–8 leaves the triangle 4–5–8. **False.**
-- (D) Every odd cycle uses 4–8 (triangles 3–4–8 and 4–5–8, etc.). Without it the colouring {1,3,5,7} vs {2,4,6,8} is proper. **True.**
+- (D) G is not bipartite and the function detects it. **True.**
 
 **Trap:** the reported edge depends on the visiting order; it is *an* edge of an odd cycle, not necessarily the unique culprit — here it happens to be unique.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [(1,2),(2,3),(3,4),(4,5),(5,6),(6,1),(2,7),(7,8),(8,5),(3,8),(4,8)]
 def mk(E):
     adj = {v: [] for v in range(1, 9)}
@@ -878,22 +885,24 @@ assert res == (5, 2, 1, 4) and ANSWER == 'A'
             'topic': 'Sorting — properties and counts',
             'text': 'Which of the following statements is/are TRUE?',
             'options': [
-                'Quicksort with the Lomuto partition (pivot = last element, test a[j] ≤ pivot) makes exactly 15 element comparisons on the array [7, 7, 7, 7, 7, 7]',
-                'Merge sort whose merge takes the element from the **left** run when the two front elements are equal is a stable sort',
-                'Insertion sort makes exactly 28 element comparisons on an array of 8 distinct elements in strictly decreasing order',
                 'Selection sort (swap a[i] with the minimum of a[i..n−1]) is stable',
+                'Quicksort with the Lomuto partition (pivot = last element, test a[j] ≤ pivot) makes exactly 15 element comparisons on the array [7, 7, 7, 7, 7, 7]',
+                'Insertion sort makes exactly 28 element comparisons on an array of 8 distinct elements in strictly decreasing order',
+                'Merge sort whose merge takes the element from the **left** run when the two front elements are equal is a stable sort',
             ],
-            'answer': ['A', 'B', 'C'],
-            'solution': '''- (A) With all keys equal, every a[j] ≤ pivot, so the partition places the pivot at the **end** and recurses on n − 1 elements. Comparisons: 5 + 4 + 3 + 2 + 1 = 15 — the Θ(n²) worst case of Lomuto on duplicates. **True.**
+            'answer': ['B', 'C', 'D'],
+            'solution': '''- (B) With all keys equal, every a[j] ≤ pivot, so the partition places the pivot at the **end** and recurses on n − 1 elements. Comparisons: 5 + 4 + 3 + 2 + 1 = 15 — the Θ(n²) worst case of Lomuto on duplicates. **True.**
 
-- (B) Taking from the left run on ties keeps equal keys in their original relative order (left-run elements were earlier in the input). **True.**
+- (D) Taking from the left run on ties keeps equal keys in their original relative order (left-run elements were earlier in the input). **True.**
 
 - (C) In reverse-sorted input, inserting the i-th element compares it with all i earlier elements (the loop stops only at index 0, with no failing comparison). Total 1 + 2 + … + 7 = 28 = n(n−1)/2. **True.**
 
-- (D) The long-distance swap can jump an element over an equal one. Example [2(a), 2(b), 1]: pass 0 swaps 2(a) with 1 → [1, 2(b), 2(a)] — the two 2s are reversed. **False.**
+- (A) The long-distance swap can jump an element over an equal one. Example [2(a), 2(b), 1]: pass 0 swaps 2(a) with 1 → [1, 2(b), 2(a)] — the two 2s are reversed. **False.**
 
 **Trap:** in (C) one might add a final failing comparison per pass (giving 35); in a strictly decreasing array every comparison succeeds until j falls below 0, where the `j >= 0` test (an index check, not an element comparison) stops the loop.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 c = [0]
 def qs(a, lo, hi):
     if lo >= hi: return
@@ -1155,23 +1164,26 @@ assert abs(tot/10 - 2.3) < 1e-9 and ANSWER == 'A'
                 },
             ],
             'options': [
-                'G is bipartite and both colour classes have 6 vertices',
-                'Adding the single edge 1–6 makes G non-bipartite',
                 'G has at least one cut vertex',
+                'G is bipartite and both colour classes have 6 vertices',
                 'Deleting the two vertices 2 and 5 disconnects G',
+                'Adding the single edge 1–6 makes G non-bipartite',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''Colour vertex (r, c) by the parity of r + c — every grid edge changes r + c by 1, so this is a proper 2-colouring (a 'chessboard' colouring).
 
-- (A) Each row of 4 has 2 vertices of each colour → 6 and 6. **True.**
-- (B) Vertex 1 = (0,0) and 6 = (1,1) both have even r + c, i.e. the same colour. An edge between them closes the odd cycle 1–2–6–1 (length 3). **True.**
-- (C) Every vertex lies on a 4-cycle (unit square) and removing any one vertex leaves the rest connected around it; the grid is 2-connected. **False.**
-- (D) Vertex 1's only neighbours are 2 and 5. Removing both isolates vertex 1 → disconnected. **True.**
+- (A) Every vertex lies on a 4-cycle (unit square) and removing any one vertex leaves the rest connected around it; the grid is 2-connected. **False.**
+- (B) Each row of 4 has 2 vertices of each colour → 6 and 6. **True.**
+- (C) Vertex 1's only neighbours are 2 and 5. Removing both isolates vertex 1 → disconnected. **True.**
+- (D) Vertex 1 = (0,0) and 6 = (1,1) both have even r + c, i.e. the same colour. An edge between them closes the odd cycle 1–2–6–1 (length 3). **True.**
 
 Extra facts: |E| = 3·3 + 2·4 = 17; minimum degree 2 (corners) — so the vertex connectivity is exactly 2.
 
-**Trap:** concluding from (D) that the grid has a cut vertex — needing **two** vertices to disconnect it means it has none.''',
-            'verify': '''
+**Trap:** concluding from (C) that the grid has a cut vertex — needing **two** vertices to disconnect it means it has none.''',
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 N = list(range(1, 13))
 E = []
 for r in range(3):

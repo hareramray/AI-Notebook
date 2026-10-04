@@ -120,12 +120,12 @@ assert ANSWER == 'B'
 enq 1, enq 2, enq 3, deq, enq 4, enq 5, deq, deq, deq, enq 6, deq.
 Which of the following statements is/are TRUE?''',
             'options': [
-                'The second dequeue moves elements from IN to OUT',
-                'In total, 5 elements are moved from IN to OUT',
                 'At the end, OUT is empty and IN contains only 6',
                 'No single dequeue performs more than 5 push/pop operations',
+                'In total, 5 elements are moved from IN to OUT',
+                'The second dequeue moves elements from IN to OUT',
             ],
-            'answer': ['B', 'C'],
+            'answer': ['A', 'C'],
             'solution': '''Elements are transferred only when OUT is empty, which is what makes the amortised cost O(1).
 
 - enq 1, 2, 3 → IN [1, 2, 3].
@@ -137,10 +137,10 @@ Which of the following statements is/are TRUE?''',
 - enq 6 → IN [6].
 - deq #5: OUT = [5] → pop 5. OUT empty; IN = [6].
 
-- (A) False — OUT still held 2 and 3.
-- (B) 3 + 2 = **5** transfers. True.
-- (C) True.
-- (D) False — the first dequeue performs 7 push/pop operations.
+- (A) True.
+- (B) False — the first dequeue performs 7 push/pop operations.
+- (C) 3 + 2 = **5** transfers. True.
+- (D) False — OUT still held 2 and 3.
 
 **Trap:** transferring on *every* dequeue (not only when OUT is empty) would break FIFO order.''',
             'solution_diagrams': [
@@ -151,7 +151,10 @@ Which of the following statements is/are TRUE?''',
                     'caption': 'Reversal puts the oldest element (1) on top',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 IN, OUT = [], []; moves = 0; costs = []; transfers_at = []
 def enq(x): IN.append(x)
 def deq():
@@ -325,17 +328,19 @@ def h(a, b=2, *args, c, **kw):
     return a + b + c + len(kw)
 h(1, c=3, d=4)''',
             'run_code': False,
-            'options': ['Snippet (A)', 'Snippet (B)', 'Snippet (C)', 'Snippet (D)'],
-            'answer': ['A', 'B'],
+            'options': ['Snippet (D)', 'Snippet (C)', 'Snippet (B)', 'Snippet (A)'],
+            'answer': ['C', 'D'],
             'solution': '''A name that is **assigned anywhere** in a function body is local to that function for the whole body (decided at compile time).
 
-- (A) `x = 6` makes x local to f, so `print(x)` reads an unassigned local → **UnboundLocalError.**
-- (B) `total += v` assigns total inside `add`, making it local to add; reading it first fails → **UnboundLocalError** (needs `nonlocal total`).
-- (C) The lambdas look up i at call time and see 2; `fs[0]()` returns 2. No error.
-- (D) c is keyword-only (after `*args`); the call supplies it, and d=4 goes into kw. Returns 1 + 2 + 3 + 1 = 7. No error.
+- (A) c is keyword-only (after `*args`); the call supplies it, and d=4 goes into kw. Returns 1 + 2 + 3 + 1 = 7. No error.
+- (B) The lambdas look up i at call time and see 2; `fs[0]()` returns 2. No error.
+- (C) `total += v` assigns total inside `add`, making it local to add; reading it first fails → **UnboundLocalError** (needs `nonlocal total`).
+- (D) `x = 6` makes x local to f, so `print(x)` reads an unassigned local → **UnboundLocalError.**
 
-**Trap:** (A) fails even though a global x exists — the local assignment *later* in the body still shadows it from the first line.''',
-            'verify': '''
+**Trap:** (D) fails even though a global x exists — the local assignment *later* in the body still shadows it from the first line.''',
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 snips = {'A': "x = 5\\ndef f():\\n    print(x)\\n    x = 6\\nf()",
          'B': "def g():\\n    total = 0\\n    def add(v):\\n        total += v\\n    add(3)\\n    return total\\ng()",
          'C': "fs = [lambda: i for i in range(3)]\\nfs[0]()",
@@ -462,20 +467,20 @@ assert hs.count(min(hs)) == int(ANSWER) and min(hs) == 2
             ],
             'options': [
                 'Dijkstra reports the correct shortest distance to B',
-                'Dijkstra reports d(A) = 2, whereas the true shortest distance to A is 0',
-                'Dijkstra reports the correct shortest distance to D',
                 'Adding 4 to every edge weight and running Dijkstra yields shortest paths that are also shortest in the original graph',
+                'Dijkstra reports the correct shortest distance to D',
+                'Dijkstra reports d(A) = 2, whereas the true shortest distance to A is 0',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'D'],
             'solution': '''**Dijkstra trace:** extract S (0): A = 2, B = 4. Extract A (2): C = 5. Extract B (4): edge B → A would give 0, but A is already final → ignored; D = 10. Extract C (5): D = 7. Extract D (7).
 Reported: A 2, B 4, C 5, D 7.
 
 **True distances** (no negative cycle): A = 4 − 4 = **0** (S→B→A), C = 3, D = 5 (S→B→A→C→D: 4 − 4 + 3 + 2), B = 4.
 
 - (A) d(B) = 4 is correct (no path to B uses the negative edge). **True.**
-- (B) **True** — A was finalised before B's negative edge was seen.
+- (B) After +4: S→B→D costs 8 + 10 = 18, while S→B→A→C→D costs 8 + 0 + 7 + 6 = 21, so Dijkstra picks S→B→D (original cost 10), not the true shortest (cost 5). Adding a constant penalises paths with **more edges**. **False.**
 - (C) Reported 7 vs true 5 — the error propagates through C. **False.**
-- (D) After +4: S→B→D costs 8 + 10 = 18, while S→B→A→C→D costs 8 + 0 + 7 + 6 = 21, so Dijkstra picks S→B→D (original cost 10), not the true shortest (cost 5). Adding a constant penalises paths with **more edges**. **False.**
+- (D) **True** — A was finalised before B's negative edge was seen.
 
 **Trap:** uniform reweighting is not Johnson's reweighting (which uses vertex potentials w'(u,v) = w(u,v) + h(u) − h(v)).''',
             'solution_diagrams': [
@@ -495,7 +500,8 @@ Reported: A 2, B 4, C 5, D 7.
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [('S','A',2),('S','B',4),('A','C',3),('B','A',-4),('C','D',2),('B','D',6)]
 V = 'SABCD'
 def dijkstra(E):
@@ -671,19 +677,21 @@ assert cnt == int(ANSWER)
                 },
             ],
             'options': [
-                'Bottom-up build-heap performs at most 11 swaps on any input of 15 keys',
                 'Inserting the keys 1, 2, …, 15 in this order, one at a time, into an initially empty **max**-heap performs 34 swaps in total',
-                'In a **min**-heap, the largest key can be at index 6',
+                'Bottom-up build-heap performs at most 11 swaps on any input of 15 keys',
                 'In a **min**-heap, the second smallest key is always at index 1 or 2',
+                'In a **min**-heap, the largest key can be at index 6',
             ],
-            'answer': ['A', 'B', 'D'],
-            'solution': '''- (A) A sift-down from a node of height h makes at most h swaps. Heights: root 3, two nodes 2, four nodes 1, eight leaves 0 → at most 3 + 2·2 + 4·1 = **11** swaps (reached e.g. for ascending input to a max-heap). **True.**
-- (B) Each new key is the largest so far and sifts up to the root, making as many swaps as its depth: depths 0 (1 key), 1 (2 keys), 2 (4 keys), 3 (8 keys) → 0 + 2 + 8 + 24 = **34**. **True.**
-- (C) Index 6 has children 13 and 14, which must be larger than it in a min-heap — so the largest key must be a **leaf** (indices 7–14). **False.**
-- (D) The second smallest has only one smaller key (the root), so its parent must be the root → index 1 or 2. **True.**
+            'answer': ['A', 'B', 'C'],
+            'solution': '''- (A) Each new key is the largest so far and sifts up to the root, making as many swaps as its depth: depths 0 (1 key), 1 (2 keys), 2 (4 keys), 3 (8 keys) → 0 + 2 + 8 + 24 = **34**. **True.**
+- (B) A sift-down from a node of height h makes at most h swaps. Heights: root 3, two nodes 2, four nodes 1, eight leaves 0 → at most 3 + 2·2 + 4·1 = **11** swaps (reached e.g. for ascending input to a max-heap). **True.**
+- (C) The second smallest has only one smaller key (the root), so its parent must be the root → index 1 or 2. **True.**
+- (D) Index 6 has children 13 and 14, which must be larger than it in a min-heap — so the largest key must be a **leaf** (indices 7–14). **False.**
 
-**Trap:** (A) vs (B) shows why bottom-up build-heap is O(n) while repeated insertion can be Θ(n log n): bottom-up sums *heights* (mostly small), insertion sums *depths* (mostly large).''',
-            'verify': '''
+**Trap:** (B) vs (A) shows why bottom-up build-heap is O(n) while repeated insertion can be Θ(n log n): bottom-up sums *heights* (mostly small), insertion sums *depths* (mostly large).''',
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import random
 def build_swaps(A):
     A = A[:]; n = len(A); sw = 0
@@ -893,9 +901,9 @@ head = prev''',
                 },
             ],
             'options': [
-                'The loop terminates',
                 'After the loop, `head` refers to the node with value 1',
                 'The loop body executes exactly 9 times',
+                'The loop terminates',
                 'After the loop, following `nxt` from `head` visits 1, 2, 3, 4, 5, 6, 3, …',
             ],
             'answer': ['A', 'B', 'C'],
@@ -913,9 +921,9 @@ head = prev''',
 
 9 iterations; prev = node 1. Final links: 1 → 2 → 3 → 6 → 5 → 4 → 3 (cycle).
 
-- (A) **True** — the walk re-enters the tail and follows the already-reversed tail links back to the head, whose nxt is None.
-- (B) **True** — reversing a ρ-shaped list returns the original head.
-- (C) **True** — 9 = 2μ + λ + 1 with tail length μ = 2 and cycle length λ = 4 (the tail is walked twice, the cycle once).
+- (A) **True** — reversing a ρ-shaped list returns the original head.
+- (B) **True** — 9 = 2μ + λ + 1 with tail length μ = 2 and cycle length λ = 4 (the tail is walked twice, the cycle once).
+- (C) **True** — the walk re-enters the tail and follows the already-reversed tail links back to the head, whose nxt is None.
 - (D) **False** — the tail 1 → 2 → 3 is restored, but the **cycle is reversed**: 3 → 6 → 5 → 4 → 3.
 
 **Tip:** comparing the returned head with the original head is a (slow) way to detect a cycle with O(1) extra space.''',
@@ -943,7 +951,9 @@ head = prev''',
                     'caption': 'Links after the loop: the cycle direction is reversed',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class Node:
     def __init__(s, v): s.v, s.nxt = v, None
 ns = [Node(i) for i in range(1, 7)]

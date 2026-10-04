@@ -226,10 +226,10 @@ assert s == int(ANSWER)
             'options': [
                 'The total number of element shifts is 8',
                 'The total number of key comparisons is 11',
-                'After the iterations i = 1, 2, 3 the array is [1, 2, 5, 9, 7, 3]',
                 'The element 9 is shifted to the right exactly twice',
+                'After the iterations i = 1, 2, 3 the array is [1, 2, 5, 9, 7, 3]',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''In insertion sort each shift removes exactly one inversion, so #shifts = #inversions. Comparisons = shifts + one extra comparison for every iteration that stops on a failing test (instead of running off the left end).
 
 - i = 1 (key 2): 5 > 2 shift; reached index 0 → 1 comparison, 1 shift → [2, 5, 9, 1, 7, 3].
@@ -242,11 +242,12 @@ Totals: shifts = 1 + 0 + 3 + 1 + 3 = 8, comparisons = 1 + 1 + 3 + 2 + 4 = 11.
 
 - (A) TRUE — also equals the inversion count 3 + 1 + 3 + 1 = 8.
 - (B) TRUE.
-- (C) TRUE — see the state after i = 3.
-- (D) FALSE — 9 is shifted at i = 3, i = 4 and i = 5, i.e. three times.
+- (C) FALSE — 9 is shifted at i = 3, i = 4 and i = 5, i.e. three times.
+- (D) TRUE — see the state after i = 3.
 
 **Tip:** counting inversions is the fastest way to get the number of shifts.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [5, 2, 9, 1, 7, 3]; sh = cmp = 0; moves9 = 0; snap = None
 for i in range(1, len(A)):
     key = A[i]; j = i - 1
@@ -432,20 +433,20 @@ Output: `-4 3 -4 -3 -3` → (D).
                 },
             ],
             'options': [
-                'G has exactly 4 vertices of odd degree',
                 'The recursive DFS order starting from A is A, B, D, E, C, F',
-                'In the BFS tree rooted at A, vertex F is at distance 3 from A',
                 'G is bipartite',
+                'In the BFS tree rooted at A, vertex F is at distance 3 from A',
+                'G has exactly 4 vertices of odd degree',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''Degrees: A 2, B 2, C 3, D 3, E 3, F 1 (sum 14 = 2 × 7 edges).
 
-- (A) Odd-degree vertices: C, D, E, F → 4. **TRUE** (always an even number by the handshaking lemma).
-- (B) DFS: A → B (first neighbour) → D (B's only unvisited neighbour) → D's neighbours in order B, C, E: C is unvisited → C → C's unvisited neighbour E → E → F. Order A, B, D, C, E, F. The stated order skips C at D. **FALSE.**
+- (A) DFS: A → B (first neighbour) → D (B's only unvisited neighbour) → D's neighbours in order B, C, E: C is unvisited → C → C's unvisited neighbour E → E → F. Order A, B, D, C, E, F. The stated order skips C at D. **FALSE.**
+- (B) C–D–E is a triangle (odd cycle), so G is not bipartite. **FALSE.**
 - (C) BFS from A: level 1 = {B, C}, level 2 = {D, E} (D from B, E from C), level 3 = {F}. **TRUE.**
-- (D) C–D–E is a triangle (odd cycle), so G is not bipartite. **FALSE.**
+- (D) Odd-degree vertices: C, D, E, F → 4. **TRUE** (always an even number by the handshaking lemma).
 
-**Trap:** in (B), at vertex D the alphabetically first unvisited neighbour is C, not E.''',
+**Trap:** in (A), at vertex D the alphabetically first unvisited neighbour is C, not E.''',
             'solution_diagrams': [
                 {
                     'type': 'graph',
@@ -478,7 +479,9 @@ Output: `-4 3 -4 -3 -3` → (D).
                     'caption': 'BFS tree from A (highlighted)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from collections import deque
 E = [("A","B"),("A","C"),("B","D"),("C","D"),("D","E"),("E","F"),("C","E")]
 G = {v: [] for v in "ABCDEF"}
@@ -609,12 +612,12 @@ s = deq() + deq()
 enq(s)
 print(front, rear, size, Q)''',
             'options': [
-                '`front` is 4 and `rear` is 3',
+                '`size` is 3',
                 'The elements logically in the queue, from front to rear, are 15, 18, 21, 21',
                 'The list `Q` contains 12 at index 3, and 12 is one of the elements logically in the queue',
-                '`size` is 3',
+                '`front` is 4 and `rear` is 3',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'D'],
             'solution': '''In a circular queue, `front` points at the oldest element and `rear` at the next free slot; both advance modulo the capacity. Dequeuing does **not** erase the slot.
 
 - enq 3, 6, 9, 12 → Q = [3, 6, 9, 12, None], front 0, rear 4, size 4.
@@ -625,10 +628,10 @@ print(front, rear, size, Q)''',
 
 Final: front 4, rear 3, size 4, Q = [18, 21, 21, 12, 15]. Logical contents from front: Q[4], Q[0], Q[1], Q[2] = 15, 18, 21, 21.
 
-- (A) TRUE.
+- (A) FALSE — size is 4.
 - (B) TRUE.
 - (C) FALSE — 12 is still physically present at index 3 (a stale value), but index 3 is outside the live range front … rear−1 (indices 4, 0, 1, 2).
-- (D) FALSE — size is 4.
+- (D) TRUE.
 
 **Trap:** reading the raw array instead of walking from `front` for `size` elements.''',
             'solution_diagrams': [
@@ -644,7 +647,8 @@ Final: front 4, rear 3, size 4, Q = [18, 21, 21, 12, 15]. Logical contents from 
                     'caption': 'Final array (live slots highlighted)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 assert OUTPUT.strip() == "4 3 4 [18, 21, 21, 12, 15]"
 live = [Q[(front + i) % 5] for i in range(size)]
 assert live == [15, 18, 21, 21] and 12 not in live and size != 3
@@ -669,15 +673,15 @@ def mystery(a, k):
     rev(a, 0, k - 1)
     rev(a, k, n - 1)''',
             'options': [
-                'After `mystery(a, 10)`, `a` is `[5, 6, 7, 1, 2, 3, 4]`',
                 '`mystery(a, 10)` performs exactly 6 swaps',
-                'After `mystery(a, -2)`, `a` is `[6, 7, 1, 2, 3, 4, 5]`',
                 '`mystery(a, 7)` leaves `a` unchanged and performs no swaps',
+                'After `mystery(a, -2)`, `a` is `[6, 7, 1, 2, 3, 4, 5]`',
+                'After `mystery(a, 10)`, `a` is `[5, 6, 7, 1, 2, 3, 4]`',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'D'],
             'solution': '''Reversing the whole array, then reversing the first k and the last n − k elements, **rotates the array right by k** in place.
 
-(A)/(B): k = 10 % 7 = 3.
+(D)/(A): k = 10 % 7 = 3.
 
 - rev(0, 6): [7, 6, 5, 4, 3, 2, 1] — 3 swaps.
 - rev(0, 2): [5, 6, 7, 4, 3, 2, 1] — 1 swap.
@@ -687,10 +691,12 @@ Result is the right-rotation by 3 and swaps = 3 + 1 + 2 = 6. Both **TRUE**.
 
 (C): Python's `%` with a positive modulus is non-negative: −2 % 7 = 5. So the call rotates right by 5 (= left by 2) giving [3, 4, 5, 6, 7, 1, 2]. The listed array is the right-rotation by 2. **FALSE.**
 
-(D): k = 0. rev(0, 6) reverses (3 swaps), rev(0, −1) does nothing (i > j), and rev(0, 6) reverses back (3 swaps). The array is unchanged but **6 swaps** occur. **FALSE.**
+(B): k = 0. rev(0, 6) reverses (3 swaps), rev(0, −1) does nothing (i > j), and rev(0, 6) reverses back (3 swaps). The array is unchanged but **6 swaps** occur. **FALSE.**
 
 **Trap:** assuming −2 % 7 is −2 (C/Java behaviour) or that k = 0 short-circuits.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def run(k):
     a = list(range(1, 8)); cnt = [0]
     def rv(i, j):
@@ -916,10 +922,10 @@ assert sum(d.values()) == int(ANSWER) and d["E"] == 11
                 },
             ],
             'options': [
-                'The resulting heap array is [30, 18, 25, 15, 7, 12, 9, 3]',
-                'Build-heap performs exactly 5 swaps',
-                'After one DELETE-MAX on the built heap (last element moved to the root, then sift-down), the array is [25, 18, 9, 15, 7, 12, 3]',
                 'In the built heap, 12 is stored in a leaf',
+                'The resulting heap array is [30, 18, 25, 15, 7, 12, 9, 3]',
+                'After one DELETE-MAX on the built heap (last element moved to the root, then sift-down), the array is [25, 18, 9, 15, 7, 12, 3]',
+                'Build-heap performs exactly 5 swaps',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''Bottom-up build-heap sifts down every internal node, from the last internal node (index ⌊n/2⌋ − 1 = 3) back to the root. Sift-down swaps with the **larger** child while that child is larger.
@@ -929,10 +935,10 @@ assert sum(d.values()) == int(ANSWER) and d["E"] == 11
 - i = 1 (7): children 15, 18 → swap with 18; index 4 has no children. [12, 18, 30, 15, 7, 25, 9, 3] (3)
 - i = 0 (12): children 18, 30 → swap with 30 (4); at index 2 children 25, 9 → swap with 25 (5). [30, 18, 25, 15, 7, 12, 9, 3]
 
-- (A) TRUE.
-- (B) TRUE — 5 swaps.
+- (A) TRUE — 12 is at index 5; indices 4 … 7 are leaves in an 8-element heap.
+- (B) TRUE.
 - (C) FALSE. Move 3 to the root: [3, 18, 25, 15, 7, 12, 9]; 3 swaps with 25 (larger child), then at index 2 children 12, 9 → swap with 12: [25, 18, 12, 15, 7, 3, 9]. The option swaps with the wrong child.
-- (D) TRUE — 12 is at index 5; indices 4 … 7 are leaves in an 8-element heap.
+- (D) TRUE — 5 swaps.
 
 **Trap:** sift-down must continue after the first swap (the 12 at the root sinks two levels).''',
             'solution_diagrams': [
@@ -942,7 +948,9 @@ assert sum(d.values()) == int(ANSWER) and d["E"] == 11
                     'caption': 'Max-heap after build-heap',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def sift(a, i, n, c):
     while True:
         l = 2 * i + 1; r = l + 1; m = i

@@ -199,21 +199,23 @@ assert L[len(L) // 2] - L[len(L) // 2 - 1] == int(ANSWER) == int(OUTPUT.strip())
             'topic': 'BST — possible search paths',
             'text': 'A binary search tree contains integer keys from 1 to 100 (not necessarily all of them), and a search for the key **55** is performed. Which of the following could be the sequence of keys examined by the search?',
             'options': [
-                '90, 20, 70, 30, 60, 50, 55',
                 '10, 80, 40, 75, 45, 60, 55',
-                '70, 30, 65, 40, 68, 55',
                 '25, 95, 50, 90, 52, 58, 53, 55',
+                '70, 30, 65, 40, 68, 55',
+                '90, 20, 70, 30, 60, 50, 55',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** Maintain the open interval (low, high) of keys still possible. Each examined key must lie inside the current interval; if it is greater than 55 it becomes the new high, if smaller the new low.
 
-- (A) (−∞,∞): 90 → (−∞,90); 20 → (20,90); 70 → (20,70); 30 → (30,70); 60 → (30,60); 50 → (50,60); 55 ✓. **Possible.**
-- (B) 10 → (10,∞); 80 → (10,80); 40 → (40,80); 75 → (40,75); 45 → (45,75); 60 → (45,60); 55 ✓. **Possible.**
+- (A) 10 → (10,∞); 80 → (10,80); 40 → (40,80); 75 → (40,75); 45 → (45,75); 60 → (45,60); 55 ✓. **Possible.**
+- (B) 25 → (25,∞); 95 → (25,95); 50 → (50,95); 90 → (50,90); 52 → (52,90); 58 → (52,58); 53 → (53,58); 55 ✓. **Possible.**
 - (C) 70 → (−∞,70); 30 → (30,70); 65 → (30,65); 40 → (40,65); **68 is outside (40,65)** — after going left at 65, every later key must be < 65. **Not possible.**
-- (D) 25 → (25,∞); 95 → (25,95); 50 → (50,95); 90 → (50,90); 52 → (52,90); 58 → (52,58); 53 → (53,58); 55 ✓. **Possible.**
+- (D) (−∞,∞): 90 → (−∞,90); 20 → (20,90); 70 → (20,70); 30 → (30,70); 60 → (30,60); 50 → (50,60); 55 ✓. **Possible.**
 
 **Trap:** checking only the immediate parent (68 > 40, so 'go right' looks fine) misses the constraint imposed by the earlier ancestor 65.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ok(seq, key=55):
     lo, hi = float('-inf'), float('inf')
     for x in seq[:-1]:
@@ -279,8 +281,8 @@ assert ["3", "0", "4", "2"]["ABCD".index(ANSWER)] == str(T.index(20))
             'topic': 'Bubble sort — passes and swaps',
             'text': 'Bubble sort (each pass scans left to right over the unsorted prefix, swapping adjacent out-of-order pairs) is applied to A = [62, 18, 45, 7, 53, 29, 11]. Which of the following statements is/are TRUE?',
             'options': [
-                'After 2 passes, A = [18, 7, 45, 29, 11, 53, 62]',
                 'The first 2 passes perform 9 swaps in total',
+                'After 2 passes, A = [18, 7, 45, 29, 11, 53, 62]',
                 'After any 2 passes of bubble sort on any array, the two largest elements are in their final positions',
                 'Sorting A completely requires 15 swaps',
             ],
@@ -289,8 +291,8 @@ assert ["3", "0", "4", "2"]["ABCD".index(ANSWER)] == str(T.index(20))
 
 **Pass 2:** 18<45 ok; 45>7 swap; 45<53 ok; 53>29 swap; 53>11 swap (3 swaps) → [18, 7, 45, 29, 11, 53, 62].
 
-- (A) **True.**
-- (B) **True** — 6 + 3 = 9.
+- (A) **True** — 6 + 3 = 9.
+- (B) **True.**
 - (C) **True** — pass k carries the k-th largest element to position n − k; this invariant holds for every input.
 - (D) **False** — bubble sort performs exactly one swap per inversion, and A has 14 inversions (62: 6, 18: 2, 45: 3, 7: 0, 53: 2, 29: 1, 11: 0), so 14 swaps.
 
@@ -312,7 +314,8 @@ assert ["3", "0", "4", "2"]["ABCD".index(ANSWER)] == str(T.index(20))
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [62, 18, 45, 7, 53, 29, 11]; sw = 0
 for p in range(2):
     for j in range(len(A) - 1 - p):
@@ -527,23 +530,26 @@ assert tot == int(ANSWER)
                 },
             ],
             'options': [
+                'Key 6 can be at index 2',
+                'Key 2 can be at index 3',
                 'Key 7 is always at one of the indices 3, 4, 5, 6',
                 'Key 3 can be at an index of depth 2 (indices 3–6)',
-                'Key 2 can be at index 3',
-                'Key 6 can be at index 2',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['C', 'D'],
             'solution': '''**Concept.** In a min-heap every key is smaller than all keys in its subtree. So a key at a node whose subtree has s nodes needs at least s − 1 larger keys; and a key can be at depth d only if its d ancestors are all smaller than it.
 
-- (A) **True.** 7 is the maximum; if it had a child, the child would have to be larger. So 7 is at a leaf, i.e. index 3–6.
-- (B) **True.** Depth 2 needs two smaller ancestors: 1 (root) and 2. Example heap [1, 2, 4, 3, 5, 6, 7] — 3 is at index 3, child of 2.
-- (C) **False.** 2 can only have the ancestor 1, so it must be at depth ≤ 1 — in fact it must be a child of the root (index 1 or 2), since its parent must be 1.
-- (D) **False.** Index 2 roots a subtree of 3 nodes, so the key there needs 2 larger keys; only 7 is larger than 6.
+- (A) **False.** Index 2 roots a subtree of 3 nodes, so the key there needs 2 larger keys; only 7 is larger than 6.
+- (B) **False.** 2 can only have the ancestor 1, so it must be at depth ≤ 1 — in fact it must be a child of the root (index 1 or 2), since its parent must be 1.
+- (C) **True.** 7 is the maximum; if it had a child, the child would have to be larger. So 7 is at a leaf, i.e. index 3–6.
+- (D) **True.** Depth 2 needs two smaller ancestors: 1 (root) and 2. Example heap [1, 2, 4, 3, 5, 6, 7] — 3 is at index 3, child of 2.
 
-**Fact:** there are exactly 80 distinct min-heaps on 7 distinct keys — enumerating them confirms (A) and (B) and refutes (C) and (D).
+**Fact:** there are exactly 80 distinct min-heaps on 7 distinct keys — enumerating them confirms (C) and (D) and refutes (B) and (A).
 
 **Trap:** assuming the k-th smallest must be at depth k − 1 or at depth ⌊log₂ k⌋; the k-th smallest can be anywhere from depth 1 down to depth k − 1.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 heaps = [p for p in itertools.permutations(range(1, 8))
          if all(p[(i - 1) // 2] < p[i] for i in range(1, 7))]
@@ -576,11 +582,11 @@ assert sorted(k for k in r if r[k]) == sorted(ANSWER)
             'run_code': False,
             'options': [
                 'The function returns 3',
+                'After the call, every element of A[0..3] is ≤ every element of A[4..8]',
                 'Exactly 3 swaps are performed',
                 'After the call, the pivot value 6 is at index 3',
-                'After the call, every element of A[0..3] is ≤ every element of A[4..8]',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Concept.** Hoare's scheme moves i right to an element ≥ pivot and j left to an element ≤ pivot, swaps them, and repeats until the pointers cross. It returns j such that A[lo..j] ≤ pivot ≤ A[j+1..hi] — but, unlike Lomuto, it does **not** put the pivot in its final place.
 
 **Trace** (pivot 6):
@@ -590,12 +596,14 @@ assert sorted(k for k in r if r[k]) == sorted(ANSWER)
 - i → 4 (9); j → 3 (2). i ≥ j → return **3**.
 
 - (A) **True.**
-- (B) **True.**
-- (C) **False** — 6 ended at index 7; index 3 holds 2.
-- (D) **True** — left part {1, 5, 3, 2} (max 5), right part {9, 8, 11, 6, 10} (min 6).
+- (B) **True** — left part {1, 5, 3, 2} (max 5), right part {9, 8, 11, 6, 10} (min 6).
+- (C) **True.**
+- (D) **False** — 6 ended at index 7; index 3 holds 2.
 
 **Trap:** recursing on (lo, j − 1) and (j + 1, hi) as with Lomuto is a bug for Hoare; the correct calls are (lo, j) and (j + 1, hi).''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def hoare(A, lo, hi):
     global SW
     p = A[lo]; i, j = lo - 1, hi + 1
@@ -849,17 +857,19 @@ t = s
 s += "base"
 u = s[::-1][1::2]
 k = s.find("a", 2)''',
-            'options': ['`t == "data"`', '`u == "sbtd"`', '`k == 3`', '`s.count("a") == 2`'],
-            'answer': ['A', 'B', 'C'],
+            'options': ['`k == 3`', '`u == "sbtd"`', '`s.count("a") == 2`', '`t == "data"`'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** Strings are immutable: `s += "base"` builds a new string and rebinds s; t still refers to the old "data". Slices create new strings.
 
-- (A) **True** — t is untouched: "data".
+- (A) `s.find("a", 2)` searches from index 2: d0 a1 **t2 a3** … → first 'a' at or after index 2 is at index 3. **True.**
 - (B) s = "database"; `s[::-1]` = "esabatad"; `[1::2]` takes indices 1, 3, 5, 7 → s, b, t, d → "sbtd". **True.**
-- (C) `s.find("a", 2)` searches from index 2: d0 a1 **t2 a3** … → first 'a' at or after index 2 is at index 3. **True.**
-- (D) "database" contains 'a' at indices 1, 3, 5 → count 3. **False.**
+- (C) "database" contains 'a' at indices 1, 3, 5 → count 3. **False.**
+- (D) **True** — t is untouched: "data".
 
 **Trap:** contrasting with lists — had s been a list, `s += [...]` would mutate in place and t would see the change (compare Q1 of this paper).''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 r = {'A': t == "data", 'B': u == "sbtd", 'C': k == 3, 'D': s.count("a") == 2}
 assert sorted(x for x in r if r[x]) == sorted(ANSWER)
 ''',

@@ -158,25 +158,27 @@ assert lv == {1, 2, 3} and ANSWER == 'A'
                 },
             ],
             'options': [
-                '6, 9, 3, 8, 1, 5, 4',
-                '6, 3, 1, 9, 4, 5, 8',
-                '6, 3, 5, 4, 9, 1, 8',
                 '6, 8, 9, 3, 5, 1, 4',
+                '6, 3, 1, 9, 4, 5, 8',
+                '6, 9, 3, 8, 1, 5, 4',
+                '6, 3, 5, 4, 9, 1, 8',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''**Concept.** A sequence produces T iff every node is inserted **after all of its ancestors** in T. Unrelated subtrees may be interleaved freely.
 
 Ancestor constraints in T: 6 first; 3 and 9 after 6; 1 and 5 after 3; 4 after 5; 8 after 9.
 
-- (A) 6, 9, 3, 8, 1, 5, 4: all constraints hold (8 after 9, 4 after 5). **Yes.**
+- (A) 8 is inserted before 9 → 8 becomes the right child of 6. **No.**
 - (B) 4 comes before 5 → 4 becomes the right child of 3 and 5 then goes under 4. **No.**
-- (C) 6, 3, 5, 4, 9, 1, 8: 5 after 3, 4 after 5, 1 after 3, 8 after 9. **Yes.**
-- (D) 8 is inserted before 9 → 8 becomes the right child of 6. **No.**
+- (C) 6, 9, 3, 8, 1, 5, 4: all constraints hold (8 after 9, 4 after 5). **Yes.**
+- (D) 6, 3, 5, 4, 9, 1, 8: 5 after 3, 4 after 5, 1 after 3, 8 after 9. **Yes.**
 
 (For the record, the number of insertion orders producing T is C(6, 2) × 3 = 45: choose the positions of the right subtree {9, 8} among the 6 non-root slots, and interleave {1} with the chain 5 → 4 after 3 in 3 ways.)
 
 **Trap:** checking only that each element lands on the correct *side* of the root — the constraint must hold at every level.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def ins(t, k):
     if t is None: return [k, None, None]
@@ -269,19 +271,21 @@ assert float(ANSWER[0]) <= e <= float(ANSWER[1])
             'topic': 'Sorting — behaviour on all-equal keys',
             'text': 'An array of n keys that are **all equal** is sorted. Which of the following statements is/are TRUE? (Insertion sort shifts while `A[j] > key`; bubble sort has an early-exit flag; quicksort uses the stated partition scheme recursively.)',
             'options': [
-                'Insertion sort performs Θ(n) comparisons',
-                'Quicksort with the Lomuto partition (last element as pivot, moving elements ≤ pivot left) performs Θ(n²) comparisons',
-                'Quicksort with the Hoare partition (first element as pivot) performs Θ(n²) comparisons',
                 'Bubble sort with early exit performs n(n − 1)/2 comparisons',
+                'Quicksort with the Hoare partition (first element as pivot) performs Θ(n²) comparisons',
+                'Quicksort with the Lomuto partition (last element as pivot, moving elements ≤ pivot left) performs Θ(n²) comparisons',
+                'Insertion sort performs Θ(n) comparisons',
             ],
-            'answer': ['A', 'B'],
-            'solution': '''- (A) Each key compares once with its left neighbour, finds it not greater, and stops: n − 1 comparisons. **TRUE.**
-- (B) Lomuto: every element satisfies `≤ pivot`, so the pivot ends at the right end; the recursion continues on n − 1 elements, then n − 2, … → n(n − 1)/2 = Θ(n²). **TRUE.**
-- (C) Hoare: both scans stop at *every* element equal to the pivot, so i and j advance in lock-step and meet in the middle — each partition splits the range roughly in half → Θ(n log n), not Θ(n²). **FALSE.**
-- (D) The first pass makes no swap, so the algorithm stops after n − 1 comparisons. **FALSE.**
+            'answer': ['C', 'D'],
+            'solution': '''- (A) The first pass makes no swap, so the algorithm stops after n − 1 comparisons. **FALSE.**
+- (B) Hoare: both scans stop at *every* element equal to the pivot, so i and j advance in lock-step and meet in the middle — each partition splits the range roughly in half → Θ(n log n), not Θ(n²). **FALSE.**
+- (C) Lomuto: every element satisfies `≤ pivot`, so the pivot ends at the right end; the recursion continues on n − 1 elements, then n − 2, … → n(n − 1)/2 = Θ(n²). **TRUE.**
+- (D) Each key compares once with its left neighbour, finds it not greater, and stops: n − 1 comparisons. **TRUE.**
 
 **Trap:** “quicksort is quadratic on equal keys” is true for Lomuto but *not* for Hoare — the stop-on-equal rule is precisely what balances Hoare’s splits.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import sys
 sys.setrecursionlimit(10000)
 def lomuto(n):
@@ -495,13 +499,13 @@ assert win_max(a, 3) == brute and sum(brute) == int(ANSWER)
             'options': [
                 'Every permutation of 1, 2, 3, 4 can be produced with two stacks in series',
                 'Exactly 14 permutations of 1, 2, 3, 4 can be produced with a single stack',
-                'The output 4 1 3 2 can be produced with a single stack',
                 'The output 2 4 3 1 can be produced with a single stack',
+                'The output 4 1 3 2 can be produced with a single stack',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Single stack.** The achievable outputs of 1..n are counted by the Catalan number C_{n} = (2n)!/((n+1)! n!), so for n = 4 there are **14** → (B) **TRUE**. A permutation is achievable iff it avoids the pattern “3 1 2” (some c … a … b with a < b < c).
-- (C) 4 1 3 2: when 4 is output, 1, 2, 3 are on the stack with 3 on top, so 1 cannot come next (4 1 3 is a 312-pattern). **FALSE.**
-- (D) 2 4 3 1: push 1, 2 pop 2; push 3, 4 pop 4; pop 3; pop 1. **TRUE.**
+- (C) 2 4 3 1: push 1, 2 pop 2; push 3, 4 pop 4; pop 3; pop 1. **TRUE.**
+- (D) 4 1 3 2: when 4 is output, 1, 2, 3 are on the stack with 3 on top, so 1 cannot come next (4 1 3 is a 312-pattern). **FALSE.**
 
 **Two stacks in series.** S2 can hold a value while S1 keeps accepting input, which lets the machine undo the single-stack obstruction. For example, the 312-type output 4 1 3 2:
 - push 1, push 2; move 2 → S2 (S1 = [1], S2 = [2])
@@ -511,7 +515,8 @@ assert win_max(a, 3) == brute and sum(brute) == int(ANSWER)
 An exhaustive search over all move sequences (see the verify code) confirms that all 24 permutations of 1..4 are reachable → (A) **TRUE**.
 
 **Trap:** assuming two stacks behave like one bigger stack; the transfer step adds genuine reordering power.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def single(n):
     res = set()
@@ -723,21 +728,23 @@ assert sum(d[v] != bf[v] for v in G) == int(ANSWER)
                 },
             ],
             'options': [
-                'The graph is bipartite',
-                'The graph has exactly one cut vertex',
-                'A BFS from A assigns vertices to exactly 6 distinct levels (level 0 to level 5)',
                 'Every spanning tree of the graph contains the edge C–E',
+                'The graph is bipartite',
+                'A BFS from A assigns vertices to exactly 6 distinct levels (level 0 to level 5)',
+                'The graph has exactly one cut vertex',
             ],
-            'answer': ['A', 'C', 'D'],
-            'solution': '''- (A) The only cycles are A-B-C-D-A and E-F-G-H-E, both of length 4 (even). A graph is bipartite iff it has no odd cycle → 2-colouring {A, C, F, H} vs {B, D, E, G}. **TRUE.**
-- (B) Removing C separates {A, B, D} from {E, F, G, H}; removing E separates {A, B, C, D} from {F, G, H}. No other vertex disconnects the graph. **Two** cut vertices → **FALSE.**
+            'answer': ['A', 'B', 'C'],
+            'solution': '''- (A) C–E is a **bridge** (its removal disconnects the graph), and every spanning tree must contain every bridge. **TRUE.**
+- (B) The only cycles are A-B-C-D-A and E-F-G-H-E, both of length 4 (even). A graph is bipartite iff it has no odd cycle → 2-colouring {A, C, F, H} vs {B, D, E, G}. **TRUE.**
 - (C) BFS from A: level 0 {A}, 1 {B, D}, 2 {C}, 3 {E}, 4 {F, H}, 5 {G} → 6 levels. **TRUE.**
-- (D) C–E is a **bridge** (its removal disconnects the graph), and every spanning tree must contain every bridge. **TRUE.**
+- (D) Removing C separates {A, B, D} from {E, F, G, H}; removing E separates {A, B, C, D} from {F, G, H}. No other vertex disconnects the graph. **Two** cut vertices → **FALSE.**
 
 **Concept recap.** A vertex is a cut vertex iff removing it increases the number of components; an edge lies in every spanning tree iff it is a bridge (it lies on no cycle).
 
-**Trap:** in (B), noticing only the bridge’s one endpoint — *both* endpoints of a bridge are cut vertices whenever each has degree ≥ 2.''',
-            'verify': '''
+**Trap:** in (D), noticing only the bridge’s one endpoint — *both* endpoints of a bridge are cut vertices whenever each has degree ≥ 2.''',
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from collections import deque
 E = "AB BC CD DA CE EF FG GH HE".split()
 G = {}
@@ -870,8 +877,8 @@ Output `['a', 'b', 'e'] c ('c', 0)` → (C).
             ],
             'options': [
                 'B D A G C E F H is a valid topological order',
-                'Kahn’s algorithm that always removes the alphabetically smallest vertex of in-degree 0 outputs A B C D E F G H',
                 'H is the last vertex in every topological order',
+                'Kahn’s algorithm that always removes the alphabetically smallest vertex of in-degree 0 outputs A B C D E F G H',
                 'A precedes D in every topological order',
             ],
             'answer': ['B', 'C'],
@@ -880,12 +887,13 @@ Output `['a', 'b', 'e'] c ('c', 0)` → (C).
 In-degrees: A 0, B 0, C 2, D 1, E 1, F 2, G 2, H 2.
 
 - (A) In B D A G C E F H, G appears before E, but E→G is an edge. **FALSE.**
-- (B) Kahn with a min-priority queue: available {A, B} → A (frees E); {B, E} → B (frees C and D); {C, D, E} → C; {D, E} → D (F freed: its predecessors C, D are done); {E, F} → E (frees G); {F, G} → F; G; H. Output **A B C D E F G H**. **TRUE.**
-- (C) H is the only sink, and every other vertex has a path to H (via F or G), so H must come after all of them. **TRUE.**
+- (B) H is the only sink, and every other vertex has a path to H (via F or G), so H must come after all of them. **TRUE.**
+- (C) Kahn with a min-priority queue: available {A, B} → A (frees E); {B, E} → B (frees C and D); {C, D, E} → C; {D, E} → D (F freed: its predecessors C, D are done); {E, F} → E (frees G); {F, G} → F; G; H. Output **A B C D E F G H**. **TRUE.**
 - (D) A and D are incomparable (no path between them): e.g. B D A C E F G H is valid. **FALSE.**
 
-**Trap:** in (B), students often output D before C because D was “freed” by B at the same time as C — the tie is broken alphabetically, so C wins.''',
-            'verify': '''
+**Trap:** in (C), students often output D before C because D was “freed” by B at the same time as C — the tie is broken alphabetically, so C wins.''',
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 D = {'A': 'CE', 'B': 'CD', 'C': 'F', 'D': 'FG', 'E': 'G', 'F': 'H', 'G': 'H', 'H': ''}
 def valid(s):

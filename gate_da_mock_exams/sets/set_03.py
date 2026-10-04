@@ -140,21 +140,22 @@ print(ev("3 8 - 2 / 4 6 * -"))''',
             'topic': 'Python — list slicing',
             'text': 'Let `q = [10, 20, 30, 40, 50, 60]`. Which of the following statements is/are TRUE?',
             'options': [
-                '`q[::-2]` evaluates to `[60, 40, 20]`',
-                '`q[4:1:-1]` evaluates to `[50, 40, 30, 20]`',
                 '`q[-3:-1]` evaluates to `[40, 50]`',
+                '`q[4:1:-1]` evaluates to `[50, 40, 30, 20]`',
+                '`q[::-2]` evaluates to `[60, 40, 20]`',
                 '`q[-1:-4]` evaluates to `[60, 50, 40]`',
             ],
             'answer': ['A', 'C'],
             'solution': '''A slice `q[start:stop:step]` starts at `start`, moves by `step`, and stops **before** reaching `stop`. Negative indices count from the end (−1 is the last element). For a negative step the defaults are start = last, stop = before-the-first.
 
-- (A) step −2 from index 5: indices 5, 3, 1 → `[60, 40, 20]`. **True.**
+- (A) −3 → index 3, −1 → index 5 (excluded) → indices 3, 4 → `[40, 50]`. **True.**
 - (B) indices 4, 3, 2 (index 1 is the excluded stop) → `[50, 40, 30]`. **False** — the stop bound is exclusive in both directions.
-- (C) −3 → index 3, −1 → index 5 (excluded) → indices 3, 4 → `[40, 50]`. **True.**
+- (C) step −2 from index 5: indices 5, 3, 1 → `[60, 40, 20]`. **True.**
 - (D) start index 5, stop index 2, step +1 (default): you cannot move forward from 5 to 2, so the result is `[]`. **False.**
 
 **Trap:** (D) looks like it should walk backwards, but without an explicit negative step Python never reverses — it silently returns an empty list.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 q = [10, 20, 30, 40, 50, 60]
 truth = [q[::-2] == [60, 40, 20], q[4:1:-1] == [50, 40, 30, 20],
          q[-3:-1] == [40, 50], q[-1:-4] == [60, 50, 40]]
@@ -418,17 +419,19 @@ assert s == 9 and ANSWER == "A"
                     },
                 },
             ],
-            'options': ['P, Q, R, S, T, U', 'P, R, Q, T, S, U', 'P, Q, R, T, S, U', 'P, R, Q, S, U, T'],
-            'answer': ['A', 'B'],
+            'options': ['P, R, Q, S, U, T', 'P, Q, R, T, S, U', 'P, R, Q, T, S, U', 'P, Q, R, S, T, U'],
+            'answer': ['C', 'D'],
             'solution': '''BFS visits vertices in non-decreasing distance from P, **and** within a level the order follows the order in which parents were dequeued (FIFO). Levels: {P}, {Q, R}, {S, T}, {U}.
 
-- (A) Q dequeued first discovers S; then R discovers T → S before T. **Valid.**
-- (B) R dequeued first discovers S and T (any order, here T then S); Q adds nothing new. **Valid.**
-- (C) Q is before R, so S (discovered by Q) must precede T (discovered only by R). **Invalid.**
-- (D) U (distance 3) appears before T (distance 2). **Invalid.**
+- (A) U (distance 3) appears before T (distance 2). **Invalid.**
+- (B) Q is before R, so S (discovered by Q) must precede T (discovered only by R). **Invalid.**
+- (C) R dequeued first discovers S and T (any order, here T then S); Q adds nothing new. **Valid.**
+- (D) Q dequeued first discovers S; then R discovers T → S before T. **Valid.**
 
-**Trap:** being level-consistent is necessary but not sufficient — (C) respects levels but violates the FIFO parent order.''',
-            'verify': '''
+**Trap:** being level-consistent is necessary but not sufficient — (B) respects levels but violates the FIFO parent order.''',
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from itertools import permutations
 adj = {"P": "QR", "Q": "PS", "R": "PST", "S": "QRU", "T": "RU", "U": "ST"}
 orders = set()
@@ -611,12 +614,12 @@ assert (f, r, (r - f) % N) == (5, 3, 5) and ANSWER == "A"
             'topic': 'Binary min-heap — insert & extract-min',
             'text': 'The keys 14, 9, 21, 6, 17, 3, 11 are inserted one at a time into an initially empty binary min-heap stored in an array (0-based, children of i at 2i+1 and 2i+2; each insert appends and sifts up). Then one `extract-min` is performed (the last element moves to the root and sifts down, swapping with the smaller child). Which of the following statements is/are TRUE?',
             'options': [
-                'After all seven insertions the array is [3, 9, 6, 14, 17, 21, 11]',
-                'Exactly 4 swaps are performed in total during the seven insertions',
-                'After the extract-min, the right child of the root is 11',
                 'After the extract-min, the element at index 4 is 21',
+                'After the extract-min, the right child of the root is 11',
+                'Exactly 4 swaps are performed in total during the seven insertions',
+                'After all seven insertions the array is [3, 9, 6, 14, 17, 21, 11]',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'D'],
             'solution': '''A priority queue implemented as a binary heap: insert = append + sift-up, extract-min = move last to root + sift-down.
 
 Insertions (swaps in brackets):
@@ -631,10 +634,10 @@ Insertions (swaps in brackets):
 
 Total swaps = 5. Extract-min: remove 3, move 11 to root → [11, 9, 6, 14, 17, 21]; smaller child is 6 → swap → [6, 9, 11, 14, 17, 21]; 11's only child 21 is larger → stop.
 
-- (A) **True.**
-- (B) **False** — 5 swaps, not 4.
-- (C) index 2 holds 11. **True.**
-- (D) index 4 holds 17; 21 is at index 5. **False.**
+- (A) index 4 holds 17; 21 is at index 5. **False.**
+- (B) index 2 holds 11. **True.**
+- (C) **False** — 5 swaps, not 4.
+- (D) **True.**
 
 **Trap:** in sift-down always swap with the **smaller** child (9 vs 6 → choose 6); swapping with the left child by default breaks the heap property.''',
             'solution_diagrams': [
@@ -644,7 +647,9 @@ Total swaps = 5. Extract-min: remove 3, move 11 to root → [11, 9, 6, 14, 17, 2
                     'caption': 'Min-heap after extract-min',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 h, sw = [], 0
 for k in [14, 9, 21, 6, 17, 3, 11]:
     h.append(k); i = len(h) - 1
@@ -878,10 +883,10 @@ assert Q[0] == sorted(Q[0]) and tot == int(ANSWER)
                 },
             ],
             'options': [
-                '`partition(A, 0, 6)` returns 3',
-                'After the call, A = [2, 4, 3, 6, 9, 8, 7]',
-                'After the call, the part of A left of the pivot is already in sorted order',
                 'If quicksort used this partition on an already ascending array of n distinct keys, it would take Θ(n²) time',
+                '`partition(A, 0, 6)` returns 3',
+                'After the call, the part of A left of the pivot is already in sorted order',
+                'After the call, A = [2, 4, 3, 6, 9, 8, 7]',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''Lomuto keeps the invariant A[lo..i] ≤ pivot < A[i+1..j−1]; at the end the pivot is swapped into position i + 1.
@@ -893,10 +898,10 @@ assert Q[0] == sorted(Q[0]) and tot == int(ANSWER)
 - j=4 (3): i=2, swap A2↔A4 → [2, 4, 3, 7, 9, 8, 6]
 - j=5 (8) skip
 - final swap A3↔A6 → [2, 4, 3, 6, 9, 8, 7], return 3
-- (A) **True.**
+- (A) on sorted input the last element is the maximum, every split is (n−1, 0), T(n) = T(n−1) + Θ(n) = Θ(n²). **True.**
 - (B) **True.**
 - (C) left part is [2, 4, 3] — not sorted. **False.** Partition only guarantees ≤ pivot, not order.
-- (D) on sorted input the last element is the maximum, every split is (n−1, 0), T(n) = T(n−1) + Θ(n) = Θ(n²). **True.**
+- (D) **True.**
 
 **Trap:** partitioning is not sorting, and Lomuto is not stable: the right part was 7, 9, 8 in the input but ends up as 9, 8, 7 because the pivot swap moved 7 to the end.''',
             'solution_diagrams': [
@@ -908,7 +913,9 @@ assert Q[0] == sorted(Q[0]) and tot == int(ANSWER)
                     'caption': 'After partition: pivot 6 at index 3',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [7, 2, 9, 4, 3, 8, 6]
 k = partition(A, 0, 6)
 truth = [k == 3, A == [2, 4, 3, 6, 9, 8, 7], A[:3] == sorted(A[:3]), True]
@@ -987,23 +994,26 @@ assert OUTPUT.strip() == ANSWER == str(6 + sum(r2))
             'marks': 2,
             'topic': 'Output-restricted deque permutations',
             'text': 'The numbers 1, 2, 3, 4 arrive in this order and each must be inserted into an initially empty **output-restricted deque** as soon as it arrives (insertion is allowed at either end, deletion only at the front). Deletions may be performed at any time, and each deleted number is written to the output. Which of the following output sequences CANNOT be produced?',
-            'options': ['4, 1, 3, 2', '4, 3, 1, 2', '3, 1, 4, 2', '4, 2, 3, 1'],
-            'answer': ['A', 'D'],
+            'options': ['4, 2, 3, 1', '3, 1, 4, 2', '4, 1, 3, 2', '4, 3, 1, 2'],
+            'answer': ['A', 'C'],
             'solution': '''If 4 is output first, then 1, 2, 3 are all inside the deque before any deletion, and the remaining output is just the deque read front-to-rear. Building the deque by inserting 1, then 2 at either end, then 3 at either end gives only:
 
 3 2 1, 2 1 3, 3 1 2, 1 2 3
 
 (the values must form a sequence where each newly inserted number is at an **end**). With 4 inserted at the front and deleted first, the possible outputs starting with 4 are 4321, 4213, 4312, 4123.
 
-- (A) 4 1 3 2 → would need deque 1 3 2 with 3 in the middle. **Cannot.**
-- (B) 4 3 1 2 → deque 3 1 2 (1; 2 at rear; 3 at front). **Can.**
-- (C) insert 1, insert 2 at the rear → [1 2]; insert 3 at front → [3 1 2]; delete 3, delete 1; insert 4 at front → [4 2]; delete 4, delete 2 → 3 1 4 2. **Can.**
-- (D) 4 2 3 1 → deque 2 3 1 with 3 in the middle, but 3 was the last of the three inserted. **Cannot.**
+- (A) 4 2 3 1 → deque 2 3 1 with 3 in the middle, but 3 was the last of the three inserted. **Cannot.**
+- (B) insert 1, insert 2 at the rear → [1 2]; insert 3 at front → [3 1 2]; delete 3, delete 1; insert 4 at front → [4 2]; delete 4, delete 2 → 3 1 4 2. **Can.**
+- (C) 4 1 3 2 → would need deque 1 3 2 with 3 in the middle. **Cannot.**
+- (D) 4 3 1 2 → deque 3 1 2 (1; 2 at rear; 3 at front). **Can.**
 
-Of the 24 permutations exactly 22 are achievable; the only two impossible ones are (A) and (D).
+Of the 24 permutations exactly 22 are achievable; the only two impossible ones are (C) and (A).
 
 **Tip:** the last-inserted element of a deque must sit at one of its ends — a quick test for any 'restricted deque' question.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 res = set()
 def rec(i, dq, out):

@@ -272,20 +272,20 @@ assert OUTPUT.strip() == '[1, 2, 3] True 4' and ANSWER == 'A'
             'topic': 'Hashing — linear probing with deletion',
             'text': 'Keys 31, 41, 51, 22, 62, 9, 19 are inserted in this order into an empty table of size 10 using h(k) = k mod 10 and linear probing. Then 41 and 22 are deleted by marking their slots with a **tombstone** (searches continue past a tombstone; an insertion of a key not present uses the first tombstone or empty slot on its probe path). Which statements is/are TRUE?',
             'options': [
-                'A search for 62 examines exactly 4 slots',
-                'Inserting 72 now places it in slot 2',
-                'An unsuccessful search for 12 examines exactly 6 slots',
                 'Had the deletions simply emptied the slots (no tombstones), a search for 62 would fail',
+                'Inserting 72 now places it in slot 2',
+                'A search for 62 examines exactly 4 slots',
+                'An unsuccessful search for 12 examines exactly 6 slots',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''Build the table: 31→1, 41→2, 51→3, 22→4 (2, 3 full), 62→5 (2, 3, 4 full), 9→9, 19→0 (9 full, wraps to 0). After deletions: slot 2 = T (tombstone), slot 4 = T.
 
 Table: 0:19, 1:31, 2:T, 3:51, 4:T, 5:62, 9:9 (slots 6, 7, 8 empty).
 
-- (A) 62: probe 2 (T, continue), 3 (51), 4 (T), 5 (62 found) → **4 slots. True.**
+- (A) Without tombstones slot 2 would be empty, so the search for 62 stops at its home slot and reports 'absent' although 62 is in slot 5. **True.**
 - (B) 72 (home 2): slot 2 is the first tombstone → stored in slot **2. True.**
-- (C) 12 (home 2): 2 (T), 3, 4 (T), 5, 6 (empty → stop) → **5** slots, not 6. False.
-- (D) Without tombstones slot 2 would be empty, so the search for 62 stops at its home slot and reports 'absent' although 62 is in slot 5. **True.**
+- (C) 62: probe 2 (T, continue), 3 (51), 4 (T), 5 (62 found) → **4 slots. True.**
+- (D) 12 (home 2): 2 (T), 3, 4 (T), 5, 6 (empty → stop) → **5** slots, not 6. False.
 
 **Trap:** deletion in open addressing must not break probe chains; tombstones preserve them.''',
             'solution_diagrams': [
@@ -304,7 +304,9 @@ Table: 0:19, 1:31, 2:T, 3:51, 4:T, 5:62, 9:9 (slots 6, 7, 8 empty).
                     'caption': 'Table after deleting 41 and 22 (T = tombstone)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 T = [None] * 10
 for k in [31, 41, 51, 22, 62, 9, 19]:
     i = k % 10
@@ -581,20 +583,20 @@ assert OUTPUT.strip() == '[3, 2, 1, 6, 5, 4, 7, 8]' and ANSWER == 'A'
                 },
             ],
             'options': [
-                'Exactly 9 key comparisons are made for these two lists',
                 'For some two sorted lists of lengths 5 and 6, this method makes 11 comparisons',
                 'For some two sorted lists of lengths 5 and 6, this method makes only 5 comparisons',
                 'Done by relinking the existing nodes, the merge needs only O(1) extra space',
+                'Exactly 9 key comparisons are made for these two lists',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''Each comparison outputs exactly one node; comparisons stop as soon as one list is exhausted.
 
 **Trace:** 3 vs 5 → 3; 8 vs 5 → 5; 8 vs 9 → 8; 12 vs 9 → 9; 12 vs 10 → 10; 12 vs 25 → 12; 20 vs 25 → 20; 31 vs 25 → 25; 31 vs 40 → 31. X is now empty; attach 40 → 47. **9 comparisons.**
 
-- (A) **True.**
-- (B) At most m + n − 1 = 10 comparisons: after 10 outputs, at least one list is empty (the last node is never compared). **False.**
-- (C) If all of the 5-element list is smaller than the first element of the other, each comparison outputs a node of the shorter list: min(m, n) = 5 comparisons. **True.**
-- (D) Relinking uses a constant number of pointers (a dummy head and a tail pointer). **True.**
+- (A) At most m + n − 1 = 10 comparisons: after 10 outputs, at least one list is empty (the last node is never compared). **False.**
+- (B) If all of the 5-element list is smaller than the first element of the other, each comparison outputs a node of the shorter list: min(m, n) = 5 comparisons. **True.**
+- (C) Relinking uses a constant number of pointers (a dummy head and a tail pointer). **True.**
+- (D) **True.**
 
 **Tip:** the number of comparisons is (m + n) − (number of nodes appended after one list runs out); here 11 − 2 = 9.''',
             'solution_diagrams': [
@@ -605,7 +607,10 @@ assert OUTPUT.strip() == '[3, 2, 1, 6, 5, 4, 7, 8]' and ANSWER == 'A'
                     'caption': 'Merged list (40, 47 attached without comparisons)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def merge_cmp(X, Y):
     i = j = c = 0
     while i < len(X) and j < len(Y):
@@ -780,10 +785,10 @@ while p is not q:
             'options': [
                 'The loop body executes exactly 14 times',
                 'When the loop ends, p and q both refer to c1',
-                'If the two lists had no common node (lengths 7 and 9), the loop would end after 16 iterations with p = q = None',
                 'The fragment uses O(1) extra space',
+                'If the two lists had no common node (lengths 7 and 9), the loop would end after 16 iterations with p = q = None',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''Each pointer walks its own list, then (after stepping onto `None` once) switches to the head of the other list. Both therefore walk (length A) + 1 + (length B before the junction) steps before arriving at the junction, which equalises the head-start difference.
 
 - p's route: a1 … a4, c1, c2, c3 (indices 0–6), None (7), b1 … b6 (8–13), **c1 (14)**.
@@ -792,11 +797,12 @@ while p is not q:
 
 - (A) **True** — 14 iterations.
 - (B) **True** — they meet at the first common node c1.
-- (C) With no common node, both reach `None` the second time after 7 + 1 + 9 = 9 + 1 + 7 = **17** iterations, not 16. **False.**
-- (D) Only two pointers and a counter. **True.**
+- (C) Only two pointers and a counter. **True.**
+- (D) With no common node, both reach `None` the second time after 7 + 1 + 9 = 9 + 1 + 7 = **17** iterations, not 16. **False.**
 
 **Trap:** because the `None` itself is a step in this code, the counts are one larger per list than the plain lengths suggest.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class Node:
     def __init__(self, v, nxt=None):
         self.v, self.nxt = v, nxt
@@ -1013,12 +1019,12 @@ assert sum(1 for p in P if len(p) == m) == int(ANSWER)
             'topic': 'Sorted list to balanced BST',
             'text': 'A sorted linked list 1 → 2 → … → 10 is converted into a BST recursively: for the sub-list at positions lo..hi (0-based), the node at position m = ⌊(lo + hi)/2⌋ becomes the root, and positions lo..m−1 and m+1..hi build the left and right subtrees. Which of the following statements is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)',
             'options': [
-                'The root of the BST is 5',
-                'The height of the BST is 4',
-                'The pre-order traversal is 5, 2, 1, 3, 4, 8, 6, 7, 9, 10',
                 'The BST has exactly 5 leaves',
+                'The height of the BST is 4',
+                'The root of the BST is 5',
+                'The pre-order traversal is 5, 2, 1, 3, 4, 8, 6, 7, 9, 10',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''Choosing the (lower) middle as root at every level gives a height-balanced BST.
 
 - Whole list, positions 0..9: m = 4 → root **5**. Left = {1..4}, right = {6..10}.
@@ -1027,10 +1033,10 @@ assert sum(1 for p in P if len(p) == m) == int(ANSWER)
 
 Tree: 5 → (2 → 1, (3 → –, 4)), (8 → (6 → –, 7), (9 → –, 10)).
 
-- (A) **True.**
+- (A) Leaves are 1, 4, 7, 10 — four. **False.**
 - (B) Longest paths, e.g. 5 → 2 → 3 → 4, have 3 edges; height = 3. **False.**
-- (C) Pre-order 5, 2, 1, 3, 4, 8, 6, 7, 9, 10. **True.**
-- (D) Leaves are 1, 4, 7, 10 — four. **False.**
+- (C) **True.**
+- (D) Pre-order 5, 2, 1, 3, 4, 8, 6, 7, 9, 10. **True.**
 
 **Trap:** using the upper middle ⌈(lo+hi)/2⌉ would make 6 the root; read the rounding rule. Note the height ⌊log₂ 10⌋ = 3 is optimal for 10 keys.''',
             'solution_diagrams': [
@@ -1064,7 +1070,9 @@ Tree: 5 → (2 → 1, (3 → –, 4)), (8 → (6 → –, 7), (9 → –, 10)).
                     'caption': 'Balanced BST built from the sorted list',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def build(lo, hi):
     if lo > hi: return None
     m = (lo + hi) // 2

@@ -100,21 +100,23 @@ Output `33 60` → (B).
             'topic': 'Height bounds and complete binary trees',
             'text': 'Height is the number of **edges** on the longest root-to-leaf path. Which of the following statements is/are TRUE?',
             'options': [
-                'Every binary tree with 50 nodes has height at least 5',
                 'A complete binary tree with 50 nodes has exactly 25 leaves',
                 'A complete binary tree with 50 nodes has exactly one node with exactly one child',
+                'Every binary tree with 50 nodes has height at least 5',
                 'Inserting 50 distinct keys into an empty BST can produce a tree of height 50',
             ],
             'answer': ['A', 'B', 'C'],
             'solution': '''A binary tree of height h has at most 2^{h+1} − 1 nodes, so n nodes force h ≥ ⌈log₂(n + 1)⌉ − 1.
 
-- (A) Height 4 allows at most 31 nodes < 50, height 5 allows 63. So h ≥ 5. **TRUE.**
-- (B) In the array layout (0-indexed) node i has a child iff 2i + 1 < n, i.e. i ≤ 24. So nodes 0 … 24 are internal and 25 … 49 are leaves: 25 leaves (⌈n/2⌉ in general). **TRUE.**
-- (C) Node 24 has left child 49 but no right child (index 50 does not exist); every other internal node has two children. Exactly one node with one child (n even). **TRUE.**
+- (A) In the array layout (0-indexed) node i has a child iff 2i + 1 < n, i.e. i ≤ 24. So nodes 0 … 24 are internal and 25 … 49 are leaves: 25 leaves (⌈n/2⌉ in general). **TRUE.**
+- (B) Node 24 has left child 49 but no right child (index 50 does not exist); every other internal node has two children. Exactly one node with one child (n even). **TRUE.**
+- (C) Height 4 allows at most 31 nodes < 50, height 5 allows 63. So h ≥ 5. **TRUE.**
 - (D) A degenerate BST (sorted insertion) is a path of 50 nodes, which has **49** edges. Height 50 is impossible. **FALSE.**
 
 **Trap:** mixing up height in edges vs nodes — 50 is the height counted in nodes.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 n = 50
 h = 0
 while 2 ** (h + 1) - 1 < n: h += 1
@@ -317,23 +319,25 @@ assert sw == 7 and ANSWER == "C"
             'topic': 'Graph theory — trees',
             'text': 'G is a **connected** simple undirected graph with 10 vertices and 9 edges. Which of the following statements is/are TRUE for every such G?',
             'options': [
-                'G contains no cycle',
-                'G has at least two vertices of degree 1',
-                'The sum of the degrees of the vertices of G is 20',
                 'G has a vertex of degree at least 3',
+                'The sum of the degrees of the vertices of G is 20',
+                'G has at least two vertices of degree 1',
+                'G contains no cycle',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['C', 'D'],
             'solution': '''A connected graph on n vertices with n − 1 edges is a **tree** (connected + n − 1 edges ⇔ connected + acyclic).
 
-- (A) Trees are acyclic. **TRUE.**
-- (B) Every tree with n ≥ 2 vertices has at least two leaves: the two endpoints of a longest path cannot have any other neighbour (that would extend the path or close a cycle). **TRUE.**
-- (C) ∑deg = 2|E| = 18, not 20. **FALSE.**
-- (D) The path P₁₀ is a tree with maximum degree 2. **FALSE.**
+- (A) The path P₁₀ is a tree with maximum degree 2. **FALSE.**
+- (B) ∑deg = 2|E| = 18, not 20. **FALSE.**
+- (C) Every tree with n ≥ 2 vertices has at least two leaves: the two endpoints of a longest path cannot have any other neighbour (that would extend the path or close a cycle). **TRUE.**
+- (D) Trees are acyclic. **TRUE.**
 
 Extra: since ∑deg = 18 = 2(n − 1), the average degree is 1.8 < 2, which is another way to see that some vertices must have degree 1.
 
-**Trap:** confusing |E| = n − 1 with |E| = n (which would give 20 in (C) and force a cycle).''',
-            'verify': '''
+**Trap:** confusing |E| = n − 1 with |E| = n (which would give 20 in (B) and force a cycle).''',
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 n, m = 10, 9
 assert 2 * m == 18 != 20
 path = {i: [j for j in (i - 1, i + 1) if 0 <= j < n] for i in range(n)}
@@ -494,20 +498,20 @@ assert post(t) == list("EAKCHFBJG") and ANSWER == "C"
             'topic': 'Heaps — array layout of a complete tree',
             'text': 'A binary max-heap stores 100 **distinct** keys in an array A[0 … 99] (children of index i at 2i + 1 and 2i + 2; depth of the root is 0). Which of the following statements is/are TRUE?',
             'options': [
-                'The children of index 24 are at indices 49 and 50',
                 'The deepest level (depth 6) contains exactly 36 keys',
-                'Index 49 holds a leaf',
                 'Depending on the keys, the minimum key can be at any of exactly 50 indices, and at no other index',
+                'The children of index 24 are at indices 49 and 50',
+                'Index 49 holds a leaf',
             ],
-            'answer': ['A', 'D'],
+            'answer': ['B', 'C'],
             'solution': '''In a complete tree with n = 100 nodes, depths 0 … 5 are full (1 + 2 + … + 32 = 63 nodes) and the remaining 37 nodes sit on depth 6. Node i is internal iff 2i + 1 ≤ n − 1 = 99, i.e. i ≤ 49.
 
-- (A) 2·24 + 1 = 49 and 2·24 + 2 = 50. **TRUE.**
-- (B) Depth 6 contains 100 − 63 = **37** keys, not 36. **FALSE.**
-- (C) Index 49 has a left child at 99 (but no right child, since 100 is out of range). It is an internal node. **FALSE.**
-- (D) In a max-heap every internal node is larger than its child, so the minimum must be a leaf: indices 50 … 99, i.e. 50 positions. Conversely each leaf can hold the minimum (no ordering constraint between a leaf and other leaves). **TRUE.**
+- (A) Depth 6 contains 100 − 63 = **37** keys, not 36. **FALSE.**
+- (B) In a max-heap every internal node is larger than its child, so the minimum must be a leaf: indices 50 … 99, i.e. 50 positions. Conversely each leaf can hold the minimum (no ordering constraint between a leaf and other leaves). **TRUE.**
+- (C) 2·24 + 1 = 49 and 2·24 + 2 = 50. **TRUE.**
+- (D) Index 49 has a left child at 99 (but no right child, since 100 is out of range). It is an internal node. **FALSE.**
 
-**Trap:** in (C), index 49 has exactly one child — the unique one-child node of a complete tree with an even number of nodes — so it is *not* a leaf.''',
+**Trap:** in (D), index 49 has exactly one child — the unique one-child node of a complete tree with an even number of nodes — so it is *not* a leaf.''',
             'solution_diagrams': [
                 {
                     'type': 'matrix',
@@ -519,7 +523,10 @@ assert post(t) == list("EAKCHFBJG") and ANSWER == "C"
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 n = 100
 depth = lambda i: (i + 1).bit_length() - 1
 assert sum(1 for i in range(n) if depth(i) == 6) == 37
@@ -699,12 +706,12 @@ assert ipl(t) == 16
                 },
             ],
             'options': [
-                'The shortest-path distance from S to F is 13',
                 'The edge A–B belongs to the shortest-path tree',
-                'E is finalised (extracted) before F',
+                'The shortest-path distance from S to F is 13',
                 'The shortest-path tree has exactly two leaves',
+                'E is finalised (extracted) before F',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''Run Dijkstra (tentative distances updated on extraction):
 
 - S (0): A = 3, B = 6.
@@ -717,10 +724,10 @@ assert ipl(t) == 16
 
 Final: S 0, A 3, B 5, C 9, D 10, F 13, E 14. Tree edges: S–A, A–B, B–C, C–D, D–F, D–E.
 
-- (A) d(F) = 13. **TRUE.**
-- (B) B's parent is A (3 + 2 = 5 < 6). **TRUE.**
-- (C) F (13) is extracted before E (14). **FALSE.**
-- (D) The tree is the path S–A–B–C–D with two branches F and E hanging off D: leaves are E and F only. **TRUE.**
+- (A) B's parent is A (3 + 2 = 5 < 6). **TRUE.**
+- (B) d(F) = 13. **TRUE.**
+- (C) The tree is the path S–A–B–C–D with two branches F and E hanging off D: leaves are E and F only. **TRUE.**
+- (D) F (13) is extracted before E (14). **FALSE.**
 
 **Trap:** taking the direct edges S–B (6) or C–E (6) at face value; both are improved by longer, cheaper routes.''',
             'solution_diagrams': [
@@ -761,7 +768,9 @@ Final: S 0, A 3, B 5, C 9, D 10, F 13, E 14. Tree edges: S–A, A–B, B–C, C�
                     'caption': 'Shortest-path tree (highlighted)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 E = [("S","A",3),("S","B",6),("A","B",2),("A","C",7),("B","C",4),("B","D",9),
      ("C","D",1),("C","E",6),("D","F",3),("E","F",2),("D","E",4)]
@@ -787,17 +796,17 @@ assert sorted(ANSWER) == ["A", "B", "D"]
             'text': 'Top-down merge sort is called on an array of n = 37 elements. Each call on a subarray of length m ≥ 2 makes two recursive calls on lengths ⌊m/2⌋ and ⌈m/2⌉ and then one merge; a call on length 1 returns immediately. Consider the recursion tree (one node per call; the root is at depth 0). Which of the following statements is/are TRUE?',
             'options': [
                 'The recursion tree has exactly 73 nodes',
-                'The recursion tree has height 5',
-                'Exactly 27 of the length-1 calls occur at depth 5',
                 'Exactly 18 of the merges combine two runs of equal length',
+                'Exactly 27 of the length-1 calls occur at depth 5',
+                'The recursion tree has height 5',
             ],
             'answer': ['A', 'C'],
             'solution': '''The tree is a full binary tree whose leaves are the n length-1 calls, so it has n − 1 = 36 internal nodes (merges) and 2n − 1 nodes. Splitting into ⌊m/2⌋ and ⌈m/2⌉ keeps all leaves within two consecutive depths, ⌊log₂ n⌋ and ⌈log₂ n⌉.
 
 - (A) 2 · 37 − 1 = 73. **TRUE.**
-- (B) 2^{5} = 32 < 37, so some length-2 calls still exist at depth 5 and their children lie at depth 6 = ⌈log₂ 37⌉. Height 6. **FALSE.**
+- (B) Equal-length merges happen exactly at the internal calls with **even** m. Sizes by depth: 37 | 18, 19 | 9, 9, 9, 10 | 4,5 ×3 and 5,5 | … Counting all internal calls with even m gives 21, not 18. **FALSE.**
 - (C) Depth 5 has 32 nodes (all depths ≤ 5 are full). Let x of them have length 2; then the 32 sizes add to 37, so x = 5. Those 5 calls create 10 leaves at depth 6, and the other 32 − 5 = **27** depth-5 calls are leaves. **TRUE.**
-- (D) Equal-length merges happen exactly at the internal calls with **even** m. Sizes by depth: 37 | 18, 19 | 9, 9, 9, 10 | 4,5 ×3 and 5,5 | … Counting all internal calls with even m gives 21, not 18. **FALSE.**
+- (D) 2^{5} = 32 < 37, so some length-2 calls still exist at depth 5 and their children lie at depth 6 = ⌈log₂ 37⌉. Height 6. **FALSE.**
 
 **Trap:** assuming the tree for 37 elements has height ⌊log₂ 37⌋ = 5 — the leftover length-2 subarrays add one more level.''',
             'solution_diagrams': [
@@ -812,7 +821,8 @@ assert sorted(ANSWER) == ["A", "B", "D"]
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from collections import Counter
 acc = []
 def rec(n, d):

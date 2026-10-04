@@ -138,16 +138,16 @@ assert ANSWER == "C"
             'marks': 1,
             'topic': 'Stacks — stack permutations',
             'text': 'The integers 1, 2, 3, 4, 5, 6 are pushed onto an initially empty stack **in this order**. Pops may be interleaved with the pushes arbitrarily, and every popped value is written to the output. Which of the following output sequences is/are possible?',
-            'options': ['3, 2, 5, 6, 4, 1', '2, 4, 3, 6, 1, 5', '4, 5, 3, 6, 2, 1', '1, 5, 2, 4, 3, 6'],
-            'answer': ['A', 'C'],
+            'options': ['2, 4, 3, 6, 1, 5', '4, 5, 3, 6, 2, 1', '1, 5, 2, 4, 3, 6', '3, 2, 5, 6, 4, 1'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept:** simulate greedily — to output x, push every not-yet-pushed value up to x, then x must be on top. Equivalently, a sequence is impossible iff it contains a pattern i < j < k output in the order k … i … j (a '3-1-2' pattern).
 
-- (A) push 1,2,3 pop 3; pop 2; push 4,5 pop 5; push 6 pop 6; pop 4; pop 1. **Possible.**
-- (B) after 2, 4, 3 the stack holds [1]; push 5, 6 and pop 6 → stack [1, 5]. Next we need 1 but 5 is on top. **Impossible** (pattern 6 … 1 … 5).
-- (C) push 1–4 pop 4; push 5 pop 5; pop 3; push 6 pop 6; pop 2; pop 1. **Possible.**
-- (D) pop 1 at once; push 2–5 pop 5 → stack [2, 3, 4]; we need 2 but 4 is on top. **Impossible** (pattern 5 … 2 … 4).
+- (A) after 2, 4, 3 the stack holds [1]; push 5, 6 and pop 6 → stack [1, 5]. Next we need 1 but 5 is on top. **Impossible** (pattern 6 … 1 … 5).
+- (B) push 1–4 pop 4; push 5 pop 5; pop 3; push 6 pop 6; pop 2; pop 1. **Possible.**
+- (C) pop 1 at once; push 2–5 pop 5 → stack [2, 3, 4]; we need 2 but 4 is on top. **Impossible** (pattern 5 … 2 … 4).
+- (D) push 1,2,3 pop 3; pop 2; push 4,5 pop 5; push 6 pop 6; pop 4; pop 1. **Possible.**
 
-**Trap:** do not check only the first few outputs; (B) looks fine until the last two pops.''',
+**Trap:** do not check only the first few outputs; (A) looks fine until the last two pops.''',
             'solution_diagrams': [
                 {
                     'type': 'stack',
@@ -156,7 +156,10 @@ assert ANSWER == "C"
                     'caption': '(D) after outputting 1 and 5: 2 is buried under 3, 4',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ok(seq):
     st, nxt = [], 1
     for x in seq:
@@ -359,21 +362,22 @@ print(out)''',
                 },
             ],
             'options': [
-                'After one delete-max (last element moved to the root, then sift-down), the array is [88, 75, 80, 40, 61, 59, 17, 12, 33]',
+                'Inserting 65 (append, then sift-up) leaves 65 at index 1',
                 'Inserting 90 (append, then sift-up) performs exactly 2 swaps',
                 'The third-largest key, 80, is a child of the root',
-                'Inserting 65 (append, then sift-up) leaves 65 at index 1',
+                'After one delete-max (last element moved to the root, then sift-down), the array is [88, 75, 80, 40, 61, 59, 17, 12, 33]',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept:** children of index i are 2i + 1 and 2i + 2; the parent is ⌊(i − 1)/2⌋.
 
-- (A) Move 59 to the root: [59, 75, 88, 40, 61, 80, 17, 12, 33]. Larger child 88 → swap → 59 at index 2; children 80, 17 → swap with 80 → 59 at index 5 (leaf). Result [88, 75, 80, 40, 61, 59, 17, 12, 33]. **True.**
+- (A) 65 at index 10 swaps with 61 (index 4), then its parent 75 is larger → stops at **index 4**. **False.**
 - (B) 90 goes to index 10; parent index 4 (61) → swap; parent index 1 (75) → swap; parent index 0 (92) is larger → stop. 2 swaps. **True.**
 - (C) The root's children are 75 and 88. 80 is a child of 88, at index 5. **False.**
-- (D) 65 at index 10 swaps with 61 (index 4), then its parent 75 is larger → stops at **index 4**. **False.**
+- (D) Move 59 to the root: [59, 75, 88, 40, 61, 80, 17, 12, 33]. Larger child 88 → swap → 59 at index 2; children 80, 17 → swap with 80 → 59 at index 5 (leaf). Result [88, 75, 80, 40, 61, 59, 17, 12, 33]. **True.**
 
 **Trap:** the k-th largest element of a heap need not be at depth k − 1 or less in any fixed spot; for k = 3 it can be a child *or* a grandchild of the root.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 H = [92, 75, 88, 40, 61, 80, 17, 12, 33, 59]
 def delmax(a):
     a = a[:]; a[0] = a.pop(); i = 0
@@ -527,12 +531,12 @@ Trace (tokens reversed: 5 8 - 4 9 2 - / 3 * +), stack bottom → top:
             'topic': 'Stacks — infix to postfix, operator-stack trace',
             'text': 'The infix expression `a * ( b + c * d ) - e / f ^ g` is converted to postfix using an operator stack (precedence `^` > `*`, `/` > `+`, `-`; `^` right-associative, others left-associative; `(` is pushed onto the same stack). Which of the following statements is/are TRUE?',
             'options': [
+                'With a = 2, b = 3, c = 4, d = 5, e = 64, f = 2, g = 3 the expression evaluates to 38',
                 'The postfix expression is `a b c d * + * e f g ^ / -`',
                 'The maximum number of symbols (operators and `(`) on the stack at any moment is 4',
                 'When `-` is scanned, exactly two operators are popped to the output',
-                'With a = 2, b = 3, c = 4, d = 5, e = 64, f = 2, g = 3 the expression evaluates to 38',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Concept:** operators wait on the stack until a lower-or-equal precedence operator (or `)` or end of input) forces them out.
 
 Trace (stack bottom → top, output so far):
@@ -550,12 +554,12 @@ Trace (stack bottom → top, output so far):
 - end → pop `^ / -` → final `a b c d * + * e f g ^ / -`.
 
 **Verdicts:**
-- (A) **True** (see final output).
-- (B) **True** — size 4 after the inner `*`; later the stack holds at most 3.
-- (C) **False** — only one operator (`*`) is on the stack when `-` arrives.
-- (D) 2 × (3 + 4 × 5) − 64 / 2^{3} = 2 × 23 − 64/8 = 46 − 8 = 38. **True.**
+- (A) 2 × (3 + 4 × 5) − 64 / 2^{3} = 2 × 23 − 64/8 = 46 − 8 = 38. **True.**
+- (B) **True** (see final output).
+- (C) **True** — size 4 after the inner `*`; later the stack holds at most 3.
+- (D) **False** — only one operator (`*`) is on the stack when `-` arrives.
 
-**Trap:** in (C) people forget that `)` already flushed `+` and the inner `*`.''',
+**Trap:** in (D) people forget that `)` already flushed `+` and the inner `*`.''',
             'solution_diagrams': [
                 {
                     'type': 'stack',
@@ -564,7 +568,10 @@ Trace (stack bottom → top, output so far):
                     'caption': 'Operator stack at its peak (after the inner *)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 prec = {'+':1,'-':1,'*':2,'/':2,'^':3}
 out, st, peak, popped_at_minus = [], [], 0, None
 for t in "a * ( b + c * d ) - e / f ^ g".split():
@@ -650,26 +657,26 @@ Total = 14 + 30 + 16 = **60**.
 
 Which of the following statements is/are TRUE?''',
             'options': [
+                'After 2 passes of selection sort the array is [1, 2, 4, 5, 8, 3]',
+                'Bubble sort performs exactly 4 passes',
                 'Selection sort performs exactly 4 swaps',
                 'Insertion sort performs exactly 7 shifts',
-                'Bubble sort performs exactly 4 passes',
-                'After 2 passes of selection sort the array is [1, 2, 4, 5, 8, 3]',
             ],
-            'answer': ['B', 'C', 'D'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concepts:** insertion-sort shifts = number of inversions; selection sort swaps depend on where each minimum sits; bubble sort stops after the first swap-free pass.
 
-**Selection sort** (see table): pass 1 swaps 5↔1; pass 2 swaps 5↔2; pass 3 swaps 4↔3; pass 4 swaps 5↔4; pass 5 swaps 8↔5. Every pass swaps → **5 swaps**. (A) **False**. After 2 passes: [1, 2, 4, 5, 8, 3] → (D) **True**.
+**Selection sort** (see table): pass 1 swaps 5↔1; pass 2 swaps 5↔2; pass 3 swaps 4↔3; pass 4 swaps 5↔4; pass 5 swaps 8↔5. Every pass swaps → **5 swaps**. (C) **False**. After 2 passes: [1, 2, 4, 5, 8, 3] → (A) **True**.
 
-**Insertion sort:** inversions of [5, 1, 4, 2, 8, 3] are (5,1), (5,4), (5,2), (5,3), (4,2), (4,3), (8,3) = 7. Each shift removes exactly one inversion → **7 shifts**. (B) **True**.
+**Insertion sort:** inversions of [5, 1, 4, 2, 8, 3] are (5,1), (5,4), (5,2), (5,3), (4,2), (4,3), (8,3) = 7. Each shift removes exactly one inversion → **7 shifts**. (D) **True**.
 
 **Bubble sort:**
 - pass 1 → [1, 4, 2, 5, 3, 8]
 - pass 2 → [1, 2, 4, 3, 5, 8]
 - pass 3 → [1, 2, 3, 4, 5, 8]
 - pass 4 → no swap → stop.
-So **4 passes**; (C) **True**.
+So **4 passes**; (B) **True**.
 
-**Trap:** in (C), people stop at 3 because the array is already sorted after pass 3 — but the algorithm only *knows* that after a swap-free pass. In (A), 5 swaps happen because no element is ever already in its final selection position.''',
+**Trap:** in (B), people stop at 3 because the array is already sorted after pass 3 — but the algorithm only *knows* that after a swap-free pass. In (C), 5 swaps happen because no element is ever already in its final selection position.''',
             'solution_diagrams': [
                 {
                     'type': 'matrix',
@@ -693,7 +700,10 @@ So **4 passes**; (C) **True**.
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A0 = [5, 1, 4, 2, 8, 3]
 a = A0[:]; sw = 0; after2 = None
 for i in range(5):
@@ -797,12 +807,12 @@ Which of the following statements is/are TRUE?''',
                 },
             ],
             'options': [
-                'The visiting order is A, D, F, G, E, C, B',
                 'The visiting order equals that of recursive DFS that explores neighbours alphabetically',
-                'The maximum number of entries on the stack at any moment is 5',
                 'Vertex C is pushed onto the stack exactly 3 times',
+                'The maximum number of entries on the stack at any moment is 5',
+                'The visiting order is A, D, F, G, E, C, B',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept:** pushing neighbours in alphabetical order makes the *last* one pop first, so the traversal goes 'reverse-alphabetical'. Because a vertex may be pushed several times (it is only checked when popped), stack entries can exceed |V| − 1 in general.
 
 Trace (stack bottom → top after processing u):
@@ -817,10 +827,10 @@ Trace (stack bottom → top after processing u):
 Visiting order: **A, D, F, G, E, C, B**.
 
 **Verdicts:**
-- (A) **True.**
-- (B) **False** — recursive alphabetical DFS gives A, B, E, C, F, D, G.
+- (A) **False** — recursive alphabetical DFS gives A, B, E, C, F, D, G.
+- (B) C is pushed by A, by F and by E → 3 times. **True.**
 - (C) **True** — peak is 5, right after E is processed.
-- (D) C is pushed by A, by F and by E → 3 times. **True.**
+- (D) **True.**
 
 **Trap:** assuming an explicit-stack DFS automatically reproduces the recursive order; to do that you must push neighbours in *reverse* order.''',
             'solution_diagrams': [
@@ -859,7 +869,9 @@ Visiting order: **A, D, F, G, E, C, B**.
                     'caption': 'DFS tree of the iterative traversal (vertex → the one that pushed it when it was visited)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [('A','B'),('A','C'),('A','D'),('B','E'),('C','E'),('C','F'),('D','F'),('E','G'),('F','G')]
 G = {}
 for u, v in E:

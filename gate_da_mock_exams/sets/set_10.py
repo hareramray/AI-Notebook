@@ -204,22 +204,22 @@ assert (S[0], mx) == (12, 4) and ANSWER == 'C'
             'topic': 'Binary search trees',
             'text': 'The keys 41, 23, 67, 15, 30, 52, 80, 27, 35, 74, 33 are inserted in this order into an initially empty binary search tree (no rebalancing). Which of the following statements is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)',
             'options': [
-                'The height of the tree is 4',
                 'The tree has exactly 4 leaves',
-                'The in-order successor of 41 is 52',
                 'The post-order traversal begins 15, 27, 35',
+                'The height of the tree is 4',
+                'The in-order successor of 41 is 52',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''**Concept.** Each key walks down from the root, going left if smaller and right otherwise, and is attached where it falls off.
 
 Resulting tree: 41 has children 23 and 67; 23 → (15, 30); 30 → (27, 35); 35 → (33, –); 67 → (52, 80); 80 → (74, –).
 
-- (A) Longest path 41→23→30→35→33 has **4 edges**. **TRUE.**
-- (B) Leaves are 15, 27, 33, 52, 74 — that is **5** leaves. **FALSE.**
-- (C) Successor of 41 = minimum of its right subtree = leftmost node under 67 = 52. **TRUE.**
-- (D) Post-order = 15, 27, 33, 35, 30, 23, 52, 74, 80, 67, 41. It begins 15, 27, **33** (the child 33 is finished before its parent 35). **FALSE.**
+- (A) Leaves are 15, 27, 33, 52, 74 — that is **5** leaves. **FALSE.**
+- (B) Post-order = 15, 27, 33, 35, 30, 23, 52, 74, 80, 67, 41. It begins 15, 27, **33** (the child 33 is finished before its parent 35). **FALSE.**
+- (C) Longest path 41→23→30→35→33 has **4 edges**. **TRUE.**
+- (D) Successor of 41 = minimum of its right subtree = leftmost node under 67 = 52. **TRUE.**
 
-**Trap:** in (D) students often list 35 before 33 because 35 was inserted first — post-order visits a node only after *both* of its subtrees.''',
+**Trap:** in (B) students often list 35 before 33 because 35 was inserted first — post-order visits a node only after *both* of its subtrees.''',
             'solution_diagrams': [
                 {
                     'type': 'bintree',
@@ -252,7 +252,10 @@ Resulting tree: 41 has children 23 and 67; 23 → (15, 30); 30 → (27, 35); 35 
                     'caption': 'BST with its longest root-to-leaf path highlighted',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins(t, k):
     if t is None: return [k, None, None]
     i = 1 if k < t[0] else 2
@@ -324,8 +327,8 @@ assert ANSWER == 'C'
                     'caption': 'Sorted array of 15 keys',
                 },
             ],
-            'options': ['4', '22', '36', '70'],
-            'answer': ['A', 'B'],
+            'options': ['70', '22', '36', '4'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept.** For n = 2^{4} − 1 = 15 elements the binary-search decision tree is perfect: one key at depth 1, two at depth 2, four at depth 3 and eight at depth 4.
 
 - Probe 1: index 7 (36).
@@ -334,13 +337,14 @@ assert ANSWER == 'C'
 - Probe 4: even indices 0, 2, 4, …, 14 → 4, 13, 22, 31, 40, 52, 63, 77.
 
 Option by option:
-- (A) 4 is at index 0 → 4 probes (7 → 3 → 1 → 0). **TRUE.**
+- (A) 70 is at index 13 → 7 → 11 → 13: 3 probes. **FALSE.**
 - (B) 22 is at index 4 → 7 → 3 → 5 → 4: 4 probes. **TRUE.**
 - (C) 36 is found on the very first probe. **FALSE.**
-- (D) 70 is at index 13 → 7 → 11 → 13: 3 probes. **FALSE.**
+- (D) 4 is at index 0 → 4 probes (7 → 3 → 1 → 0). **TRUE.**
 
 **Tip:** with n = 2^{k} − 1, exactly half the keys (the even indices) need the maximum k probes.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [4, 9, 13, 18, 22, 27, 31, 36, 40, 45, 52, 58, 63, 70, 77]
 def probes(x):
     lo, hi, c = 0, 14, 0
@@ -459,8 +463,8 @@ c = a[:]
 d = a.sort(reverse=True)
 e = sorted(c, key=lambda x: -x)''',
             'text2': 'After it executes, which of the following expressions evaluate to `True`?',
-            'options': ['`b[0] == 8`', '`c[0] == 8`', '`d is None`', '`e == b`'],
-            'answer': ['A', 'C', 'D'],
+            'options': ['`c[0] == 8`', '`b[0] == 8`', '`e == b`', '`d is None`'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** `list.sort()` sorts *in place* and returns `None`; `sorted()` builds and returns a *new* list. `b = a` creates an alias, `a[:]` a shallow copy.
 
 - After `a.sort(reverse=True)`, the list object shared by `a` and `b` is [8, 5, 3, 1].
@@ -469,13 +473,15 @@ e = sorted(c, key=lambda x: -x)''',
 - `e` sorts the copy by key −x, i.e. descending → [8, 5, 3, 1].
 
 Option by option:
-- (A) `b[0]` is 8 because `b` aliases the sorted list. **True.**
-- (B) `c[0]` is 5 — the copy is untouched. **False.**
-- (C) `d is None`. **True.**
-- (D) `e` = [8, 5, 3, 1] = `b` (equal contents). **True.**
+- (A) `c[0]` is 5 — the copy is untouched. **False.**
+- (B) `b[0]` is 8 because `b` aliases the sorted list. **True.**
+- (C) `e` = [8, 5, 3, 1] = `b` (equal contents). **True.**
+- (D) `d is None`. **True.**
 
 **Trap:** writing `x = x.sort()` is a classic bug that silently replaces the list by `None`.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 assert b[0] == 8 and c[0] != 8 and d is None and e == b
 assert sorted(ANSWER) == ['A', 'C', 'D']
 ''',
@@ -646,11 +652,11 @@ and are sorted by **key only** (ascending). Consider these four procedures:
 Which of the following statements is/are TRUE?''',
             'options': [
                 'Selection sort outputs (6, r) before (6, p)',
-                'Insertion sort outputs (6, p) before (6, r)',
                 'The `>=` bubble sort outputs (6, r) before (6, p)',
+                'Insertion sort outputs (6, p) before (6, r)',
                 '`sorted` outputs (6, r) before (6, p)',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'C'],
             'solution': '''**Concept.** A sort is *stable* if records with equal keys keep their input order. Swapping non-adjacent elements (selection sort) or swapping equal neighbours (a `>=` bubble sort) can break stability — but whether it *actually* happens depends on the input.
 
 **Selection sort trace:**
@@ -658,14 +664,15 @@ Which of the following statements is/are TRUE?''',
 - i=1: (4,q) already minimal. i=2: first minimum key 6 is (6,r) at index 2 → no swap. i=3: no swap.
 Output: (2,s) (4,q) **(6,r) (6,p)** (9,t) → (A) **TRUE**.
 
-**Insertion sort** with strict `>` never moves a record past an equal key, so it is stable: (6,p) stays ahead of (6,r) → (B) **TRUE**.
+**Insertion sort** with strict `>` never moves a record past an equal key, so it is stable: (6,p) stays ahead of (6,r) → (C) **TRUE**.
 
-**`>=` bubble sort:** equal neighbours are swapped every time they meet. Pass 1: (6,p)>(4,q) swap; (6,p)≥(6,r) **swap** → r ahead; (6,p)>(2,s) swap; … giving (4,q) (6,r) (2,s) (6,p) (9,t). Pass 2: (6,r)>(2,s) swap; (6,r)≥(6,p) **swap again** → p ahead: (4,q) (2,s) (6,p) (6,r) (9,t). Passes 3–4 only move (2,s) to the front. The two 6s were swapped an *even* number of times, so the final order is (6,p) (6,r) → (C) **FALSE** (the algorithm is unstable in general, but not on this input).
+**`>=` bubble sort:** equal neighbours are swapped every time they meet. Pass 1: (6,p)>(4,q) swap; (6,p)≥(6,r) **swap** → r ahead; (6,p)>(2,s) swap; … giving (4,q) (6,r) (2,s) (6,p) (9,t). Pass 2: (6,r)>(2,s) swap; (6,r)≥(6,p) **swap again** → p ahead: (4,q) (2,s) (6,p) (6,r) (9,t). Passes 3–4 only move (2,s) to the front. The two 6s were swapped an *even* number of times, so the final order is (6,p) (6,r) → (B) **FALSE** (the algorithm is unstable in general, but not on this input).
 
 **`sorted`** uses Timsort, which is guaranteed stable → (6,p) first → (D) **FALSE**.
 
 **Trap:** “unstable algorithm” does not mean “always reorders equal keys” — always trace.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import operator as op
 R = [(6,'p'),(4,'q'),(6,'r'),(2,'s'),(9,'t')]
 def sel(b):
@@ -862,12 +869,12 @@ assert ms([4, 11, 2, 9, 15, 6, 1, 13])[1] == int(ANSWER)
                 },
             ],
             'options': [
-                'In the resulting heap the children of the root are 8 and 19',
-                'Exactly 5 swaps are performed during the build',
-                'In the resulting heap, key 3 is at index 8',
                 'If one delete-max is then performed (move last element to the root and sift down), the array becomes 19, 8, 14, 7, 5, 12, 1, 3',
+                'Exactly 5 swaps are performed during the build',
+                'In the resulting heap the children of the root are 8 and 19',
+                'In the resulting heap, key 3 is at index 8',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** Build-heap sifts down each internal node, starting from the last internal node (index ⌊9/2⌋−1 = 3).
 
 - i=3 (3): children 1, 7 → swap with 7 (**swap 1**). A = 12 5 19 7 8 25 14 1 3
@@ -876,10 +883,10 @@ assert ms([4, 11, 2, 9, 15, 6, 1, 13])[1] == int(ANSWER)
 - i=0 (12): children 8, 25 → swap with 25 (**swap 4**); now at index 2, children 19, 14 → swap with 19 (**swap 5**). A = **25 8 19 7 5 12 14 1 3**
 
 Option by option:
-- (A) Root 25 has children A[1] = 8 and A[2] = 19. **TRUE.**
+- (A) Delete-max: move 3 to the root → 3 8 19 7 5 12 14 1; swap with 19 → index 2; children 12, 14 → swap with 14 → 19 8 14 7 5 12 **3 1**. The option has the last two reversed (it forgets that 3 moved down to index 6 while 1 stayed at index 7). **FALSE.**
 - (B) Five swaps in total. **TRUE.**
-- (C) Key 3 sits at index 8 (a leaf). **TRUE.**
-- (D) Delete-max: move 3 to the root → 3 8 19 7 5 12 14 1; swap with 19 → index 2; children 12, 14 → swap with 14 → 19 8 14 7 5 12 **3 1**. The option has the last two reversed (it forgets that 3 moved down to index 6 while 1 stayed at index 7). **FALSE.**
+- (C) Root 25 has children A[1] = 8 and A[2] = 19. **TRUE.**
+- (D) Key 3 sits at index 8 (a leaf). **TRUE.**
 
 **Trap:** in sift-down, keep going after the first swap — 12 had to fall two levels.''',
             'solution_diagrams': [
@@ -889,7 +896,9 @@ Option by option:
                     'caption': 'Max-heap after build-heap',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 sw = [0]
 def sift(a, i, n):
     while True:

@@ -78,19 +78,20 @@ Sum = 1 + 10 + 3 + 30 + 5 + 50 − 6 − 7 = **86**.
             'marks': 1,
             'topic': 'Input-restricted deque permutations',
             'text': 'An **input-restricted deque** allows insertion only at the rear but deletion at both ends. The values 1, 2, 3, 4 are inserted in this order; deletions may be interleaved with insertions, and each deleted value is output at once. Which of the following output sequences is/are possible?',
-            'options': ['4, 1, 3, 2', '4, 2, 1, 3', '3, 1, 4, 2', '4, 2, 3, 1'],
+            'options': ['3, 1, 4, 2', '4, 2, 1, 3', '4, 1, 3, 2', '4, 2, 3, 1'],
             'answer': ['A', 'C'],
             'solution': '''When the first output is 4, all of 1, 2, 3, 4 have already been inserted, in order, so the deque is [1, 2, 3, 4] and afterwards only the two **ends** can be removed.
 
-- (A) [1,2,3,4]: delete rear 4 → [1,2,3]; delete front 1 → [2,3]; delete rear 3; then 2. **Possible.**
+- (A) Insert 1, 2, 3 → [1,2,3]; delete rear 3; delete front 1 → [2]; insert 4 → [2,4]; delete rear 4; delete 2. **Possible.** (This sequence is *impossible* for a stack — the deque's extra front deletion makes it reachable.)
 - (B) After 4 the deque is [1, 2, 3]; 2 is in the middle — neither end. **Impossible.**
-- (C) Insert 1, 2, 3 → [1,2,3]; delete rear 3; delete front 1 → [2]; insert 4 → [2,4]; delete rear 4; delete 2. **Possible.** (This sequence is *impossible* for a stack — the deque's extra front deletion makes it reachable.)
+- (C) [1,2,3,4]: delete rear 4 → [1,2,3]; delete front 1 → [2,3]; delete rear 3; then 2. **Possible.**
 - (D) Again 2 would have to leave from the middle of [1, 2, 3]. **Impossible.**
 
 In fact, of the 24 permutations of 1..4, exactly these two (4,2,1,3 and 4,2,3,1) cannot be produced by an input-restricted deque.
 
-**Trap:** applying the stack rule (forbidden 3-1-2 pattern) — it rejects (C) wrongly.''',
-            'verify': '''
+**Trap:** applying the stack rule (forbidden 3-1-2 pattern) — it rejects (A) wrongly.''',
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def possible(seq):
     n = len(seq); st = [(1, (), 0)]; seen = set()
@@ -269,21 +270,24 @@ assert mx == 36 and ['9','36','37','45'][ord(ANSWER) - 65] == str(mx + 1)
             'topic': 'Stability depends on the comparison',
             'text': 'Which of the following sorting procedures is/are **stable**?',
             'options': [
-                'Insertion sort that shifts A[j] right while `A[j] > key`',
-                'Bubble sort that swaps adjacent elements when `A[j] >= A[j+1]`',
                 'Merge sort whose merge takes from the left run only when `L[i] <= R[j]`',
                 'Quicksort with Lomuto partitioning (pivot = last element, `a[j] <= pivot` goes left)',
+                'Bubble sort that swaps adjacent elements when `A[j] >= A[j+1]`',
+                'Insertion sort that shifts A[j] right while `A[j] > key`',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['A', 'D'],
             'solution': '''A sort is stable if records with equal keys keep their input order. Whether an implementation is stable often hinges on a single `<` versus `<=`.
 
-- (A) **Stable.** The key stops at the first element ≤ it, so it never jumps over an equal key.
-- (B) **Not stable.** With `>=`, two adjacent equal keys are swapped, reversing their order; e.g. (1,'x'), (1,'y') becomes (1,'y'), (1,'x').
-- (C) **Stable.** On ties the merge takes from the **left** run, which holds the earlier records. (With strict `<` it would take from the right on ties and be unstable.)
-- (D) **Not stable.** The final pivot swap is a long-range exchange. Input [(1,a), (1,b), (0,c)]: pivot key 0, nothing goes left, and the pivot swap exchanges positions 0 and 2 → [(0,c), (1,b), (1,a)]. The recursive call on [(1,b), (1,a)] leaves it unchanged, so the 1-records come out as b, a — reversed.
+- (A) **Stable.** On ties the merge takes from the **left** run, which holds the earlier records. (With strict `<` it would take from the right on ties and be unstable.)
+- (B) **Not stable.** The final pivot swap is a long-range exchange. Input [(1,a), (1,b), (0,c)]: pivot key 0, nothing goes left, and the pivot swap exchanges positions 0 and 2 → [(0,c), (1,b), (1,a)]. The recursive call on [(1,b), (1,a)] leaves it unchanged, so the 1-records come out as b, a — reversed.
+- (C) **Not stable.** With `>=`, two adjacent equal keys are swapped, reversing their order; e.g. (1,'x'), (1,'y') becomes (1,'y'), (1,'x').
+- (D) **Stable.** The key stops at the first element ≤ it, so it never jumps over an equal key.
 
 **Trap:** classifying algorithms as stable/unstable without looking at the exact comparison.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def ins(a):
     a = a[:]
@@ -527,12 +531,12 @@ print(next(g), list(g))''',
                 },
             ],
             'options': [
+                'Bellman–Ford on this graph would report a negative-weight cycle',
                 'The final value d[B] equals the true shortest distance from S to B',
                 'The final value d[C] is 5, whereas the true distance to C is 4',
                 'Exactly one vertex ends with an incorrect d value',
-                'Bellman–Ford on this graph would report a negative-weight cycle',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'C'],
             'solution': '''**Dijkstra trace:**
 
 - Extract S (0): d[A] = 5, d[B] = 2.
@@ -545,13 +549,16 @@ Final: S 0, A 5, B 1, C 5, D 7.
 
 **True distances** (Bellman–Ford): S 0, A 5, B = 5 − 4 = 1, C = 1 + 3 = 4, D = 4 + 2 = 6.
 
-- (A) **True** — d[B] = 1 is correct, but only because the late relaxation from A updated it.
-- (B) **True** — C was relaxed from B while d[B] was still 2, and the improvement of B never propagated: d[C] = 5 vs 4.
-- (C) **False** — both C (5 vs 4) and D (7 vs 6) are wrong.
-- (D) **False** — the graph has no directed cycle at all, so there is no negative cycle; Bellman–Ford simply returns the true distances.
+- (A) **False** — the graph has no directed cycle at all, so there is no negative cycle; Bellman–Ford simply returns the true distances.
+- (B) **True** — d[B] = 1 is correct, but only because the late relaxation from A updated it.
+- (C) **True** — C was relaxed from B while d[B] was still 2, and the improvement of B never propagated: d[C] = 5 vs 4.
+- (D) **False** — both C (5 vs 4) and D (7 vs 6) are wrong.
 
 **Trap:** believing Dijkstra fails only at the endpoint of the negative edge — the damage is in everything *downstream* of it.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'S':[('A',5),('B',2)],'A':[('B',-4),('D',6)],'B':[('C',3)],'C':[('D',2)],'D':[]}
 INF = float('inf'); d = {v: INF for v in G}; d['S'] = 0; done = set()
 while len(done) < len(G):
@@ -779,11 +786,11 @@ assert find(57)[1] + find(55)[1] == int(ANSWER)
             ],
             'options': [
                 'Exactly 8 distinct BFS visiting orders are possible',
-                'f is the last vertex visited in every BFS order',
                 'Some BFS order visits e before d',
                 's, c, a, b, d, e, f is a possible BFS order',
+                'f is the last vertex visited in every BFS order',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''Levels are fixed: {s}, {a, b, c}, {d, e}, {f}. Within these, BFS order is constrained: the level-2 vertices are visited in the order they were **discovered**, which is determined by the level-1 order (d is discovered by a or b, e by b or c).
 
 Enumerate the 6 orders of {a, b, c} and see who discovers d, e first:
@@ -796,12 +803,14 @@ Enumerate the 6 orders of {a, b, c} and see who discovers d, e first:
 Total orders = 1 + 1 + 2 + 2 + 1 + 1 = **8**.
 
 - (A) **True.**
-- (B) **True** — f is the only vertex at distance 3.
-- (C) **True** — e.g. s, c, a, b, e, d, f.
-- (D) **False** — if c is the first level-1 vertex, it discovers e before anyone discovers d, so e must precede d.
+- (B) **True** — e.g. s, c, a, b, e, d, f.
+- (C) **False** — if c is the first level-1 vertex, it discovers e before anyone discovers d, so e must precede d.
+- (D) **True** — f is the only vertex at distance 3.
 
 **Trap:** assuming any permutation within each level is achievable (that would give 3! × 2! = 12).''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 E = [('s','a'),('s','b'),('s','c'),('a','d'),('b','d'),('b','e'),('c','e'),('d','f'),('e','f')]
 adj = {}
@@ -922,19 +931,22 @@ Joined: `2 1 5 4 3 9 8 7 6 10`.
             'topic': 'Heap facts and heapsort',
             'text': 'Which of the following statements about binary heaps with n distinct keys is/are TRUE?',
             'options': [
+                'Heapsort is a stable sorting algorithm',
+                'For n ≥ 7, the third-largest key of a max-heap can occupy exactly 6 different array positions',
                 'The k-th smallest key of a min-heap can be found in O(k log k) time without modifying the heap',
                 'Two binary heaps of n keys each can be merged into one binary heap in O(n) time',
-                'For n ≥ 7, the third-largest key of a max-heap can occupy exactly 6 different array positions',
-                'Heapsort is a stable sorting algorithm',
             ],
-            'answer': ['A', 'B', 'C'],
-            'solution': '''- (A) **True.** Keep an auxiliary min-heap of *candidates*, starting with the root. Pop the smallest candidate and push its (at most two) children; the k-th pop is the k-th smallest. The auxiliary heap never exceeds k + 1 entries, so the cost is O(k log k), independent of n.
-- (B) **True.** Concatenate the two arrays (O(n)) and run bottom-up build-heap on the 2n keys, which is O(n).
-- (C) **True.** The third-largest has exactly two larger keys, so it has at most two ancestors: depth 1 or 2 → array positions 2..7 (1-indexed), six positions. Each is achievable: at depth 1 with the second-largest as its sibling, at depth 2 with the second-largest as its parent.
-- (D) **False.** E.g. records (1,x), (1,y): build-heap leaves them, then the first extraction swaps the root (1,x) to the end, giving the order y, x. Long-range swaps destroy stability.
+            'answer': ['B', 'C', 'D'],
+            'solution': '''- (A) **False.** E.g. records (1,x), (1,y): build-heap leaves them, then the first extraction swaps the root (1,x) to the end, giving the order y, x. Long-range swaps destroy stability.
+- (B) **True.** The third-largest has exactly two larger keys, so it has at most two ancestors: depth 1 or 2 → array positions 2..7 (1-indexed), six positions. Each is achievable: at depth 1 with the second-largest as its sibling, at depth 2 with the second-largest as its parent.
+- (C) **True.** Keep an auxiliary min-heap of *candidates*, starting with the root. Pop the smallest candidate and push its (at most two) children; the k-th pop is the k-th smallest. The auxiliary heap never exceeds k + 1 entries, so the cost is O(k log k), independent of n.
+- (D) **True.** Concatenate the two arrays (O(n)) and run bottom-up build-heap on the 2n keys, which is O(n).
 
-**Trap:** in (C), confusing *positions* (6) with *depths* (2); in (A), thinking the heap order forces the k-th smallest to be at depth ≤ log k (it can be at depth k − 1).''',
-            'verify': '''
+**Trap:** in (B), confusing *positions* (6) with *depths* (2); in (C), thinking the heap order forces the k-th smallest to be at depth ≤ log k (it can be at depth k − 1).''',
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools, heapq
 # (C): enumerate all max-heaps on 1..7 and 1..8, positions of the 3rd largest
 for n in (7, 8):

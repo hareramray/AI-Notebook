@@ -516,8 +516,8 @@ def f4(A, x):
         if A[mid] <= x: lo = mid
         else: hi = mid - 1
     return lo if A and A[lo] == x else -1''',
-            'options': ['`f1`', '`f2`', '`f3`', '`f4`'],
-            'answer': ['A', 'C'],
+            'options': ['`f2`', '`f3`', '`f1`', '`f4`'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept.** A first-occurrence search must keep moving **left** after a match, must make progress in every branch, and must not index outside the list.
 
 - **f1** — closed interval [lo, hi]; on A[mid] ≥ x it records a match (if equal) and continues left with hi = mid − 1, else goes right. Every branch shrinks the range; the last recorded match is the leftmost. Empty list: loop skipped, returns −1. **Correct.**
@@ -528,7 +528,9 @@ def f4(A, x):
 Answer: f1 and f3.
 
 **Trap:** f2 passes every test where x is present — bugs at the boundaries (x beyond the maximum, empty list) are exactly what GATE questions probe.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import bisect, itertools, random
 random.seed(5)
 def correct(f):
@@ -646,21 +648,23 @@ assert ANSWER == "C"
             hi = mid - 1
     return lo''',
             'options': [
-                '`isqrt(99)` returns 9',
                 'For every integer n ≥ 0 the function returns ⌊√n⌋',
-                'If `mid` were computed as `(lo + hi) // 2`, the call `isqrt(2)` would never terminate',
+                '`isqrt(99)` returns 9',
                 'For n = 1000 the loop body executes exactly 10 times',
+                'If `mid` were computed as `(lo + hi) // 2`, the call `isqrt(2)` would never terminate',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** 'Binary search on the answer': the predicate P(m) = (m² ≤ n) is true for m = 0 … ⌊√n⌋ and false afterwards. The loop keeps the invariant P(lo) is true and P(hi + 1) is false, and finds the **last** true m. Because the true branch sets lo = mid, mid must be rounded **up** to guarantee progress.
 
-- (A) 9² = 81 ≤ 99 < 100 = 10². Trace: (0,99) mid 50 → hi 49; mid 25 → hi 24; mid 12 → hi 11; mid 6 → lo 6; (6,11) mid 9 → lo 9; (9,11) mid 10 → hi 9; stop → 9. **True.**
-- (B) The invariant holds initially (P(0) true; P(n + 1) false since (n+1)² > n), each branch preserves it, and every iteration shrinks hi − lo because lo < mid ≤ hi. **True** (n = 0 and n = 1 return immediately/correctly).
-- (C) With floor mid: (0,2) mid 1, 1 ≤ 2 → lo 1; (1,2) mid 1 → lo 1 again … infinite loop. **True.**
-- (D) For n = 1000 the range shrinks 1000 → 499 → 249 → … ; tracing gives **9** iterations, not 10 (result 31). **False.**
+- (A) The invariant holds initially (P(0) true; P(n + 1) false since (n+1)² > n), each branch preserves it, and every iteration shrinks hi − lo because lo < mid ≤ hi. **True** (n = 0 and n = 1 return immediately/correctly).
+- (B) 9² = 81 ≤ 99 < 100 = 10². Trace: (0,99) mid 50 → hi 49; mid 25 → hi 24; mid 12 → hi 11; mid 6 → lo 6; (6,11) mid 9 → lo 9; (9,11) mid 10 → hi 9; stop → 9. **True.**
+- (C) For n = 1000 the range shrinks 1000 → 499 → 249 → … ; tracing gives **9** iterations, not 10 (result 31). **False.**
+- (D) With floor mid: (0,2) mid 1, 1 ≤ 2 → lo 1; (1,2) mid 1 → lo 1 again … infinite loop. **True.**
 
 **Trap:** with the floor mid the code looks fine and works for many n (e.g. n = 0, 1), but hangs whenever the final two-element range has a true lower end.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import math
 assert isqrt(99) == 9
 assert all(isqrt(n) == math.isqrt(n) for n in range(3000))
@@ -716,12 +720,12 @@ assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
                 },
             ],
             'options': [
+                'The edge R–S belongs to the shortest-path tree rooted at P',
+                'A shortest path from P to U passes through Q',
                 'The shortest-path distance from P to U is 12',
                 'Vertices are finalised in the order P, R, Q, S, T, U',
-                'A shortest path from P to U passes through Q',
-                'The edge R–S belongs to the shortest-path tree rooted at P',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** Dijkstra finalises vertices in increasing distance; each vertex's parent in the shortest-path tree is the vertex whose relaxation last lowered it.
 
 Trace:
@@ -733,10 +737,10 @@ Trace:
 - U (12).
 
 Option analysis:
-- (A) **True** — d(U) = 12 via P–R–Q–S–T–U (2 + 2 + 4 + 1 + 3).
-- (B) **True** — distances 0, 2, 4, 8, 9, 12 in that order.
-- (C) **True** — the unique shortest path uses Q.
-- (D) **False** — S's parent became Q (8 < 9), so R–S is not a tree edge.
+- (A) **False** — S's parent became Q (8 < 9), so R–S is not a tree edge.
+- (B) **True** — the unique shortest path uses Q.
+- (C) **True** — d(U) = 12 via P–R–Q–S–T–U (2 + 2 + 4 + 1 + 3).
+- (D) **True** — distances 0, 2, 4, 8, 9, 12 in that order.
 
 **Trap:** R–S was used *temporarily* (S = 9) but a later relaxation replaced it.''',
             'solution_diagrams': [
@@ -773,7 +777,10 @@ Option analysis:
                     'caption': 'Shortest-path tree (red)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [("P","Q",5),("P","R",2),("R","Q",2),("Q","S",4),("R","S",7),("R","T",9),("S","T",1),
      ("S","U",6),("T","U",3)]
 G = {}
@@ -874,17 +881,19 @@ assert cost == int(ANSWER)
             'marks': 2,
             'topic': 'Graph theory — graphical degree sequences',
             'text': 'Which of the following sequences is/are the degree sequence of some **simple** undirected graph?',
-            'options': ['3, 3, 3, 3, 3, 3', '5, 5, 4, 3, 2, 1', '4, 4, 3, 2, 2, 1', '3, 3, 3, 1'],
-            'answer': ['A', 'C'],
+            'options': ['5, 5, 4, 3, 2, 1', '3, 3, 3, 3, 3, 3', '3, 3, 3, 1', '4, 4, 3, 2, 2, 1'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept.** Havel–Hakimi: a non-increasing sequence d₁ ≥ d₂ ≥ … is graphical iff the sequence obtained by deleting d₁ and subtracting 1 from the next d₁ terms is graphical. (Necessary first check: the sum must be even.)
 
-- (A) 3,3,3,3,3,3 (sum 18): → 2,2,2,3,3 → sort 3,3,2,2,2 → 2,1,1,2 → sort 2,2,1,1 → 1,0,1 → 1,1,0 → 0,0 ✓. **Graphical** (e.g. K₃,₃ or the triangular prism).
-- (B) 5,5,4,3,2,1 (sum 20): → 4,3,2,1,0 → 2,1,0,−1 ✗. **Not graphical**: two vertices of degree 5 among 6 vertices are adjacent to everyone, so no vertex can have degree 1.
-- (C) 4,4,3,2,2,1 (sum 16): → 3,2,1,1,1 → 1,0,0,1 → 1,1,0,0 → 0,0,0 ✓. **Graphical.**
-- (D) 3,3,3,1 (sum 10): with 4 vertices a degree-3 vertex is adjacent to all others, so three such vertices force the last vertex to degree ≥ 3. HH: → 2,2,0 → 1,−1 ✗. **Not graphical.**
+- (A) 5,5,4,3,2,1 (sum 20): → 4,3,2,1,0 → 2,1,0,−1 ✗. **Not graphical**: two vertices of degree 5 among 6 vertices are adjacent to everyone, so no vertex can have degree 1.
+- (B) 3,3,3,3,3,3 (sum 18): → 2,2,2,3,3 → sort 3,3,2,2,2 → 2,1,1,2 → sort 2,2,1,1 → 1,0,1 → 1,1,0 → 0,0 ✓. **Graphical** (e.g. K₃,₃ or the triangular prism).
+- (C) 3,3,3,1 (sum 10): with 4 vertices a degree-3 vertex is adjacent to all others, so three such vertices force the last vertex to degree ≥ 3. HH: → 2,2,0 → 1,−1 ✗. **Not graphical.**
+- (D) 4,4,3,2,2,1 (sum 16): → 3,2,1,1,1 → 1,0,0,1 → 1,1,0,0 → 0,0,0 ✓. **Graphical.**
 
-**Trap:** an even degree sum is necessary but not sufficient — (B) and (D) both have even sums.''',
-            'verify': '''
+**Trap:** an even degree sum is necessary but not sufficient — (A) and (C) both have even sums.''',
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def hh(seq):
     s = sorted(seq, reverse=True)
     while s and s[0] > 0:

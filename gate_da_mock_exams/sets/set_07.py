@@ -109,16 +109,16 @@ assert [ok(o) for o in opts] == [False, True, False, False] and ANSWER == 'B'
             'marks': 1,
             'topic': 'Stacks — permutations',
             'text': 'The integers 1, 2, 3, 4, 5, 6 are pushed onto an initially empty stack in this order. Pops may be interleaved with pushes arbitrarily, and every popped value is written to the output immediately. Which of the following output sequences is/are possible?',
-            'options': ['3 2 5 4 6 1', '2 4 3 6 1 5', '4 5 3 6 2 1', '1 5 2 4 3 6'],
-            'answer': ['A', 'C'],
+            'options': ['2 4 3 6 1 5', '1 5 2 4 3 6', '4 5 3 6 2 1', '3 2 5 4 6 1'],
+            'answer': ['C', 'D'],
             'solution': '''Simulate greedily: to output x, push everything up to x (if not yet pushed), then x must be on top.
 
-- (A) push 1,2,3 pop **3**; pop **2**; push 4,5 pop **5**; pop **4**; push 6 pop **6**; pop **1**. **Possible.**
-- (B) push 1,2 pop **2**; push 3,4 pop **4**; pop **3**; push 5,6 pop **6**. Stack is now [1, 5] with 5 on top, but 1 is required → **impossible**.
+- (A) push 1,2 pop **2**; push 3,4 pop **4**; pop **3**; push 5,6 pop **6**. Stack is now [1, 5] with 5 on top, but 1 is required → **impossible**.
+- (B) push 1 pop **1**; push 2..5 pop **5**; top is 4 but 2 is required → **impossible**.
 - (C) push 1..4 pop **4**; push 5 pop **5**; pop **3**; push 6 pop **6**; pop **2**; pop **1**. **Possible.**
-- (D) push 1 pop **1**; push 2..5 pop **5**; top is 4 but 2 is required → **impossible**.
+- (D) push 1,2,3 pop **3**; pop **2**; push 4,5 pop **5**; pop **4**; push 6 pop **6**; pop **1**. **Possible.**
 
-**Tip:** an output sequence is impossible exactly when it contains three values appearing in the order high, low, middle (a, then c, then b with a > b > c) — the forbidden “3-1-2” pattern. In (B) 6, 1, 5 forms it; in (D) 5, 2, 4 forms it.''',
+**Tip:** an output sequence is impossible exactly when it contains three values appearing in the order high, low, middle (a, then c, then b with a > b > c) — the forbidden “3-1-2” pattern. In (A) 6, 1, 5 forms it; in (B) 5, 2, 4 forms it.''',
             'solution_diagrams': [
                 {
                     'type': 'stack',
@@ -126,7 +126,9 @@ assert [ok(o) for o in opts] == [False, True, False, False] and ANSWER == 'B'
                     'label': '(B) stuck: stack after 6 is popped',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def possible(seq):
     st = []; nxt = 1
     for x in seq:
@@ -411,12 +413,12 @@ while p.next and p.next.next:
                 },
             ],
             'options': [
-                'Traversing from `head` now visits 4, 2, 5',
                 'The node holding 9 is no longer reachable from `head`',
-                'When the loop ends, `p` refers to the node holding 7',
                 'For any list of n ≥ 1 nodes, the loop leaves exactly ⌈n/2⌉ nodes reachable from `head`',
+                'When the loop ends, `p` refers to the node holding 7',
+                'Traversing from `head` now visits 4, 2, 5',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'D'],
             'solution': '''Each iteration bypasses the node after `p` and then advances `p` to the node two ahead.
 
 - Start: p = 4. p.next (9) and p.next.next (2) exist → 4.next = 2, p = 2.
@@ -425,10 +427,10 @@ while p.next and p.next.next:
 
 List is now 4 → 2 → 5.
 
-- (A) **True.**
-- (B) **True** — 4.next was redirected to 2, so 9 is bypassed (and 7 likewise).
+- (A) **True** — 4.next was redirected to 2, so 9 is bypassed (and 7 likewise).
+- (B) **False** — for even n the last node survives too. With n = 6 (1..6): 1→3, p=3; 3→5, p=5; 5.next.next is None, so the list is 1, 3, 5, 6 — 4 nodes, not ⌈6/2⌉ = 3. In general the length is ⌊n/2⌋ + 1.
 - (C) **False** — p ends at the node holding 5.
-- (D) **False** — for even n the last node survives too. With n = 6 (1..6): 1→3, p=3; 3→5, p=5; 5.next.next is None, so the list is 1, 3, 5, 6 — 4 nodes, not ⌈6/2⌉ = 3. In general the length is ⌊n/2⌋ + 1.
+- (D) **True.**
 
 **Trap:** the loop condition requires *two* nodes ahead; when only one remains it is kept.''',
             'solution_diagrams': [
@@ -439,7 +441,9 @@ List is now 4 → 2 → 5.
                     'caption': 'Reachable list after the loop',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 out = []; q = head
 while q: out.append(q.val); q = q.next
 assert out == [4, 2, 5] and p.val == 5
@@ -831,14 +835,14 @@ assert d == {'S':0, 'B':2, 'A':5, 'C':6, 'D':7, 'E':9}
                     },
                 },
             ],
-            'options': ['P, Q, S, R, U, T', 'P, Q, S, T, R, U', 'P, R, U, T, S, Q', 'P, R, S, U, T, Q'],
-            'answer': ['A', 'C'],
+            'options': ['P, R, S, U, T, Q', 'P, Q, S, T, R, U', 'P, Q, S, R, U, T', 'P, R, U, T, S, Q'],
+            'answer': ['C', 'D'],
             'solution': '''Rule: each newly discovered vertex must be adjacent to the **deepest vertex on the current recursion path that still has an undiscovered neighbour** (DFS only backtracks when the current vertex is exhausted).
 
-- (A) P→Q→S→R (S–R edge) →U (R–U) →T (U–T). Every step goes to a neighbour of the current vertex. **Valid.**
+- (A) P→R→S→U? S and U are **not** adjacent; at that moment S still has undiscovered neighbours Q and T, so the next vertex must be one of them. **Invalid.**
 - (B) P→Q→S→T. T still has the undiscovered neighbour U, so DFS must go T→U next; it cannot jump to R. **Invalid.**
-- (C) P→R→U→T→S (T–S) →Q (S–Q). **Valid.**
-- (D) P→R→S→U? S and U are **not** adjacent; at that moment S still has undiscovered neighbours Q and T, so the next vertex must be one of them. **Invalid.**
+- (C) P→Q→S→R (S–R edge) →U (R–U) →T (U–T). Every step goes to a neighbour of the current vertex. **Valid.**
+- (D) P→R→U→T→S (T–S) →Q (S–Q). **Valid.**
 
 **Trap:** BFS-like thinking (“visit R since it is adjacent to P”) breaks DFS order; a jump back to an ancestor's neighbour is allowed only after the current vertex has no unvisited neighbours.''',
             'solution_diagrams': [
@@ -873,7 +877,9 @@ assert d == {'S':0, 'B':2, 'A':5, 'C':6, 'D':7, 'E':9}
                     'caption': 'DFS tree for order (A)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [('P','Q'),('P','R'),('Q','S'),('R','S'),('S','T'),('R','U'),('T','U')]
 adj = {}
 for u, v in E: adj.setdefault(u, set()).add(v); adj.setdefault(v, set()).add(u)
@@ -1027,21 +1033,24 @@ assert [k for k, v in opts.items() if v == a] == [ANSWER]
             'topic': 'Priority-queue operation costs',
             'text': 'Let n be the number of keys in a binary heap stored in an array. Which of the following statements is/are TRUE (worst-case bounds)?',
             'options': [
-                'Building a heap bottom-up from n arbitrary keys takes Θ(n) time',
-                'The maximum key of a binary **min**-heap can be found in O(log n) time',
                 'Given the array index of a key, decrease-key in a binary min-heap takes O(log n) time',
                 "Dijkstra's algorithm with a binary heap on a graph with V vertices and E edges runs in O((V + E) log V) time",
+                'The maximum key of a binary **min**-heap can be found in O(log n) time',
+                'Building a heap bottom-up from n arbitrary keys takes Θ(n) time',
             ],
-            'answer': ['A', 'C', 'D'],
-            'solution': '''- (A) **True.** Sift-down from a node of height h costs O(h); there are at most ⌈n/2^{h+1}⌉ nodes of height h, and ∑ h/2^{h} converges, so the total is Θ(n) — not Θ(n log n).
-- (B) **False.** The maximum of a min-heap must be a leaf, but it can be *any* of the ⌈n/2⌉ leaves; the heap order gives no information comparing different leaves, so Θ(n) comparisons are needed.
-- (C) **True.** Decreasing a key can only violate the heap property with its parent; one sift-up of at most ⌊log₂ n⌋ levels fixes it. Knowing the index avoids an O(n) search.
-- (D) **True.** At most V extract-min operations and at most E decrease-key (or lazy push) operations, each O(log V) → O((V + E) log V).
+            'answer': ['A', 'B', 'D'],
+            'solution': '''- (A) **True.** Decreasing a key can only violate the heap property with its parent; one sift-up of at most ⌊log₂ n⌋ levels fixes it. Knowing the index avoids an O(n) search.
+- (B) **True.** At most V extract-min operations and at most E decrease-key (or lazy push) operations, each O(log V) → O((V + E) log V).
+- (C) **False.** The maximum of a min-heap must be a leaf, but it can be *any* of the ⌈n/2⌉ leaves; the heap order gives no information comparing different leaves, so Θ(n) comparisons are needed.
+- (D) **True.** Sift-down from a node of height h costs O(h); there are at most ⌈n/2^{h+1}⌉ nodes of height h, and ∑ h/2^{h} converges, so the total is Θ(n) — not Θ(n log n).
 
 **Trap:** “heaps support O(log n) everything” — a heap is only partially ordered; search for an arbitrary key or the opposite extreme (max in a min-heap) is linear.
 
 **Tip:** for dense graphs (E ≈ V²) an array-based Dijkstra in O(V²) beats the binary heap's O(V² log V).''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 # (B) the max of a min-heap can sit at any leaf: show every leaf position is achievable
 import itertools
 pos = set()

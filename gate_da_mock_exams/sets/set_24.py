@@ -80,21 +80,24 @@ assert passes([2, 3, 4, 5, 6, 1]) + passes([6, 1, 2, 3, 4, 5]) == int(ANSWER)
             'topic': 'Sorting — stability of standard algorithms',
             'text': 'Each algorithm below is implemented in its standard textbook form on an array and sorts records by key in ascending order. Which of them is/are **stable** for every input?',
             'options': [
-                'Insertion sort that shifts A[j] right while A[j] > key',
                 'Selection sort that swaps the minimum of A[i..n−1] (first occurrence) with A[i]',
                 'Merge sort whose merge takes from the left half when the two front keys are equal',
                 'Quicksort using the Lomuto partition with the last element as pivot',
+                'Insertion sort that shifts A[j] right while A[j] > key',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept.** A sort is stable if equal keys keep their input order. Algorithms that move elements only between *adjacent* positions (or merge with a left-preference on ties) are stable; algorithms that make long-distance swaps usually are not.
 
-- (A) **Stable.** The strict test `A[j] > key` stops at an equal key, so a later equal key is placed after it.
-- (B) **Not stable.** The long swap can jump an element over its equal twin. Example: [2a, 2b, 1] → swap 2a with 1 → [1, 2b, 2a].
-- (C) **Stable.** On ties the left (earlier) record is output first.
-- (D) **Not stable.** Example [1a, 1b, 0]: pivot 0; nothing ≤ 0 in the loop, final swap exchanges A[0] and A[2] → [0, 1b, 1a].
+- (A) **Not stable.** The long swap can jump an element over its equal twin. Example: [2a, 2b, 1] → swap 2a with 1 → [1, 2b, 2a].
+- (B) **Stable.** On ties the left (earlier) record is output first.
+- (C) **Not stable.** Example [1a, 1b, 0]: pivot 0; nothing ≤ 0 in the loop, final swap exchanges A[0] and A[2] → [0, 1b, 1a].
+- (D) **Stable.** The strict test `A[j] > key` stops at an equal key, so a later equal key is placed after it.
 
 **Trap:** stability is a property of the *implementation*: insertion sort with `>=` or merge sort preferring the right half on ties become unstable.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import random
 def ins(A, key):
     A = A[:]
@@ -323,19 +326,22 @@ assert sum(r2[:4]) == int(ANSWER) == int(OUTPUT.strip())
             'topic': 'Sorting — auxiliary space',
             'text': 'Which of the following statements about the extra space used by sorting algorithms is/are TRUE?',
             'options': [
-                'Top-down merge sort on an array of n elements, with the usual merge, uses Θ(n) auxiliary space',
                 'Heapsort sorts an array using O(1) auxiliary space',
-                'Quicksort that recurses on the smaller part and loops on the larger part needs only O(log n) stack depth, even in the worst case',
                 'Merging two sorted singly linked lists of total length n by relinking nodes requires Θ(n) auxiliary space',
+                'Top-down merge sort on an array of n elements, with the usual merge, uses Θ(n) auxiliary space',
+                'Quicksort that recurses on the smaller part and loops on the larger part needs only O(log n) stack depth, even in the worst case',
             ],
-            'answer': ['A', 'B', 'C'],
-            'solution': '''- (A) **True.** The array merge copies the two runs into a buffer (or writes into one); the top-level merge alone needs n/2 to n extra cells.
-- (B) **True.** Build-heap and the repeated swap-root-with-last + sift-down work entirely inside the array; only a few index variables are needed.
-- (C) **True.** Each recursive call is on a part of size ≤ half of the current range, so the depth is ≤ log₂ n. The larger part is handled by the loop (tail-call elimination). The *time* can still be Θ(n²) — only the stack is bounded.
-- (D) **False.** Linked-list merge only changes `next` pointers using a constant number of extra pointer variables: O(1) space. This is why merge sort is preferred for linked lists.
+            'answer': ['A', 'C', 'D'],
+            'solution': '''- (A) **True.** Build-heap and the repeated swap-root-with-last + sift-down work entirely inside the array; only a few index variables are needed.
+- (B) **False.** Linked-list merge only changes `next` pointers using a constant number of extra pointer variables: O(1) space. This is why merge sort is preferred for linked lists.
+- (C) **True.** The array merge copies the two runs into a buffer (or writes into one); the top-level merge alone needs n/2 to n extra cells.
+- (D) **True.** Each recursive call is on a part of size ≤ half of the current range, so the depth is ≤ log₂ n. The larger part is handled by the loop (tail-call elimination). The *time* can still be Θ(n²) — only the stack is bounded.
 
 **Trap:** confusing worst-case *time* of quicksort (Θ(n²)) with its worst-case *space*; with the smaller-side-first trick they are independent.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import math
 def depth_qs(A):
     best = [0]
@@ -466,12 +472,12 @@ assert ["10", "14", "5", "20"]["ABCD".index(ANSWER)] == str(cnt(1, 2) * cnt(4, 6
             'topic': 'Inversions — insertion sort, bubble sort, reversal',
             'text': 'Let A = [4, 9, 2, 7, 5, 1, 8, 3]. An inversion is a pair of indices i < j with A[i] > A[j]. Which of the following statements is/are TRUE?',
             'options': [
-                'A has exactly 16 inversions',
-                'Insertion sort (shift while A[j] > key) performs exactly 16 element shifts on A',
                 'Bubble sort with early termination (stop after a pass with no swap) executes all n − 1 = 7 passes on A',
+                'Insertion sort (shift while A[j] > key) performs exactly 16 element shifts on A',
+                'A has exactly 16 inversions',
                 'The reverse of A, [3, 8, 1, 5, 7, 2, 9, 4], has exactly 12 inversions',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Counting inversions** (for each element, how many later elements are smaller):
 - 4: {2, 1, 3} → 3
 - 9: {2, 7, 5, 1, 8, 3} → 6
@@ -481,14 +487,15 @@ assert ["10", "14", "5", "20"]["ABCD".index(ANSWER)] == str(cnt(1, 2) * cnt(4, 6
 - 1: 0
 - 8: {3} → 1
 - 3: 0
-Total = 3 + 6 + 1 + 3 + 2 + 0 + 1 + 0 = **16**. (A) **True.**
+Total = 3 + 6 + 1 + 3 + 2 + 0 + 1 + 0 = **16**. (C) **True.**
 
+- (A) **False.** Each pass moves an element at most one place to the left. The element that must travel farthest left is 1 (index 5 → 0, five places) — 3 travels from index 7 to 2, also five. So 5 passes sort the array and the 6th pass makes no swap and stops: 6 passes, not 7.
 - (B) **True.** Every shift in insertion sort swaps one adjacent inverted pair, removing exactly one inversion, and the sort ends with 0 inversions → shifts = inversions = 16. (Bubble sort likewise performs exactly 16 swaps.)
-- (C) **False.** Each pass moves an element at most one place to the left. The element that must travel farthest left is 1 (index 5 → 0, five places) — 3 travels from index 7 to 2, also five. So 5 passes sort the array and the 6th pass makes no swap and stops: 6 passes, not 7.
 - (D) **True.** Reversing turns every inverted pair into a non-inverted one and vice versa; there are C(8, 2) = 28 pairs, so the reverse has 28 − 16 = 12 inversions.
 
 **Trap:** the number of *passes* of bubble sort depends on the maximum leftward displacement, not on the number of inversions.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [4, 9, 2, 7, 5, 1, 8, 3]
 inv = lambda X: sum(X[i] > X[j] for i in range(len(X)) for j in range(i + 1, len(X)))
 B, sh = A[:], 0
@@ -691,11 +698,11 @@ c = sorted(data, key=lambda t: -t[1])
 d = data.sort(key=lambda t: t[1])''',
             'options': [
                 '`a == c` evaluates to True',
-                '`a == b` evaluates to True',
                 'The names in `b`, in order, are r, p, s, q',
+                '`a == b` evaluates to True',
                 "`d` is None and `data` is now [('q', 1), ('s', 1), ('p', 2), ('r', 2)]",
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** `sorted(..., reverse=True)` is still **stable**: it sorts as if each comparison were reversed, so records with equal keys keep their *original* order. Reversing an ascending result with `[::-1]` instead reverses the order of equal keys too. `list.sort()` sorts in place and returns None.
 
 **Values.**
@@ -706,12 +713,13 @@ d = data.sort(key=lambda t: t[1])''',
 
 **Statements.**
 - (A) **True** — both are p, r, q, s.
-- (B) **False** — b has the ties reversed (r before p, s before q).
-- (C) **True.**
+- (B) **True.**
+- (C) **False** — b has the ties reversed (r before p, s before q).
 - (D) **True** — note `a`, `b`, `c` were computed before the in-place sort, and `sorted` always returns a new list, so they are unaffected.
 
 **Trap:** believing `reverse=True` is the same as reversing the sorted list. It is the same only when all keys are distinct.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 r = {'A': a == c, 'B': a == b, 'C': [x for x, _ in b] == list("rpsq"),
      'D': d is None and data == [('q', 1), ('s', 1), ('p', 2), ('r', 2)]}
 assert sorted(k for k in r if r[k]) == sorted(ANSWER)
@@ -891,18 +899,18 @@ assert OUTPUT.strip() == str(exp) and ANSWER == 'B'
                 },
             ],
             'options': [
+                'D precedes E in every topological order',
                 'DFS with the outer loop over vertices in alphabetical order and out-neighbours explored alphabetically, outputting vertices in reverse order of finishing, gives B, E, A, D, G, C, F',
                 'C, A, B, D, E, F, G is a valid topological order',
                 "Kahn's algorithm that always removes the alphabetically smallest current source outputs A, B, C, D, E, F, G",
-                'D precedes E in every topological order',
             ],
-            'answer': ['A', 'C'],
-            'solution': '''**(A) DFS trace.** Start A: A → C → F (F finishes 1st), C finishes; A → D → F seen, D → G (G finishes), D finishes; A finishes. Start B: B → D seen, B → E → G seen, E finishes, B finishes.
+            'answer': ['B', 'D'],
+            'solution': '''**(B) DFS trace.** Start A: A → C → F (F finishes 1st), C finishes; A → D → F seen, D → G (G finishes), D finishes; A finishes. Start B: B → D seen, B → E → G seen, E finishes, B finishes.
 Finish order: F, C, G, D, A, E, B. Reverse: **B, E, A, D, G, C, F** → **True.**
 
-**(B)** Edge A → C requires A before C. **False.**
+**(C)** Edge A → C requires A before C. **False.**
 
-**(C) Kahn trace** (current sources, choose smallest):
+**(D) Kahn trace** (current sources, choose smallest):
 - {A, B} → A; now C is a source (D still waits for B).
 - {B, C} → B; D and E become sources.
 - {C, D, E} → C; F waits for D.
@@ -911,10 +919,13 @@ Finish order: F, C, G, D, A, E, B. Reverse: **B, E, A, D, G, C, F** → **True.*
 - {F, G} → F, then G.
 Output **A, B, C, D, E, F, G** → **True.**
 
-**(D)** There is no path between D and E, so they can appear in either order; e.g. the DFS order in (A) has E before D. **False.**
+**(A)** There is no path between D and E, so they can appear in either order; e.g. the DFS order in (B) has E before D. **False.**
 
 **Trap:** the DFS order and the Kahn order are both valid but generally different — a DAG usually has many topological orders (this one has 42).''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 D = {'A': 'CD', 'B': 'DE', 'C': 'F', 'D': 'FG', 'E': 'G', 'F': '', 'G': ''}
 seen, fin = set(), []
 def vis(u):

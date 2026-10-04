@@ -177,19 +177,19 @@ assert order[4] == int(ANSWER) and L == [1]
             ],
             'options': [
                 'If 45 is deleted by replacing it with its in-order predecessor, the new root is 39',
-                'After that deletion, node 34 has exactly one child',
                 'The in-order successor of 61 in T is 78',
+                'After that deletion, node 34 has exactly one child',
                 'T has exactly 4 leaves',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'C'],
             'solution': '''The in-order predecessor of a node with a left subtree is the **maximum** of that left subtree (go left once, then right as far as possible). The in-order successor of a node **without** a right subtree is the nearest ancestor of which it lies in the left subtree.
 
 - (A) Left subtree of 45 = {22, 11, 34, 29, 39}; its maximum is 39 (22 → 34 → 39). 39 replaces 45. **TRUE.**
-- (B) 39 was the right child (a leaf) of 34, so after removing it 34 keeps only its left child 29. **TRUE.**
-- (C) 61 has no right child; walking up, 61 is in the right subtree of 56 and in the **left** subtree of 67 → successor 67 (in-order …, 56, 61, 67, 78, 89). **FALSE.**
+- (B) 61 has no right child; walking up, 61 is in the right subtree of 56 and in the **left** subtree of 67 → successor 67 (in-order …, 56, 61, 67, 78, 89). **FALSE.**
+- (C) 39 was the right child (a leaf) of 34, so after removing it 34 keeps only its left child 29. **TRUE.**
 - (D) Leaves: 11, 29, 39, 61, 78 → 5 leaves. **FALSE.**
 
-**Trap:** in (C), picking the smallest key in some right subtree (78) — the successor is found upward when the node has no right child.''',
+**Trap:** in (B), picking the smallest key in some right subtree (78) — the successor is found upward when the node has no right child.''',
             'solution_diagrams': [
                 {
                     'type': 'bintree',
@@ -222,7 +222,8 @@ assert order[4] == int(ANSWER) and L == [1]
                     'caption': 'After deleting 45 (predecessor 39 promoted)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 T = [45, [22, [11, None, None], [34, [29, None, None], [39, None, None]]],
      [67, [56, None, [61, None, None]], [89, [78, None, None], None]]]
 def ino(t): return [] if t is None else ino(t[1]) + [t[0]] + ino(t[2])
@@ -398,19 +399,21 @@ assert S == [8, 17, 25, 52, 41, 33] and B == [17, 33, 8, 41, 25, 52] and ANSWER 
                 },
             ],
             'options': [
-                'A is the only vertex with in-degree 0',
-                'G has exactly 6 topological orderings',
                 'Running DFS from A (neighbours in alphabetical order) and listing vertices in decreasing order of finishing time gives A, C, F, B, D, E',
+                'G has exactly 6 topological orderings',
                 'Deleting the edge C → D increases the number of topological orderings',
+                'A is the only vertex with in-degree 0',
             ],
             'answer': ['A', 'C', 'D'],
-            'solution': '''- (A) In-degrees: A 0, B 1, C 1, D 2, E 1, F 1. **TRUE.**
+            'solution': '''- (A) DFS(A): A → B → D → E; E finishes, D finishes, B finishes; then A → C → (D done) → F; F, C, A finish. Finish order E, D, B, F, C, A; reversed: A, C, F, B, D, E. **TRUE.**
 - (B) Count orderings: A is first. Constraints left: B, C before D; D before E; C before F. Place F relative to the chain: sequences of {B, C, D, E} with B, C before D before E are B C D E and C B D E (2). F must come after C: in B C D E, F can go after C in 3 gaps; in C B D E, F can go after C in 4 gaps. Total 3 + 4 = **7**, not 6. **FALSE.**
-- (C) DFS(A): A → B → D → E; E finishes, D finishes, B finishes; then A → C → (D done) → F; F, C, A finish. Finish order E, D, B, F, C, A; reversed: A, C, F, B, D, E. **TRUE.**
-- (D) Without C → D the constraints are A first, B before D before E, C before F. The number of interleavings of chain B D E with chain C F is C(5, 2) = 10 > 7. **TRUE.**
+- (C) Without C → D the constraints are A first, B before D before E, C before F. The number of interleavings of chain B D E with chain C F is C(5, 2) = 10 > 7. **TRUE.**
+- (D) In-degrees: A 0, B 1, C 1, D 2, E 1, F 1. **TRUE.**
 
 **Tip:** reverse post-order of DFS is always a valid topological order; removing constraints can never decrease the count.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def cnt(E):
     def ok(p):
@@ -543,23 +546,26 @@ Without the `finally` clause the answer would be 4 + 3 + 2 + 1 + 100 = 110.
                 },
             ],
             'options': [
-                'The 3rd smallest key can be at depth 2',
-                'The 3rd smallest key can be at depth 3',
                 'The largest key is always at a leaf',
                 'The 4th smallest key can be at depth 4',
+                'The 3rd smallest key can be at depth 3',
+                'The 3rd smallest key can be at depth 2',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['A', 'D'],
             'solution': '''In a min-heap every ancestor of a key is smaller than it. So the k-th smallest key has at most k − 1 ancestors, i.e. its depth is at most **k − 1**.
 
-- (A) The 3rd smallest may have the 2nd smallest as parent and the minimum as grandparent. In the example figure, the keys 2, 3, 4 lie on a root path: 4 (the 3rd smallest) is at depth 2. **TRUE.**
-- (B) Depth 3 would require 3 smaller ancestors, but only 2 keys are smaller. **FALSE.**
-- (C) Every internal node has a child, which must be larger; the largest key has nothing larger, so it can have no children → it is a leaf (depth 4 here). **TRUE.**
-- (D) Depth 4 needs 4 smaller ancestors; the 4th smallest has only 3 smaller keys. Its depth is at most 3. **FALSE.**
+- (A) Every internal node has a child, which must be larger; the largest key has nothing larger, so it can have no children → it is a leaf (depth 4 here). **TRUE.**
+- (B) Depth 4 needs 4 smaller ancestors; the 4th smallest has only 3 smaller keys. Its depth is at most 3. **FALSE.**
+- (C) Depth 3 would require 3 smaller ancestors, but only 2 keys are smaller. **FALSE.**
+- (D) The 3rd smallest may have the 2nd smallest as parent and the minimum as grandparent. In the example figure, the keys 2, 3, 4 lie on a root path: 4 (the 3rd smallest) is at depth 2. **TRUE.**
 
 Consequence: finding the k-th smallest needs to inspect only the top k levels (and in fact only O(k) nodes with a priority-queue walk).
 
 **Trap:** confusing “can be at depth d” with “must be at depth d”: the 3rd smallest can be at depth 1 *or* 2.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq, random
 random.seed(7)
 deps3, deps4, leaf = set(), set(), True
@@ -792,12 +798,12 @@ assert f["T"] == int(ANSWER) and d == {"P": 1, "Q": 2, "R": 3, "T": 5, "U": 6, "
                 },
             ],
             'options': [
-                "Dijkstra's algorithm reports the distance of C as 5",
                 'The true shortest-path distance from S to C is 4',
-                'The Bellman–Ford algorithm reports a negative-weight cycle in this graph',
                 'Adding 4 to every edge weight and then running Dijkstra yields the correct shortest paths of the original graph',
+                'The Bellman–Ford algorithm reports a negative-weight cycle in this graph',
+                "Dijkstra's algorithm reports the distance of C as 5",
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'D'],
             'solution': '''Dijkstra's correctness proof needs non-negative weights: it assumes no path through an unfinished vertex can later improve a finished one.
 
 Dijkstra trace:
@@ -809,13 +815,15 @@ Dijkstra trace:
 
 True distances: B = min(2, 5 − 4) = 1 via S→A→B, and C = 1 + 3 = 4 via S→A→B→C.
 
-- (A) **TRUE** — Dijkstra outputs 5 for C (and 2 for B).
-- (B) **TRUE** — S→A→B→C costs 5 − 4 + 3 = 4.
+- (A) **TRUE** — S→A→B→C costs 5 − 4 + 3 = 4.
+- (B) **FALSE** — adding a constant penalises paths with more edges. New weights: S→A 9, A→B 0, B→C 7, S→B 6; S→B→C = 13 < S→A→B→C = 16, so the re-weighted shortest path to C is S→B→C, which is wrong for the original graph.
 - (C) **FALSE** — the graph is acyclic, so it has no cycle at all, let alone a negative one; Bellman–Ford returns the correct distances.
-- (D) **FALSE** — adding a constant penalises paths with more edges. New weights: S→A 9, A→B 0, B→C 7, S→B 6; S→B→C = 13 < S→A→B→C = 16, so the re-weighted shortest path to C is S→B→C, which is wrong for the original graph.
+- (D) **TRUE** — Dijkstra outputs 5 for C (and 2 for B).
 
-**Trap:** (D) looks like a fix, but uniform shifting does not preserve shortest paths (Johnson's algorithm uses vertex potentials instead).''',
-            'verify': '''
+**Trap:** (B) looks like a fix, but uniform shifting does not preserve shortest paths (Johnson's algorithm uses vertex potentials instead).''',
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 E = [("S","A",5),("S","B",2),("A","B",-4),("B","C",3),("A","C",6)]
 def dij(E):
@@ -964,19 +972,21 @@ assert T.index(31) == int(ANSWER)
             'topic': 'Python — mutability, tuples and closures',
             'text': 'Each statement below refers to a separate fresh Python 3 session. Which of the statements is/are TRUE?',
             'options': [
-                'After `m = [[0] * 2 for _ in range(2)]` and `m[0][0] = 1`, `m == [[1, 0], [1, 0]]` is True',
                 'After `t = (1, [2])` and running `t[1] += [3]` inside `try: … except TypeError: pass`, `t == (1, [2, 3])` is True',
-                'After `x = 5`, `f = lambda: x`, `x = 7`, the call `f()` returns 7',
                 '`sorted("bca") == "abc"` is True',
+                'After `x = 5`, `f = lambda: x`, `x = 7`, the call `f()` returns 7',
+                'After `m = [[0] * 2 for _ in range(2)]` and `m[0][0] = 1`, `m == [[1, 0], [1, 0]]` is True',
             ],
-            'answer': ['B', 'C'],
-            'solution': '''- (A) The comprehension creates a **new** inner list on each iteration, so the rows are independent: m = [[1, 0], [0, 0]]. **FALSE.** (The aliasing trap applies to `[[0] * 2] * 2`.)
-- (B) `t[1] += [3]` runs in two steps: `t[1].__iadd__([3])` mutates the list in place (succeeds), then Python tries `t[1] = <result>`, which raises TypeError because tuples do not support item assignment. The exception is swallowed, but the mutation has already happened: t == (1, [2, 3]). **TRUE.**
+            'answer': ['A', 'C'],
+            'solution': '''- (A) `t[1] += [3]` runs in two steps: `t[1].__iadd__([3])` mutates the list in place (succeeds), then Python tries `t[1] = <result>`, which raises TypeError because tuples do not support item assignment. The exception is swallowed, but the mutation has already happened: t == (1, [2, 3]). **TRUE.**
+- (B) `sorted` always returns a **list**: ['a', 'b', 'c'] ≠ 'abc'. (`''.join(sorted("bca"))` would equal 'abc'.) **FALSE.**
 - (C) The lambda looks up the global name `x` when it is **called**, by which time x is 7. **TRUE.**
-- (D) `sorted` always returns a **list**: ['a', 'b', 'c'] ≠ 'abc'. (`''.join(sorted("bca"))` would equal 'abc'.) **FALSE.**
+- (D) The comprehension creates a **new** inner list on each iteration, so the rows are independent: m = [[1, 0], [0, 0]]. **FALSE.** (The aliasing trap applies to `[[0] * 2] * 2`.)
 
-**Trap:** in (B), most people assume an operation that raises has no effect; augmented assignment on a mutable element of an immutable container is the classic counter-example. Similarly in (C), a closure captures *variables*, not values; to freeze the value write `lambda x=x: x`.''',
-            'verify': '''
+**Trap:** in (A), most people assume an operation that raises has no effect; augmented assignment on a mutable element of an immutable container is the classic counter-example. Similarly in (C), a closure captures *variables*, not values; to freeze the value write `lambda x=x: x`.''',
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 m = [[0] * 2 for _ in range(2)]; m[0][0] = 1
 A = m == [[1, 0], [1, 0]]
 t = (1, [2])

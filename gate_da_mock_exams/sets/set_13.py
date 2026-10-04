@@ -82,17 +82,18 @@ assert hh([5, 5, 5, 3, 3, 3, 3, 3])
             'marks': 1,
             'topic': 'Graphical degree sequences',
             'text': 'A sequence of non-negative integers is *graphical* if it is the degree sequence of some **simple** undirected graph. Which of the following sequences is/are graphical?',
-            'options': ['(3, 3, 3, 3, 2, 2)', '(5, 4, 3, 2, 1, 1)', '(4, 3, 3, 2, 2, 2)', '(3, 3, 3, 1)'],
+            'options': ['(4, 3, 3, 2, 2, 2)', '(5, 4, 3, 2, 1, 1)', '(3, 3, 3, 3, 2, 2)', '(3, 3, 3, 1)'],
             'answer': ['A', 'C'],
             'solution': '''Use the **Havel–Hakimi** test: remove the largest degree d, subtract 1 from the next d largest entries, re-sort, repeat. The sequence is graphical iff we reach all zeros without a negative entry or a d larger than the remaining length. (An odd sum fails at once.)
 
-- (A) 3,3,3,3,2,2 → 2,2,2,2,2 → 1,1,2,2 → sort 2,2,1,1 → 1,0,1 → 1,1,0 → 0,0. **Graphical** (e.g. a 6-cycle with two chords).
+- (A) 4,3,3,2,2,2 → 2,2,1,1,2 → sort 2,2,2,1,1 → 1,1,1,1 → 0,1,1 → 0,0. **Graphical.**
 - (B) sum 16 is even, but 5 on 6 vertices means that vertex is adjacent to **all** others, so every other degree is ≥ 1; remove it → 3,2,1,0,0; then 3 → 1,0,−1 ✗. **Not graphical** — the two degree-1 vertices are both used up by the degree-5 vertex, so the degree-4 vertex can reach at most 3 others.
-- (C) 4,3,3,2,2,2 → 2,2,1,1,2 → sort 2,2,2,1,1 → 1,1,1,1 → 0,1,1 → 0,0. **Graphical.**
+- (C) 3,3,3,3,2,2 → 2,2,2,2,2 → 1,1,2,2 → sort 2,2,1,1 → 1,0,1 → 1,1,0 → 0,0. **Graphical** (e.g. a 6-cycle with two chords).
 - (D) sum 10 is even, but 3,3,3 on 4 vertices: each degree-3 vertex is adjacent to all others, so the fourth vertex would have degree 3, not 1. **Not graphical.**
 
 **Trap:** an even degree sum is necessary but **not** sufficient — (B) and (D) both pass the parity check.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def hh(s):
     s = sorted(s, reverse=True)
     while s and s[0] > 0:
@@ -342,21 +343,22 @@ assert 7 - cyc == 4
             'topic': 'Python — sets, tuples and frozensets for edges',
             'text': 'Which of the following Python expressions evaluate to `True`?',
             'options': [
-                '`({1, 2, 3} ^ {2, 3, 4}) == {1, 4}`',
+                "`sorted({3: 'a', 1: 'b'}) == ['a', 'b']`",
                 '`len({(1, 2), (2, 1)}) == 1`',
                 '`len({frozenset((1, 2)), frozenset((2, 1))}) == 1`',
-                "`sorted({3: 'a', 1: 'b'}) == ['a', 'b']`",
+                '`({1, 2, 3} ^ {2, 3, 4}) == {1, 4}`',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''These are the usual ways to store undirected edges and neighbour sets.
 
-- (A) `^` is symmetric difference: elements in exactly one set → {1, 4}. **True.**
+- (A) iterating a dict yields its **keys**; `sorted` gives `[1, 3]`. **False.**
 - (B) tuples are ordered, so (1, 2) ≠ (2, 1); the set has 2 elements. **False.** This is why storing an undirected edge as a tuple can double-count it.
 - (C) a frozenset is unordered and hashable, so both describe the same edge → set of size 1. **True.**
-- (D) iterating a dict yields its **keys**; `sorted` gives `[1, 3]`. **False.**
+- (D) `^` is symmetric difference: elements in exactly one set → {1, 4}. **True.**
 
 **Tip:** for undirected edges either normalise to `(min(u, v), max(u, v))` or use `frozenset({u, v})`.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 truth = [({1, 2, 3} ^ {2, 3, 4}) == {1, 4}, len({(1, 2), (2, 1)}) == 1,
          len({frozenset((1, 2)), frozenset((2, 1))}) == 1, sorted({3: 'a', 1: 'b'}) == ['a', 'b']]
 assert sorted(ANSWER) == [c for c, t in zip("ABCD", truth) if t]
@@ -474,21 +476,22 @@ assert cnt == int(ANSWER) == 4 ** 2
                 },
             ],
             'options': [
-                'G has exactly 12 edges',
+                'The complement of G (with respect to K₇ on the same 7 vertices) has exactly 9 edges',
                 'G contains a cycle of length 5',
                 'G has an Euler circuit',
-                'The complement of G (with respect to K₇ on the same 7 vertices) has exactly 9 edges',
+                'G has exactly 12 edges',
             ],
             'answer': ['A', 'D'],
             'solution': '''In Kₘ,ₙ every vertex of one part is adjacent to every vertex of the other part and to none in its own part.
 
-- (A) |E| = m·n = 3·4 = 12. **True.** (Check by handshaking: 3·4 + 4·3 = 24 = 2·12.)
+- (A) K₇ has C(7, 2) = 21 edges; the complement has 21 − 12 = 9 edges — exactly a K₃ on X (3 edges) plus a K₄ on Y (6 edges). **True.**
 - (B) Every edge goes X ↔ Y, so any closed walk alternates sides and has **even** length. A bipartite graph has no odd cycle. **False.**
 - (C) An Euler circuit needs every degree even. The x-vertices have degree 4 (even) but the y-vertices have degree 3 (odd). **False.** (Four odd vertices also rule out an Euler trail.)
-- (D) K₇ has C(7, 2) = 21 edges; the complement has 21 − 12 = 9 edges — exactly a K₃ on X (3 edges) plus a K₄ on Y (6 edges). **True.**
+- (D) |E| = m·n = 3·4 = 12. **True.** (Check by handshaking: 3·4 + 4·3 = 24 = 2·12.)
 
 **Trap:** in (C), the even degree of the X side is irrelevant — *all* vertices must have even degree. **Tip:** the complement of Kₘ,ₙ is always Kₘ ∪ Kₙ.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 X = ["x1", "x2", "x3"]; Y = ["y1", "y2", "y3", "y4"]
 E = {frozenset((x, y)) for x in X for y in Y}
@@ -760,21 +763,24 @@ assert len(set(roots)) == 5 and max(roots.count(r) for r in roots) == 3
             'topic': 'Edges, components and cycles',
             'text': 'G is a simple undirected graph with 10 vertices and 7 edges. Which of the following statements is/are **necessarily** TRUE?',
             'options': [
-                'G has at least 3 connected components',
-                'G contains a cycle',
                 'If G has no cycle, then G has exactly 3 connected components',
+                'G has at least 3 connected components',
                 'G has a vertex of degree at most 1',
+                'G contains a cycle',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''Key facts: a connected graph on c vertices has ≥ c − 1 edges; a forest with n vertices and k components has exactly n − k edges.
 
-- (A) If G has k components of sizes c₁, …, c_{k}, then 7 = |E| ≥ Σ(cᵢ − 1) = 10 − k, so k ≥ 3. **True.**
-- (B) A forest of 3 trees, e.g. a path on 8 vertices plus 2 isolated vertices, has 7 edges and no cycle. **False** (not necessarily).
-- (C) For a forest, |E| = n − k → 7 = 10 − k → k = 3. **True.**
-- (D) Degree sum = 14 < 2·10 = 20, so the average degree is 1.4 < 2; some vertex must have degree ≤ 1. **True.**
+- (A) For a forest, |E| = n − k → 7 = 10 − k → k = 3. **True.**
+- (B) If G has k components of sizes c₁, …, c_{k}, then 7 = |E| ≥ Σ(cᵢ − 1) = 10 − k, so k ≥ 3. **True.**
+- (C) Degree sum = 14 < 2·10 = 20, so the average degree is 1.4 < 2; some vertex must have degree ≤ 1. **True.**
+- (D) A forest of 3 trees, e.g. a path on 8 vertices plus 2 isolated vertices, has 7 edges and no cycle. **False** (not necessarily).
 
-**Trap:** (B) confuses 'too few edges to be connected' with 'must have a cycle'. A cycle is forced only when |E| ≥ n, which is not the case here.''',
-            'verify': '''
+**Trap:** (D) confuses 'too few edges to be connected' with 'must have a cycle'. A cycle is forced only when |E| ≥ n, which is not the case here.''',
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools, random
 random.seed(7)
 allE = list(itertools.combinations(range(10), 2))
@@ -897,12 +903,12 @@ assert (9 + 25) % 11 == 1 and (9 + 36) % 11 == 1
             'topic': 'Binary search trees — build and delete',
             'text': 'The keys 41, 17, 63, 8, 29, 55, 72, 25, 34, 60, 50 are inserted in that order into an initially empty binary search tree T. Height is the number of **edges** on the longest root-to-leaf path. Which of the following statements is/are TRUE?',
             'options': [
-                'The height of T is 3',
                 'T has exactly 5 leaves',
                 'If 41 is deleted by replacing it with its in-order successor, the new root is 50 and 55 then has no left child',
                 'The pre-order traversal of T begins 41, 17, 8, 29, 25',
+                'The height of T is 3',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''Build T by standard BST insertion:
 
 - 41 root; 17 L; 63 R; 8 under 17 (L); 29 under 17 (R); 55 under 63 (L); 72 under 63 (R)
@@ -910,12 +916,12 @@ assert (9 + 25) % 11 == 1 and (9 + 36) % 11 == 1
 
 Now the statements:
 
-- (A) deepest nodes 25, 34, 50, 60 are at depth 3. **True.**
-- (B) leaves: 8, 25, 34, 50, 60, 72 → **6**. **False.**
-- (C) in-order successor of 41 = minimum of the right subtree = 50 (63 → 55 → 50). 50 is a leaf, so it is simply moved to the root and 55's left pointer becomes empty. **True.**
-- (D) pre-order (root, left, right): 41, 17, 8, 29, 25, 34, 63, 55, 50, 60, 72. **True.**
+- (A) leaves: 8, 25, 34, 50, 60, 72 → **6**. **False.**
+- (B) in-order successor of 41 = minimum of the right subtree = 50 (63 → 55 → 50). 50 is a leaf, so it is simply moved to the root and 55's left pointer becomes empty. **True.**
+- (C) pre-order (root, left, right): 41, 17, 8, 29, 25, 34, 63, 55, 50, 60, 72. **True.**
+- (D) deepest nodes 25, 34, 50, 60 are at depth 3. **True.**
 
-**Trap:** in (C), students often pick 55 or 63 as the successor; the successor is the **leftmost** node of the right subtree.''',
+**Trap:** in (B), students often pick 55 or 63 as the successor; the successor is the **leftmost** node of the right subtree.''',
             'solution_diagrams': [
                 {
                     'type': 'bintree',
@@ -969,7 +975,10 @@ Now the statements:
                     'caption': 'T after deleting 41 (successor 50)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins(t, k):
     if t is None: return [k, None, None]
     if k < t[0]: t[1] = ins(t[1], k)

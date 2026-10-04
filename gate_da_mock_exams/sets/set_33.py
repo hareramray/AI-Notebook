@@ -273,17 +273,19 @@ assert len({k % 13 for k in range(4, 81, 4)}) == 13
             hi = mid
     return lo''',
             'run_code': False,
-            'options': ['`bs(a, 2)`', '`bs(a, 6)`', '`bs(a, 10)`', '`bs(a, 7)`'],
-            'answer': ['B', 'C', 'D'],
+            'options': ['`bs(a, 10)`', '`bs(a, 7)`', '`bs(a, 2)`', '`bs(a, 6)`'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''The bug: `lo = mid` instead of `lo = mid + 1`. When hi = lo + 1, mid = lo (floor), and if a[lo] < x the assignment `lo = mid` changes nothing → infinite loop.
 
-- (A) x = 2: mid 2 → hi 2; mid 1 (4 ≥ 2) → hi 1; mid 0 (2 ≥ 2) → hi 0 → stop. Terminates.
-- (B) x = 6: mid 2 (6 ≥ 6) → hi 2; mid 1 (4 < 6) → lo 1; now lo 1, hi 2 → mid 1 again → lo 1 forever. **Loops.**
-- (C) x = 10: mid 2 → lo 2; mid 3 (8 < 10) → lo 3; lo 3, hi 4 → mid 3 forever. **Loops.**
-- (D) x = 7: mid 2 (6 < 7) → lo 2; mid 3 (8 ≥ 7) → hi 3; lo 2, hi 3 → mid 2 → lo 2 forever. **Loops.**
+- (A) x = 10: mid 2 → lo 2; mid 3 (8 < 10) → lo 3; lo 3, hi 4 → mid 3 forever. **Loops.**
+- (B) x = 7: mid 2 (6 < 7) → lo 2; mid 3 (8 ≥ 7) → hi 3; lo 2, hi 3 → mid 2 → lo 2 forever. **Loops.**
+- (C) x = 2: mid 2 → hi 2; mid 1 (4 ≥ 2) → hi 1; mid 0 (2 ≥ 2) → hi 0 → stop. Terminates.
+- (D) x = 6: mid 2 (6 ≥ 6) → hi 2; mid 1 (4 < 6) → lo 1; now lo 1, hi 2 → mid 1 again → lo 1 forever. **Loops.**
 
 **Rule:** with mid = ⌊(lo + hi)/2⌋ the lower bound must move to mid + 1; with mid = ⌈(lo + hi)/2⌉ the upper bound must move to mid − 1. Otherwise a 2-element range can stall.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def bs(a, x, cap=100):
     lo, hi = 0, len(a) - 1; it = 0
     while lo < hi:
@@ -304,9 +306,9 @@ assert sorted(ANSWER) == [c for c, t in zip("ABCD", loops) if t]
             'topic': 'Sorting — stability',
             'text': 'The records (3,a), (1,b), (3,c), (2,d), (1,e) are sorted by their **numeric key only** (letters are just labels). Selection sort is the standard version (find the minimum of A[i..n−1] with strict `<`, then swap it with A[i]); insertion sort shifts while the key is strictly greater. Which of the following statements is/are TRUE?',
             'options': [
+                'Selection sort outputs (1,b) before (1,e)',
                 'Selection sort outputs (3,c) before (3,a)',
                 'Insertion sort outputs (3,a) before (3,c)',
-                'Selection sort outputs (1,b) before (1,e)',
                 'Selection sort is stable on this input',
             ],
             'answer': ['A', 'B', 'C'],
@@ -321,13 +323,15 @@ Selection sort trace:
 
 Result: (1,b) (1,e) (2,d) **(3,c) (3,a)**.
 
-- (A) **True** — (3,a) was carried to the end by the swap at i=1.
-- (B) insertion sort gives (1,b) (1,e) (2,d) (3,a) (3,c). **True.**
-- (C) **True** — the 1-keys happen to keep their order.
+- (A) **True** — the 1-keys happen to keep their order.
+- (B) **True** — (3,a) was carried to the end by the swap at i=1.
+- (C) insertion sort gives (1,b) (1,e) (2,d) (3,a) (3,c). **True.**
 - (D) the 3-keys are reordered. **False.**
 
-**Trap:** concluding stability from one pair that happens to stay in order (C).''',
-            'verify': '''
+**Trap:** concluding stability from one pair that happens to stay in order (A).''',
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 R = [(3, 'a'), (1, 'b'), (3, 'c'), (2, 'd'), (1, 'e')]
 A = R[:]
 for i in range(len(A) - 1):
@@ -436,12 +440,12 @@ assert OUTPUT.strip() == ANSWER == str(C[9])
 
 Which of the following statements is/are TRUE?''',
             'options': [
-                'The post-order traversal ends with 45, 50, 40, 30',
-                'The tree has exactly 4 leaves',
-                'The level-order traversal is 30, 20, 40, 10, 25, 35, 50, 22, 28, 45',
                 'The in-order successor of 28 is 35',
+                'The tree has exactly 4 leaves',
+                'The post-order traversal ends with 45, 50, 40, 30',
+                'The level-order traversal is 30, 20, 40, 10, 25, 35, 50, 22, 28, 45',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''In a BST the pre-order sequence determines the tree: the first key is the root; the following keys smaller than it form the left subtree's pre-order, the larger ones the right subtree's. (Equivalently, insert the keys in pre-order sequence into an empty BST.)
 
 - Root 30; left part 20, 10, 25, 22, 28; right part 40, 35, 50, 45.
@@ -450,10 +454,10 @@ Which of the following statements is/are TRUE?''',
 
 Post-order: 10, 22, 28, 25, 20, 35, 45, 50, 40, 30.
 
-- (A) **True.**
+- (A) 28 has no right child, so its successor is the nearest ancestor for which 28 lies in the left subtree: **30**, not 35. **False.**
 - (B) leaves: 10, 22, 28, 35, 45 → **5**. **False.**
-- (C) levels: [30] [20, 40] [10, 25, 35, 50] [22, 28, 45]. **True.**
-- (D) 28 has no right child, so its successor is the nearest ancestor for which 28 lies in the left subtree: **30**, not 35. **False.**
+- (C) **True.**
+- (D) levels: [30] [20, 40] [10, 25, 35, 50] [22, 28, 45]. **True.**
 
 **Tip:** the in-order sequence of a BST is just the sorted keys — 28's successor is the next larger key, 30.''',
             'solution_diagrams': [
@@ -483,7 +487,9 @@ Post-order: 10, 22, 28, 25, 20, 35, 45, 50, 40, 30.
                     'caption': 'Reconstructed BST',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins(t, k):
     if t is None: return [k, None, None]
     if k < t[0]: t[1] = ins(t[1], k)
@@ -756,22 +762,22 @@ assert split == int(ANSWER) and inv(A) == inv(L) + inv(R) + split == 15
                 },
             ],
             'options': [
-                'Every vertex of the DFS tree has at most one child (the DFS tree is a path)',
-                'The DFS produces exactly 3 back edges',
-                'In the BFS tree the largest distance (level) of any vertex from A is 3',
                 'In the DFS, G is discovered before E',
+                'The DFS produces exactly 3 back edges',
+                'Every vertex of the DFS tree has at most one child (the DFS tree is a path)',
+                'In the BFS tree the largest distance (level) of any vertex from A is 3',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**DFS (recursive, alphabetical):** A → B (A's first neighbour) → D (B's next unvisited) → C (D's neighbours B, C, E: B visited, so C) → F (C's neighbours A, D visited, F new) → E (F's neighbours C, E, G → E first) → G (E's neighbours D, F visited, G new). Then everything backtracks.
 
 Tree edges: AB, BD, DC, CF, FE, EG — the tree is the path A-B-D-C-F-E-G. The other 9 − 6 = 3 edges (AC, DE, FG) are back edges.
 
 **BFS from A:** level 1 {B, C}; level 2 {D (via B), F (via C)}; level 3 {E (via D), G (via F)}.
 
-- (A) **True.**
+- (A) E is discovered from F before G. **False.**
 - (B) **True** — in an undirected DFS every non-tree edge is a back edge; 9 − (7 − 1) = 3.
-- (C) **True** — E and G are at distance 3.
-- (D) E is discovered from F before G. **False.**
+- (C) **True.**
+- (D) **True** — E and G are at distance 3.
 
 **Contrast:** the DFS tree has depth 6 while the BFS tree has depth 3 — BFS trees are shortest-path trees; DFS trees can be as deep as n − 1.''',
             'solution_diagrams': [
@@ -810,7 +816,9 @@ Tree edges: AB, BD, DC, CF, FE, EG — the tree is the path A-B-D-C-F-E-G. The o
                     'caption': 'DFS tree (highlighted) is a Hamiltonian path',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [("A","B"),("A","C"),("B","D"),("C","D"),("D","E"),("E","F"),("E","G"),("F","G"),("C","F")]
 adj = {}
 for a, b in E:
@@ -841,9 +849,9 @@ assert sorted(ANSWER) == [c for c, t in zip("ABCD", truth) if t]
             'topic': 'Linear probing — clustering effects',
             'text': 'Keys 25, 47, 14, 36, 58, 70, 3 are inserted in that order into an initially empty hash table of size 11 with h(k) = k mod 11 and linear probing (step +1). Probes are counted as slots inspected, including the final one. Which of the following statements is/are TRUE?',
             'options': [
-                'Key 70 is stored in slot 8',
-                'The average number of probes over the seven successful searches is 27/7',
                 'An unsuccessful search for a key whose home slot is 3 makes 8 probes',
+                'The average number of probes over the seven successful searches is 27/7',
+                'Key 70 is stored in slot 8',
                 'The table contains a run of 8 consecutive occupied slots',
             ],
             'answer': ['A', 'B', 'C'],
@@ -855,9 +863,9 @@ assert sorted(ANSWER) == [c for c, t in zip("ABCD", truth) if t]
 
 Final: slots 3–9 occupied (a run of 7), slots 0, 1, 2, 10 empty.
 
-- (A) **True.**
+- (A) from slot 3: slots 3 … 9 full (7 probes), slot 10 empty (8th probe). **True.**
 - (B) a successful search for a key repeats its insertion probes: 1 + 2 + 3 + 4 + 5 + 5 + 7 = 27 → 27/7 ≈ 3.86. **True.**
-- (C) from slot 3: slots 3 … 9 full (7 probes), slot 10 empty (8th probe). **True.**
+- (C) **True.**
 - (D) the run is slots 3–9, length **7**. **False.**
 
 **Insight:** key 70 had a *different* home slot yet paid 5 probes — primary clustering penalises every key whose home falls inside a cluster, not just keys with the same home.''',
@@ -877,7 +885,8 @@ Final: slots 3–9 occupied (a run of 7), slots 0, 1, 2, 10 empty.
                     'caption': 'Final table: one cluster, slots 3–9',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 T = [None] * 11; pr = {}
 for k in [25, 47, 14, 36, 58, 70, 3]:
     i, c = k % 11, 1

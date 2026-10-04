@@ -159,23 +159,25 @@ assert (st[0], d) == (4, 4) and ANSWER == 'A'
     memo[n] = n if n < 2 else fib(n - 1) + fib(n - 2)
     return memo[n]''',
             'options': [
-                'The first call `fib(10)` makes 19 calls to `fib` in total (including itself)',
-                'After the first call `fib(10)`, the dictionary `fib.__defaults__[0]` has 11 keys',
-                'A second call `fib(10)` afterwards makes exactly one call to `fib`',
                 'A later call `fib(12)` makes 12 calls to `fib` in total',
+                'A second call `fib(10)` afterwards makes exactly one call to `fib`',
+                'After the first call `fib(10)`, the dictionary `fib.__defaults__[0]` has 11 keys',
+                'The first call `fib(10)` makes 19 calls to `fib` in total (including itself)',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''The default `{}` is created once, so the memo **persists across top-level calls**.
 
 **First fib(10):** fib(n) calls fib(n−1) first (a new value), and when it later calls fib(n−2) that value is already memoised (a single, immediately-returning call). So each n from 10 down to 2 makes two calls, fib(1) and fib(0) make none: total = 1 + 2 × 9 = **19**.
 
-- (A) **True** (19 calls).
-- (B) Keys 0, 1, …, 10 are stored → 11 keys. **True.**
-- (C) 10 is in the memo, so the call returns at once — 1 call. **True.**
-- (D) fib(12) → fib(11) (new) → fib(10) hit, fib(9) hit; fib(12) also calls fib(10) hit. Calls: fib(12), fib(11), fib(10), fib(9), fib(10) = **5**, not 12. **False.**
+- (A) fib(12) → fib(11) (new) → fib(10) hit, fib(9) hit; fib(12) also calls fib(10) hit. Calls: fib(12), fib(11), fib(10), fib(9), fib(10) = **5**, not 12. **False.**
+- (B) 10 is in the memo, so the call returns at once — 1 call. **True.**
+- (C) Keys 0, 1, …, 10 are stored → 11 keys. **True.**
+- (D) **True** (19 calls).
 
 **Trap:** a mutable default is shared state. Here that is exploited deliberately; in ordinary code it is a classic bug.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 calls = 0
 def fib2(n, memo={}):
     global calls
@@ -420,22 +422,22 @@ assert comps == 18 and ANSWER == 'A'
                 },
             ],
             'options': [
-                'The discovery order is A, B, C, E, F, D',
-                'The finish time of D is 8',
-                'A → D is a back edge',
                 'E finishes before F',
+                'A → D is a back edge',
+                'The finish time of D is 8',
+                'The discovery order is A, B, C, E, F, D',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['C', 'D'],
             'solution': '''Trace (d/f = discovery/finish):
 
 - A d1 → B d2 → C d3; C → A is to a vertex still on the stack (back edge); C f4.
 - B → E d5 → F d6 → D d7; D → E: E is on the stack (back edge); D f8; F f9; E f10; B f11.
 - A → D: D is already finished and was discovered after A → **forward** edge. A f12.
 
-- (A) Discovery order A, B, C, E, F, D. **True.**
-- (B) D finishes at 8. **True.**
-- (C) A → D goes to a *descendant* that is already finished: a forward edge, not a back edge. **False.**
-- (D) F (9) finishes before E (10) since F is E's descendant. **False.**
+- (A) F (9) finishes before E (10) since F is E's descendant. **False.**
+- (B) A → D goes to a *descendant* that is already finished: a forward edge, not a back edge. **False.**
+- (C) D finishes at 8. **True.**
+- (D) Discovery order A, B, C, E, F, D. **True.**
 
 **Tip:** for an edge u → v to an already-discovered v: v still active ⇒ back; v finished with d[u] < d[v] ⇒ forward; otherwise cross.''',
             'solution_diagrams': [
@@ -484,7 +486,9 @@ assert comps == 18 and ANSWER == 'A'
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'A': ['B', 'D'], 'B': ['C', 'E'], 'C': ['A'], 'D': ['E'], 'E': ['F'], 'F': ['D']}
 t = 0; d = {}; f = {}; kind = {}
 def dfs(u):
@@ -673,18 +677,18 @@ assert int(OUTPUT.strip()) == int(ANSWER)
             'topic': 'Merge sort — recursion structure',
             'text': 'Top-down merge sort is applied to an array of **13** elements. Each call on a sub-array of length L > 1 splits it into the first ⌊L/2⌋ and the remaining ⌈L/2⌉ elements, recursively sorts both halves and merges them; a call on length 1 returns immediately. Which of the following statements is/are TRUE?',
             'options': [
-                'The merge-sort function is called 25 times in total (including the first call)',
                 'At most 5 merge-sort calls are simultaneously active on the call stack',
+                'The merge-sort function is called 25 times in total (including the first call)',
                 'The final (top-level) merge can perform up to 13 key comparisons',
                 'Exactly 13 calls are made on sub-arrays of length 1',
             ],
             'answer': ['A', 'B', 'D'],
             'solution': '''The recursion tree is a full binary tree whose leaves are the length-1 calls.
 
-- (D) Every element ends up alone in exactly one leaf → **13 leaf calls. True.**
-- (A) A full binary tree with 13 leaves has 12 internal nodes → 13 + 12 = **25 calls. True.**
-- (B) Longest chain of sizes: 13 → 7 → 4 → 2 → 1 (always following the larger half). That is **5** frames. **True.**
+- (A) Longest chain of sizes: 13 → 7 → 4 → 2 → 1 (always following the larger half). That is **5** frames. **True.**
+- (B) A full binary tree with 13 leaves has 12 internal nodes → 13 + 12 = **25 calls. True.**
 - (C) Merging sorted lists of sizes 6 and 7 needs at most 6 + 7 − 1 = **12** comparisons (the last element is placed without comparing). **False.**
+- (D) Every element ends up alone in exactly one leaf → **13 leaf calls. True.**
 
 **Trap:** depth is governed by ⌈log₂ 13⌉ + 1 = 5 frames (4 edges); and the merge worst case is n − 1, not n.''',
             'solution_diagrams': [
@@ -716,7 +720,8 @@ assert int(OUTPUT.strip()) == int(ANSWER)
                     'caption': 'Recursion tree by sub-array length (each 2 has two leaf children, not drawn)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 calls = 0; leaves = 0; maxd = 0
 def ms(L, dep=1):
     global calls, leaves, maxd
@@ -814,21 +819,23 @@ def range_ok(t, lo=-INF, hi=INF):
                 },
             ],
             'options': [
+                'The in-order traversal of T is 8, 15, 34, 30, 40, 45, 52',
                 '`local_ok(T)` returns True',
                 '`range_ok(T)` returns False',
-                'The in-order traversal of T is 8, 15, 34, 30, 40, 45, 52',
                 'If the key 34 is changed to 31, `range_ok(T)` returns True',
             ],
             'answer': ['A', 'B', 'C'],
             'solution': '''`local_ok` only compares each node with its **immediate children**, while `range_ok` passes down an interval (lo, hi) that every key in the subtree must satisfy — the correct BST definition.
 
-- (A) Every parent–child pair is ordered correctly (15 < 30 < 45, 8 < 15 < 34, 40 < 45 < 52), so `local_ok` returns **True**. **True.**
-- (B) `range_ok`: root 30 → left subtree must lie in (−∞, 30); node 15 → its right subtree must lie in (15, 30); 34 ∉ (15, 30) → **False**. **True.**
-- (C) In-order (left, root, right): 8, 15, 34, 30, 40, 45, 52 — not sorted, confirming T is not a BST. **True.**
+- (A) In-order (left, root, right): 8, 15, 34, 30, 40, 45, 52 — not sorted, confirming T is not a BST. **True.**
+- (B) Every parent–child pair is ordered correctly (15 < 30 < 45, 8 < 15 < 34, 40 < 45 < 52), so `local_ok` returns **True**. **True.**
+- (C) `range_ok`: root 30 → left subtree must lie in (−∞, 30); node 15 → its right subtree must lie in (15, 30); 34 ∉ (15, 30) → **False**. **True.**
 - (D) 31 is still > 30, so it still violates the bound (15, 30). **False.** (Any key in (15, 30), e.g. 29, would fix it.)
 
 **Trap:** checking only parent–child relations is the classic wrong BST test; the constraint from the root (30) reaches all the way down to 34.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 T = [30, [15, [8, None, None], [34, None, None]], [45, [40, None, None], [52, None, None]]]
 def ino(t): return [] if t is None else ino(t[1]) + [t[0]] + ino(t[2])
 T2 = [30, [15, [8, None, None], [31, None, None]], [45, [40, None, None], [52, None, None]]]
@@ -863,20 +870,22 @@ def d(n):
     return 1 if n <= 0 else d(n - 1) + d(n - 1)''',
             'options': [
                 'The running time of `a(n)` is Θ(n)',
-                'The running time of `b(n)` is Θ(n²)',
                 'The running time of `c(n)` is Θ(n²)',
                 'The running time of `d(n)` is Θ(2ⁿ)',
+                'The running time of `b(n)` is Θ(n²)',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Write the recurrence for each function from its code, then solve it.
 
 - (A) Two calls on n/2 plus Θ(√n) work: T(n) = 2T(n/2) + √n. Here n^{log₂2} = n dominates √n (master case 1) → **Θ(n)**. **True.**
-- (B) One call on n − 1 plus building a list of n elements: T(n) = T(n−1) + Θ(n) = Θ(1 + 2 + … + n) = **Θ(n²)**. **True.**
-- (C) Four calls on n/2 plus Θ(n²) work: T(n) = 4T(n/2) + n². Now n^{log₂4} = n² equals f(n) (master case 2) → **Θ(n² log n)**, not Θ(n²). **False.**
-- (D) Two calls on n − 1 plus O(1): T(n) = 2T(n−1) + 1 = 2^{n+1} − 1 → **Θ(2ⁿ)**. **True.**
+- (B) Four calls on n/2 plus Θ(n²) work: T(n) = 4T(n/2) + n². Now n^{log₂4} = n² equals f(n) (master case 2) → **Θ(n² log n)**, not Θ(n²). **False.**
+- (C) Two calls on n − 1 plus O(1): T(n) = 2T(n−1) + 1 = 2^{n+1} − 1 → **Θ(2ⁿ)**. **True.**
+- (D) One call on n − 1 plus building a list of n elements: T(n) = T(n−1) + Θ(n) = Θ(1 + 2 + … + n) = **Θ(n²)**. **True.**
 
-**Trap:** in (C) each of the log₂ n levels of the recursion tree does n² total work (4^{i} calls × (n/2^{i})²), which adds the log factor. In (B) the `len(list(range(n)))` hides a linear cost.''',
-            'verify': '''
+**Trap:** in (B) each of the log₂ n levels of the recursion tree does n² total work (4^{i} calls × (n/2^{i})²), which adds the log factor. In (D) the `len(list(range(n)))` hides a linear cost.''',
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 # c(n) returns (#inner-loop steps + #leaves): check the n^2 log n growth
 r = c(512) / c(256)
 assert 4.3 < r < 4.6            # n^2 would give 4.0, n^2 log n gives 4*(9/8)=4.5

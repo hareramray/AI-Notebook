@@ -150,17 +150,20 @@ Insertion order is `he`, `at`, `nd`. Both `he` and `at` have 9; `max` keeps the 
             'marks': 1,
             'topic': 'Python — floor division and modulo with negatives',
             'text': 'Which of the following Python 3 expressions evaluate to `True`?',
-            'options': ['`-7 // 2 == -3`', '`-7 % 3 == 2`', '`7 % -3 == -2`', '`int(-7 / 2) == -7 // 2`'],
-            'answer': ['B', 'C'],
+            'options': ['`-7 % 3 == 2`', '`7 % -3 == -2`', '`int(-7 / 2) == -7 // 2`', '`-7 // 2 == -3`'],
+            'answer': ['A', 'B'],
             'solution': '''**Concept.** Python's `//` floors (rounds toward −∞) and `%` is defined so that `a == (a // b) * b + a % b`; hence the remainder takes the **sign of the divisor**. `int()` truncates toward 0.
 
-- (A) −7 / 2 = −3.5, floor → −4. So `-7 // 2` is −4 ≠ −3. **False.**
-- (B) −7 // 3 = −3 (floor of −2.33), remainder −7 − (−9) = 2. **True.**
-- (C) 7 // −3 = −3 (floor of −2.33), remainder 7 − 9 = −2. **True.**
-- (D) `int(-3.5)` = −3 (truncation) but `-7 // 2` = −4. **False.**
+- (A) −7 // 3 = −3 (floor of −2.33), remainder −7 − (−9) = 2. **True.**
+- (B) 7 // −3 = −3 (floor of −2.33), remainder 7 − 9 = −2. **True.**
+- (C) `int(-3.5)` = −3 (truncation) but `-7 // 2` = −4. **False.**
+- (D) −7 / 2 = −3.5, floor → −4. So `-7 // 2` is −4 ≠ −3. **False.**
 
 **Trap:** C and Java truncate toward zero, so −7 / 2 is −3 there and −7 % 3 is −1. Python differs whenever the operands have opposite signs.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 truth = {"A": -7 // 2 == -3, "B": -7 % 3 == 2, "C": 7 % -3 == -2, "D": int(-7 / 2) == -7 // 2}
 assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
 ''',
@@ -536,12 +539,12 @@ assert d["T"] == int(ANSWER)
                 },
             ],
             'options': [
-                'The vertices are finalised in the order S, A, B, C, D, E',
-                'In the shortest-path tree, the parent of D is B',
-                'Exactly 4 updates occur during the run',
                 'The shortest path from S to E has exactly 5 edges',
+                'Exactly 4 updates occur during the run',
+                'In the shortest-path tree, the parent of D is B',
+                'The vertices are finalised in the order S, A, B, C, D, E',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** Track tentative distances and predecessors; the predecessor recorded at the last decrease of a vertex is its parent in the shortest-path tree.
 
 Trace (∞ → value is a first assignment; old → new is an update):
@@ -555,10 +558,10 @@ Trace (∞ → value is a first assignment; old → new is an update):
 Final: A 2, B 4, C 7, D 8, E 10; parents A←S, B←A, C←B, D←C, E←D.
 
 Option analysis:
-- (A) **True** — order S, A, B, C, D, E.
-- (B) **False** — B offers 11 (not better than A's 11); D's final parent is C.
-- (C) **True** — exactly four strict decreases.
-- (D) **True** — S→A→B→C→D→E has 5 edges, cost 2 + 2 + 3 + 1 + 2 = 10.
+- (A) **True** — S→A→B→C→D→E has 5 edges, cost 2 + 2 + 3 + 1 + 2 = 10.
+- (B) **True** — exactly four strict decreases.
+- (C) **False** — B offers 11 (not better than A's 11); D's final parent is C.
+- (D) **True** — order S, A, B, C, D, E.
 
 **Trap:** an equal-cost offer (B→D gives 11 = current 11) does not trigger an update with the usual strict `<` test.''',
             'solution_diagrams': [
@@ -596,7 +599,9 @@ Option analysis:
                     'caption': 'Shortest-path tree (red)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [("S","A",2),("S","B",5),("A","B",2),("A","C",6),("B","C",3),("B","D",7),("C","D",1),
      ("C","E",4),("D","E",2),("A","D",9)]
 G = {v: [] for v in "SABCDE"}
@@ -907,12 +912,12 @@ assert T[3][4] == int(ANSWER) == int(OUTPUT)
             'topic': 'Elementary sorting — bubble and insertion sort',
             'text': 'Consider the array [6, 1, 8, 3, 7, 2] to be sorted in ascending order. Bubble sort makes left-to-right passes swapping adjacent out-of-order pairs; insertion sort inserts A[1], A[2], … in turn into the sorted prefix. Which of the following statements is/are TRUE?',
             'options': [
-                'After the first pass of bubble sort the array is [1, 6, 3, 7, 2, 8]',
                 'The first pass of bubble sort performs exactly 5 swaps',
-                'After insertion sort has inserted A[1], A[2] and A[3], the array is [1, 3, 6, 8, 7, 2]',
                 'The array contains exactly 8 inversions',
+                'After insertion sort has inserted A[1], A[2] and A[3], the array is [1, 3, 6, 8, 7, 2]',
+                'After the first pass of bubble sort the array is [1, 6, 3, 7, 2, 8]',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** One bubble pass moves the maximum to the end; insertion sort keeps a sorted prefix. Every adjacent swap (in either algorithm) removes exactly one inversion.
 
 Bubble pass 1 on [6, 1, 8, 3, 7, 2]:
@@ -926,13 +931,15 @@ Insertion sort: insert 1 → [1, 6, 8, …]; insert 8 → unchanged; insert 3 �
 
 Inversions: 6 > {1, 3, 2} (3), 8 > {3, 7, 2} (3), 3 > 2 (1), 7 > 2 (1) → 8.
 
-- (A) **True.**
-- (B) **False** — 4 swaps (the pair 6, 8 is already in order).
+- (A) **False** — 4 swaps (the pair 6, 8 is already in order).
+- (B) **True** — so bubble sort makes 8 swaps in total and insertion sort 8 shifts.
 - (C) **True.**
-- (D) **True** — so bubble sort makes 8 swaps in total and insertion sort 8 shifts.
+- (D) **True.**
 
-**Trap:** counting comparisons (5 in a pass) instead of swaps for (B).''',
-            'verify': '''
+**Trap:** counting comparisons (5 in a pass) instead of swaps for (A).''',
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [6, 1, 8, 3, 7, 2]; B = A[:]; sw = 0
 for j in range(len(B) - 1):
     if B[j] > B[j+1]: B[j], B[j+1] = B[j+1], B[j]; sw += 1
@@ -959,12 +966,12 @@ assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
                 },
             ],
             'options': [
-                'The resulting heap array is [1, 3, 2, 4, 8, 7, 6, 9]',
-                'Exactly 6 swaps are performed in total',
                 'Key 9 ends up in a leaf',
+                'The resulting heap array is [1, 3, 2, 4, 8, 7, 6, 9]',
                 'The sift-down started at index 1 performs exactly one swap',
+                'Exactly 6 swaps are performed in total',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** Build-heap sifts down every internal node from the last one up to the root; total work is O(n) because most nodes are near the bottom.
 
 n = 8, so sift-downs at i = 3, 2, 1, 0:
@@ -975,10 +982,10 @@ n = 8, so sift-downs at i = 3, 2, 1, 0:
 
 Total swaps = 0 + 1 + 2 + 3 = 6.
 
-- (A) **True.**
+- (A) **True** — 9 sinks to index 7, a leaf.
 - (B) **True.**
-- (C) **True** — 9 sinks to index 7, a leaf.
-- (D) **False** — the sift-down from index 1 swaps twice (4 ↔ 1, then 4 ↔ 3).
+- (C) **False** — the sift-down from index 1 swaps twice (4 ↔ 1, then 4 ↔ 3).
+- (D) **True.**
 
 **Trap:** stopping a sift-down after one level; it continues until the key is no larger than both children.''',
             'solution_diagrams': [
@@ -988,7 +995,10 @@ Total swaps = 0 + 1 + 2 + 3 = 6.
                     'caption': 'Resulting min-heap',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 h = [9, 4, 7, 1, 8, 2, 6, 3]; per = {}
 def sd(i):
     c, n = 0, len(h)

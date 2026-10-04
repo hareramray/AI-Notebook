@@ -426,20 +426,22 @@ assert L == int(ANSWER)
             ],
             'options': [
                 'Inserting 4 yields [3, 4, 5, 12, 8, 7, 6, 15, 14, 11, 9]',
+                'H has exactly 5 leaves',
                 'Deleting the minimum yields [5, 8, 6, 12, 9, 7, 11, 15, 14]',
                 'The third-smallest key, 6, is a child of the root',
-                'H has exactly 5 leaves',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Concept:** insertion appends and sifts up; delete-min moves the last element to the root and sifts down towards the **smaller** child.
 
 - (A) 4 goes to index 10; parent index 4 (9) > 4 → swap; parent index 1 (8) > 4 → swap; parent index 0 (3) < 4 → stop. Result [3, 4, 5, 12, 8, 7, 6, 15, 14, 11, 9]. **True.**
-- (B) Move 11 to the root: [11, 8, 5, 12, 9, 7, 6, 15, 14]. Smaller child 5 → swap → 11 at index 2; children 7, 6 → swap with 6 → 11 at index 6 (leaf). Result [5, 8, 6, 12, 9, 7, 11, 15, 14]. **True.**
-- (C) The root's children are 8 and 5; 6 is at index 6, a child of 5. **False.**
-- (D) A heap with n = 10 nodes has n − ⌊n/2⌋ = 5 leaves (indices 5..9). **True.**
+- (B) A heap with n = 10 nodes has n − ⌊n/2⌋ = 5 leaves (indices 5..9). **True.**
+- (C) Move 11 to the root: [11, 8, 5, 12, 9, 7, 6, 15, 14]. Smaller child 5 → swap → 11 at index 2; children 7, 6 → swap with 6 → 11 at index 6 (leaf). Result [5, 8, 6, 12, 9, 7, 11, 15, 14]. **True.**
+- (D) The root's children are 8 and 5; 6 is at index 6, a child of 5. **False.**
 
-**Trap:** in (B), sifting towards the *left* child by default (8) would produce an invalid heap.''',
-            'verify': '''
+**Trap:** in (C), sifting towards the *left* child by default (8) would produce an invalid heap.''',
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 H = [3, 8, 5, 12, 9, 7, 6, 15, 14, 11]
 a = H[:]; heapq.heappush(a, 4)
@@ -456,21 +458,23 @@ assert sorted(ANSWER) == [x for x, ok in zip("ABCD", truth) if ok]
             'topic': 'Python — built-in semantics',
             'text': 'Which of the following Python 3 expressions evaluate to `True`?',
             'options': [
-                '`sorted("BaNaNa", key=str.lower) == [\'a\', \'a\', \'a\', \'B\', \'N\', \'N\']`',
-                '`[1, 2, 3] * 2 == [2, 4, 6]`',
                 '`{1, 2, 3} ^ {2, 3, 4} == {1, 4}`',
                 '`round(2.5) == 3`',
+                '`sorted("BaNaNa", key=str.lower) == [\'a\', \'a\', \'a\', \'B\', \'N\', \'N\']`',
+                '`[1, 2, 3] * 2 == [2, 4, 6]`',
             ],
             'answer': ['A', 'C'],
             'solution': '''**Concept checks:** key functions and stability of `sorted`, sequence repetition, set symmetric difference, and Python's rounding rule.
 
-- (A) Keys: B→b, a→a, N→n, a, N, a. Sorting by key puts the three 'a's first (in original order), then 'B', then the two 'N's. Result ['a', 'a', 'a', 'B', 'N', 'N']. **True.** (Without the key, uppercase letters sort before lowercase: ['B', 'N', 'N', 'a', 'a', 'a'].)
-- (B) `*` on a list means repetition: [1, 2, 3, 1, 2, 3], not element-wise multiplication. **False.**
-- (C) `^` is symmetric difference: elements in exactly one set → {1, 4}. **True.**
-- (D) Python 3 uses round-half-to-even ('banker's rounding'): round(2.5) = 2 (and round(3.5) = 4). **False.**
+- (A) `^` is symmetric difference: elements in exactly one set → {1, 4}. **True.**
+- (B) Python 3 uses round-half-to-even ('banker's rounding'): round(2.5) = 2 (and round(3.5) = 4). **False.**
+- (C) Keys: B→b, a→a, N→n, a, N, a. Sorting by key puts the three 'a's first (in original order), then 'B', then the two 'N's. Result ['a', 'a', 'a', 'B', 'N', 'N']. **True.** (Without the key, uppercase letters sort before lowercase: ['B', 'N', 'N', 'a', 'a', 'a'].)
+- (D) `*` on a list means repetition: [1, 2, 3, 1, 2, 3], not element-wise multiplication. **False.**
 
-**Trap:** (D) — most people expect 3 from school rounding.''',
-            'verify': '''
+**Trap:** (B) — most people expect 3 from school rounding.''',
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 vals = [sorted("BaNaNa", key=str.lower) == ['a','a','a','B','N','N'],
         [1, 2, 3] * 2 == [2, 4, 6], {1, 2, 3} ^ {2, 3, 4} == {1, 4}, round(2.5) == 3]
 assert sorted(ANSWER) == [x for x, ok in zip("ABCD", vals) if ok]
@@ -585,10 +589,10 @@ assert opts["ABCD".index(ANSWER)] == a
 8, 15, 12, 22, 20, 35, 45, 40, 30.
 Which of the following statements is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)''',
             'options': [
-                'The pre-order traversal is 30, 20, 12, 8, 15, 22, 40, 35, 45',
-                'The tree has exactly 4 leaves',
-                'The height of the tree is 3',
                 'If 30 is deleted by replacing it with its in-order predecessor, the new root is 22',
+                'The tree has exactly 4 leaves',
+                'The pre-order traversal is 30, 20, 12, 8, 15, 22, 40, 35, 45',
+                'The height of the tree is 3',
             ],
             'answer': ['A', 'C', 'D'],
             'solution': '''**Concept:** in a BST, the in-order traversal is the sorted key list, so post-order alone determines the tree: the last element is the root, keys smaller than it form the left subtree (a contiguous prefix of the post-order), larger keys the right subtree.
@@ -598,12 +602,12 @@ Reconstruction:
 - Right part (> 30): 35, 45, 40 → root 40 with children 35 and 45.
 
 **Verdicts:**
-- (A) pre-order: 30, 20, 12, 8, 15, 22, 40, 35, 45. **True.**
+- (A) in-order predecessor of 30 = maximum of the left subtree = 22 (a leaf). It is copied into the root and removed. **True.**
 - (B) leaves: 8, 15, 22, 35, 45 → **5**, not 4. **False.**
-- (C) longest path 30 → 20 → 12 → 8 (or → 15) has 3 edges. **True.**
-- (D) in-order predecessor of 30 = maximum of the left subtree = 22 (a leaf). It is copied into the root and removed. **True.**
+- (C) pre-order: 30, 20, 12, 8, 15, 22, 40, 35, 45. **True.**
+- (D) longest path 30 → 20 → 12 → 8 (or → 15) has 3 edges. **True.**
 
-**Trap:** in (D), taking the predecessor to be the left child (20) — it is the *rightmost* node of the left subtree.''',
+**Trap:** in (A), taking the predecessor to be the left child (20) — it is the *rightmost* node of the left subtree.''',
             'solution_diagrams': [
                 {
                     'type': 'bintree',
@@ -627,7 +631,9 @@ Reconstruction:
                     'caption': 'BST reconstructed from the post-order',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 post = [8, 15, 12, 22, 20, 35, 45, 40, 30]
 def build(p):
     if not p: return None
@@ -847,25 +853,27 @@ assert rep == int(ANSWER) and h[0] == 12
                 },
             ],
             'options': [
-                'G has exactly 3 bridges (edges whose removal disconnects the graph)',
                 'G is bipartite',
                 'Removing vertex D (with its edges) leaves exactly 2 connected components',
+                'G has exactly 3 bridges (edges whose removal disconnects the graph)',
                 'G has exactly 3 articulation points (cut vertices)',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept:** an edge is a bridge iff it lies on no cycle; a vertex is a cut vertex iff removing it increases the number of components. A graph is bipartite iff it has no odd cycle.
 
 Cycles: triangle A–B–C and triangle D–E–F. Edges outside every cycle: C–D, F–G, G–H.
 
-- (A) Bridges are exactly C–D, F–G, G–H → 3. **True.**
-- (B) Triangles are odd cycles → not bipartite. **False.**
-- (C) Without D: {A, B, C} and {E, F, G, H} (E–F–G–H still connected). Exactly 2. **True.**
+- (A) Triangles are odd cycles → not bipartite. **False.**
+- (B) Without D: {A, B, C} and {E, F, G, H} (E–F–G–H still connected). Exactly 2. **True.**
+- (C) Bridges are exactly C–D, F–G, G–H → 3. **True.**
 - (D) Cut vertices: C (separates A, B), D, F (separates G, H), G (separates H) → **4**. **False.**
 
 **Trap:** in (D) forgetting G — an internal vertex of a pendant path is always a cut vertex. Also note: an endpoint of a bridge is a cut vertex unless it has degree 1 (H is not a cut vertex).
 
 **Method tip:** for small graphs, first mark every edge that lies on a cycle (here the six triangle edges); the remaining edges are exactly the bridges. Here every endpoint of a bridge that has degree ≥ 2 (C, D, F, G) is a cut vertex; in general you can also confirm a cut vertex by deleting it and checking connectivity.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [('A','B'),('A','C'),('B','C'),('C','D'),('D','E'),('D','F'),('E','F'),('F','G'),('G','H')]
 V = "ABCDEFGH"
 def comps(vs, es):
@@ -979,21 +987,24 @@ assert vals == [k*(k+1)//2 for k in range(1, 15)] and ANSWER == "B"
     return True''',
             'run_code': False,
             'options': [
-                'It returns True for the list 1 → 2 → 3 → 2 → 1',
                 'It returns True for the list 4 → 5 → 5 → 4 → 4',
                 'For a list of 9 nodes, the stack never holds more than 4 values',
                 'It returns True for the list 1 → 2 → 1 → 2',
+                'It returns True for the list 1 → 2 → 3 → 2 → 1',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept:** the fast pointer moves two steps per iteration, so when it stops, slow is at the middle and the stack holds the first ⌊n/2⌋ values (in reverse order). For odd n (`fast` not None) the middle node is skipped. The second half is then compared with the popped values.
 
-- (A) n = 5: stack [1, 2]; slow at 3, fast at the last node → skip 3. Compare 2 = pop 2, 1 = pop 1 → True. **True.**
-- (B) n = 5: stack [4, 5]; skip middle 5; compare 4 with pop 5 → mismatch → False. **False.** (Reversed it reads 4 4 5 5 4.)
-- (C) n = 9: the loop runs while fast and fast.nx exist: fast visits nodes 1, 3, 5, 7, 9 → 4 iterations → 4 pushes; afterwards the stack only shrinks. **True.**
-- (D) n = 4: stack [1, 2]; fast becomes None → no skip; compare 1 with pop 2 → False. **False.**
+- (A) n = 5: stack [4, 5]; skip middle 5; compare 4 with pop 5 → mismatch → False. **False.** (Reversed it reads 4 4 5 5 4.)
+- (B) n = 9: the loop runs while fast and fast.nx exist: fast visits nodes 1, 3, 5, 7, 9 → 4 iterations → 4 pushes; afterwards the stack only shrinks. **True.**
+- (C) n = 4: stack [1, 2]; fast becomes None → no skip; compare 1 with pop 2 → False. **False.**
+- (D) n = 5: stack [1, 2]; slow at 3, fast at the last node → skip 3. Compare 2 = pop 2, 1 = pop 1 → True. **True.**
 
-**Trap:** forgetting to skip the middle element for odd lengths — then (A) would compare 3 against 2 and fail. The `if fast:` line handles exactly that.''',
-            'verify': '''
+**Trap:** forgetting to skip the middle element for odd lengths — then (D) would compare 3 against 2 and fail. The `if fast:` line handles exactly that.''',
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class N:
     def __init__(s, v, nx=None): s.v, s.nx = v, nx
 def build(xs):

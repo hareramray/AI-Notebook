@@ -392,10 +392,11 @@ def back_matter(ST, H2TOC, sets, RunningMark, fmt_answer):
                 q = s["questions"][qi]
                 row.append(P(esc(fmt_answer(q)).replace(", ", ","), cs))
             rows.append(row)
-        t = Table(rows, colWidths=[22] + [None] * len(chunk), repeatRows=1)
+        t = Table(rows, colWidths=[26] + [None] * len(chunk), repeatRows=1)
         st = [("GRID", (0, 0), (-1, -1), 0.4, GRIDC), ("BACKGROUND", (0, 0), (-1, 0), MAROON),
               ("BACKGROUND", (0, 0), (0, -1), MAROON), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
               ("TOPPADDING", (0, 0), (-1, -1), 1.6), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.6),
+              ("LEFTPADDING", (0, 0), (-1, -1), 2), ("RIGHTPADDING", (0, 0), (-1, -1), 2),
               ("LINEBELOW", (0, 10), (-1, 10), 1.2, MAROON)]
         for r in range(1, 21):
             if r % 2 == 0:
@@ -407,7 +408,7 @@ def back_matter(ST, H2TOC, sets, RunningMark, fmt_answer):
                     "given as a range, any value within the range is correct.", ST["small"])]
 
     S += [PageBreak(), RunningMark("Score tracker"), Paragraph("Score Tracker", ST["h1"])]
-    rows = [["Test", "Date", "Time taken", "Attempted", "Correct", "Wrong (MCQ)", "Score / 30", "Weak topics"]]
+    rows = [["Test", "Date", "Time taken", "Attempted", "Correct", "Wrong MCQs", "Score/30", "Weak topics"]]
     for s in sets:
         rows.append(["%02d" % s["number"], "", "", "", "", "", "", ""])
     t = Table(rows, colWidths=[30, 52, 52, 50, 44, 54, 50, None], repeatRows=1, rowHeights=[16] + [13.2] * len(sets))

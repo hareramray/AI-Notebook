@@ -202,23 +202,26 @@ Output `-1 2 6` → (C).
             'topic': 'Hashing — quadratic probing coverage',
             'text': 'A hash table of size m = 8 uses quadratic probing: probe i (i = 0, 1, 2, …) for key k examines slot (h(k) + i²) mod 8. Which of the following statements is/are TRUE?',
             'options': [
+                'If m were 7 instead, the probe sequence from any home slot would reach exactly 4 distinct slots',
+                'For a key whose home slot is 3, the first four probes examine slots 3, 4, 7, 6',
                 'For a key whose home slot is 0, the slots 2, 3, 5, 6 and 7 are never examined',
                 'An insertion can fail even when only 3 of the 8 slots are occupied',
-                'For a key whose home slot is 3, the first four probes examine slots 3, 4, 7, 6',
-                'If m were 7 instead, the probe sequence from any home slot would reach exactly 4 distinct slots',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept.** The slots reachable from home h are h + (i² mod m). The set of squares modulo m decides how much of the table is reachable.
 
 Squares mod 8: 0, 1, 4, 1, 0, 1, 4, 1, … → only offsets **{0, 1, 4}**.
 
-- (A) From home 0 only slots 0, 1, 4 are ever probed; 2, 3, 5, 6, 7 never. **TRUE.**
-- (B) If slots 0, 1, 4 are occupied, a key hashing to 0 can never be placed, although 5 slots are free. **TRUE.**
-- (C) Offsets for i = 0, 1, 2, 3 are 0, 1, 4, 9 mod 8 = 1 → slots 3, 4, 7, **4**, not 6. **FALSE.**
-- (D) Squares mod 7: 0, 1, 4, 2, 2, 4, 1 → {0, 1, 2, 4}, i.e. (7 + 1)/2 = 4 distinct offsets. **TRUE.**
+- (A) Squares mod 7: 0, 1, 4, 2, 2, 4, 1 → {0, 1, 2, 4}, i.e. (7 + 1)/2 = 4 distinct offsets. **TRUE.**
+- (B) Offsets for i = 0, 1, 2, 3 are 0, 1, 4, 9 mod 8 = 1 → slots 3, 4, 7, **4**, not 6. **FALSE.**
+- (C) From home 0 only slots 0, 1, 4 are ever probed; 2, 3, 5, 6, 7 never. **TRUE.**
+- (D) If slots 0, 1, 4 are occupied, a key hashing to 0 can never be placed, although 5 slots are free. **TRUE.**
 
 **Tip:** for a prime m, quadratic probing reaches exactly ⌈m/2⌉ slots, which guarantees an insertion succeeds whenever the table is at most half full.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 sq8 = {i * i % 8 for i in range(64)}; sq7 = {i * i % 7 for i in range(49)}
 res = [sq8 == {0, 1, 4}, len(sq8) <= 3,
        [(3 + i * i) % 8 for i in range(4)] == [3, 4, 7, 6], len(sq7) == 4]
@@ -491,19 +494,22 @@ assert qc(A) == qs(A) == sorted(A) and c[0] == int(ANSWER)
             'topic': 'Recurrences — asymptotic solutions',
             'text': 'Which of the following recurrence/solution pairs is/are correct? (T(1) = Θ(1) in each case.)',
             'options': [
-                'T(n) = T(n/2) + T(n/4) + n  ⇒  T(n) = Θ(n)',
-                'T(n) = 2T(n/2) + n log n  ⇒  T(n) = Θ(n log² n)',
                 'T(n) = T(√n) + 1  ⇒  T(n) = Θ(log log n)',
                 'T(n) = 7T(n/2) + n²  ⇒  T(n) = Θ(n³)',
+                'T(n) = 2T(n/2) + n log n  ⇒  T(n) = Θ(n log² n)',
+                'T(n) = T(n/2) + T(n/4) + n  ⇒  T(n) = Θ(n)',
             ],
-            'answer': ['A', 'B', 'C'],
-            'solution': '''- (A) Recursion-tree: level costs are n, (3/4)n, (3/4)^{2} n, … because the subproblem sizes sum to n/2 + n/4 = 3n/4 < n. A decreasing geometric series → Θ(n). **Correct.**
-- (B) a = 2, b = 2, n^{log_b a} = n; f(n) = n log n = Θ(n · log^{1} n) → extended case 2 → Θ(n log² n). (Each of the log n levels costs n·log(n/2^{i}); the sum is n·Σ(log n − i) = Θ(n log² n).) **Correct.**
-- (C) Substitute n = 2^{m}: S(m) = T(2^{m}) satisfies S(m) = S(m/2) + 1 → S(m) = Θ(log m) = Θ(log log n). **Correct.**
-- (D) a = 7, b = 2: n^{log₂ 7} ≈ n^{2.807}, which dominates f(n) = n² polynomially → case 1 → Θ(n^{log₂ 7}), **not** Θ(n³). (This is Strassen’s recurrence.) **Incorrect.**
+            'answer': ['A', 'C', 'D'],
+            'solution': '''- (A) Substitute n = 2^{m}: S(m) = T(2^{m}) satisfies S(m) = S(m/2) + 1 → S(m) = Θ(log m) = Θ(log log n). **Correct.**
+- (B) a = 7, b = 2: n^{log₂ 7} ≈ n^{2.807}, which dominates f(n) = n² polynomially → case 1 → Θ(n^{log₂ 7}), **not** Θ(n³). (This is Strassen’s recurrence.) **Incorrect.**
+- (C) a = 2, b = 2, n^{log_b a} = n; f(n) = n log n = Θ(n · log^{1} n) → extended case 2 → Θ(n log² n). (Each of the log n levels costs n·log(n/2^{i}); the sum is n·Σ(log n − i) = Θ(n log² n).) **Correct.**
+- (D) Recursion-tree: level costs are n, (3/4)n, (3/4)^{2} n, … because the subproblem sizes sum to n/2 + n/4 = 3n/4 < n. A decreasing geometric series → Θ(n). **Correct.**
 
-**Trap:** in (A), seeing two recursive calls and guessing Θ(n log n) — that needs the sizes to add up to n (as in T(n/2) + T(n/2)). In (D), 7 < 8 = 2³ is exactly why Strassen beats the cubic algorithm.''',
-            'verify': '''
+**Trap:** in (D), seeing two recursive calls and guessing Θ(n log n) — that needs the sizes to add up to n (as in T(n/2) + T(n/2)). In (B), 7 < 8 = 2³ is exactly why Strassen beats the cubic algorithm.''',
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import math
 from functools import lru_cache
 @lru_cache(None)
@@ -690,12 +696,12 @@ assert best[0] == int(ANSWER)
         else:
             hi = q - 1''',
             'options': [
-                'The function returns 9',
-                'Exactly 3 partitioning passes are performed',
                 'After the first partitioning pass, 15 is at index 7',
                 'When the function returns, A[0..2] is in ascending order',
+                'The function returns 9',
+                'Exactly 3 partitioning passes are performed',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['C', 'D'],
             'solution': '''**Concept.** Quickselect partitions once, then continues on **one** side only — the side containing index k − 1 = 3. Expected time Θ(n), worst case Θ(n²).
 
 - Pass 1 on A[0..9], pivot 15: elements ≤ 15 are 13, 4, 9, 2, 11, 6 (6 of them) → pivot goes to index **6**. A = [13, 4, 9, 2, 11, 6, **15**, 17, 21, 25]. 6 > 3 → hi = 5.
@@ -703,13 +709,15 @@ assert best[0] == int(ANSWER)
 - Pass 3 on A[3..5] = [13, 11, 9], pivot 9: nothing ≤ 9 → pivot to index 3 → A[3..5] = [**9**, 11, 13]. q = 3 = k − 1 → return **9**.
 
 Option by option:
-- (A) The 4th smallest of {2, 4, 6, 9, 11, …} is 9. **TRUE.**
-- (B) Three passes. **TRUE.**
-- (C) 15 lands at index 6 (six smaller elements). **FALSE.**
-- (D) A[0..2] = [4, 2, 6] — quickselect only guarantees that these are the elements *smaller* than A[3], not that they are sorted. **FALSE.**
+- (A) 15 lands at index 6 (six smaller elements). **FALSE.**
+- (B) A[0..2] = [4, 2, 6] — quickselect only guarantees that these are the elements *smaller* than A[3], not that they are sorted. **FALSE.**
+- (C) The 4th smallest of {2, 4, 6, 9, 11, …} is 9. **TRUE.**
+- (D) Three passes. **TRUE.**
 
 **Trap:** expecting a sorted prefix — selection does strictly less work than sorting.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [13, 4, 21, 9, 17, 2, 25, 11, 6, 15]
 passes = []; B = A[:]; lo, hi, k = 0, 9, 4
 while True:
@@ -881,11 +889,11 @@ assert g(list(range(100)), 0, 100) > 0
             ],
             'options': [
                 'Listing the vertices in decreasing order of f gives B, E, A, D, G, C, F, H',
-                'f(A) = 11',
                 'The edge B→D is a cross edge',
                 'The edge A→D is a forward edge',
+                'f(A) = 11',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['A', 'B'],
             'solution': '''**Concept.** Decreasing finish time of a DFS on a DAG is a topological order. Edge types: tree (first discovery), forward (to an already-finished descendant), cross (to a finished vertex in another branch/tree).
 
 Trace (discovery/finish):
@@ -896,12 +904,14 @@ Trace (discovery/finish):
 Finish times: H 5, F 6, C 7, G 10, D 11, A 12, E 15, B 16.
 
 - (A) Decreasing f: B(16), E(15), A(12), D(11), G(10), C(7), F(6), H(5). **TRUE.**
-- (B) f(A) = 12, not 11 (11 is f(D)). **FALSE.**
-- (C) D was discovered (8) and finished (11) before B was discovered (13) → **cross** edge. **TRUE.**
-- (D) When A scans D, D is still undiscovered (A explored C’s branch first, which never reaches D) → A→D is a **tree** edge. **FALSE.**
+- (B) D was discovered (8) and finished (11) before B was discovered (13) → **cross** edge. **TRUE.**
+- (C) When A scans D, D is still undiscovered (A explored C’s branch first, which never reaches D) → A→D is a **tree** edge. **FALSE.**
+- (D) f(A) = 12, not 11 (11 is f(D)). **FALSE.**
 
 **Trap:** assuming that an edge reaching a vertex “late” must be forward; it is forward only if the target was already *discovered from u’s subtree* when u examines it.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'A': 'CD', 'B': 'DE', 'C': 'F', 'D': 'FG', 'E': 'G', 'F': 'H', 'G': 'H', 'H': ''}
 t = [0]; disc = {}; fin = {}; cls = {}
 def dfs(u):

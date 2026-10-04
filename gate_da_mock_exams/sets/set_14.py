@@ -474,17 +474,18 @@ assert opts[1] == ", ".join(ino(T)) and opts[3] == ", ".join(pre(T))
                     },
                 },
             ],
-            'options': ['A, B, D, F, C, E', 'A, C, E, F, D, B', 'A, C, D, F, B, E', 'A, B, D, F, E, C'],
+            'options': ['A, B, D, F, C, E', 'A, C, E, F, D, B', 'A, B, D, F, E, C', 'A, C, D, F, B, E'],
             'answer': ['A', 'B'],
             'solution': '''**Concept.** DFS always continues from the most recently discovered vertex that still has an undiscovered out-neighbour. It may backtrack only when the current vertex is exhausted.
 
 - (A) A → B → D → F; F, D, B exhausted; back at A → C → E (D, F already seen). **Possible.**
 - (B) A → C → E → F; F, E exhausted; back at C → D (F seen); back at A → B. **Possible.**
-- (C) A → C → D → F; back at D, then C — but C still has the undiscovered neighbour E, so E must be discovered before returning to A for B. **Not possible.**
-- (D) After A → B → D → F, backtracking reaches A, whose only undiscovered out-neighbour is C. E is reachable only through C, so E cannot appear before C. **Not possible.**
+- (C) After A → B → D → F, backtracking reaches A, whose only undiscovered out-neighbour is C. E is reachable only through C, so E cannot appear before C. **Not possible.**
+- (D) A → C → D → F; back at D, then C — but C still has the undiscovered neighbour E, so E must be discovered before returning to A for B. **Not possible.**
 
 **Trap:** an order can look plausible because every vertex is adjacent to *some* earlier vertex — that is not enough; it must be adjacent to the deepest unfinished vertex.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'A': 'BC', 'B': 'D', 'C': 'DE', 'D': 'F', 'E': 'F', 'F': ''}
 def ok(s):
     s = s.replace(', ', '')
@@ -846,21 +847,21 @@ assert ways['T'] == int(ANSWER) and dist['T'] == 4
                 },
             ],
             'options': [
+                'The interval [d(S), f(S)] is nested inside the interval [d(Q), f(Q)]',
                 'Edge (U, Q) is a back edge',
                 'Edge (S, R) is a cross edge',
-                'The interval [d(S), f(S)] is nested inside the interval [d(Q), f(Q)]',
                 'The graph contains a directed cycle',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Trace** (d / f):
 - P 1 → Q 2 → R 3 → T 4 → U 5; U→Q: Q is grey → back edge. U f=6, T f=7, R f=8, Q f=9.
 - P → S 10; S→R: R black, d(R) = 3 < 10 → cross edge; S→T: black, d(T) = 4 < 10 → cross edge. S f=11. P f=12.
 
 Times: P 1/12, Q 2/9, R 3/8, S 10/11, T 4/7, U 5/6.
 
-- (A) **True** — Q is an ancestor of U still on the recursion stack.
-- (B) **True** — R is finished and in a different subtree (discovered earlier).
-- (C) **False** — [10, 11] and [2, 9] are disjoint; S and Q are siblings under P, not ancestor/descendant. By the parenthesis theorem two intervals are either nested or disjoint.
+- (A) **False** — [10, 11] and [2, 9] are disjoint; S and Q are siblings under P, not ancestor/descendant. By the parenthesis theorem two intervals are either nested or disjoint.
+- (B) **True** — Q is an ancestor of U still on the recursion stack.
+- (C) **True** — R is finished and in a different subtree (discovered earlier).
 - (D) **True** — a directed graph has a cycle iff DFS finds a back edge; here Q → R → T → U → Q.
 
 **Trap:** S → R points 'upward' in the drawing but is not a back edge — R is not an ancestor of S in the DFS tree.''',
@@ -876,7 +877,9 @@ Times: P 1/12, Q 2/9, R 3/8, S 10/11, T 4/7, U 5/6.
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'P': 'QS', 'Q': 'R', 'R': 'T', 'S': 'RT', 'T': 'U', 'U': 'Q'}
 d, f, col, t, kind = {}, {}, {v: 0 for v in G}, [0], {}
 def vis(u):
@@ -1048,12 +1051,12 @@ assert cnt(V) == int(ANSWER)
                 },
             ],
             'options': [
-                'The resulting heap array is [31, 22, 27, 14, 3, 18, 6, 9]',
                 'Exactly 4 swaps are performed in total',
-                'Key 3 ends at a leaf position',
                 'Inserting the same keys one at a time (in array order) into an empty max-heap with sift-up produces the same final array',
+                'Key 3 ends at a leaf position',
+                'The resulting heap array is [31, 22, 27, 14, 3, 18, 6, 9]',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept.** Bottom-up heap construction sifts down every internal node from the last one (index ⌊n/2⌋ − 1 = 3) to the root. Total work is O(n).
 
 **Trace.**
@@ -1062,10 +1065,10 @@ assert cnt(V) == int(ANSWER)
 - i = 1 (3): children 22, 31 → swap with 31 (index 4); index 4 has no children. [14, 31, 27, 22, 3, 18, 6, 9] (2)
 - i = 0 (14): children 31, 27 → swap with 31 → index 1: children 22, 3 → swap with 22 → index 3: child 9 < 14 → stop. [31, 22, 27, 14, 3, 18, 6, 9] (4)
 
-- (A) **True.**
-- (B) **True** — 1 + 0 + 1 + 2 = 4 swaps.
+- (A) **True** — 1 + 0 + 1 + 2 = 4 swaps.
+- (B) **False** — repeated insertion gives [31, 27, 18, 22, 9, 14, 6, 3]. The two methods generally produce different (both valid) heaps.
 - (C) **True** — 3 is at index 4, whose children 9, 10 are beyond n − 1 = 7.
-- (D) **False** — repeated insertion gives [31, 27, 18, 22, 9, 14, 6, 3]. The two methods generally produce different (both valid) heaps.
+- (D) **True.**
 
 **Trap:** stopping a sift-down after one swap; the key 14 must keep sinking until it is ≥ both children.''',
             'solution_diagrams': [
@@ -1076,7 +1079,9 @@ assert cnt(V) == int(ANSWER)
                     'caption': 'Max-heap after build-heap',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 H = [14, 3, 27, 9, 31, 18, 6, 22]; n = len(H); sw = 0
 for i in range(n // 2 - 1, -1, -1):
     while True:
@@ -1252,12 +1257,12 @@ assert OUTPUT.strip() == "[1, 1, 2, 3, 3, 4]" and ANSWER == 'B'
             'topic': 'Merge sort — comparison counts',
             'text': 'Top-down merge sort (split a list of length n into the first ⌊n/2⌋ elements and the rest) sorts [21, 7, 33, 14, 2, 40, 19, 11]. Merging compares the front elements of the two halves and stops comparing as soon as one half is exhausted. Which of the following statements is/are TRUE?',
             'options': [
-                'The total number of element comparisons is 17',
                 'The final (top-level) merge performs 7 comparisons',
-                'No other permutation of 8 distinct keys makes this merge sort perform more comparisons',
                 'Merging [2, 40] with [11, 19] performs 2 comparisons',
+                'No other permutation of 8 distinct keys makes this merge sort perform more comparisons',
+                'The total number of element comparisons is 17',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept.** Merging lists of sizes p and q takes between min(p, q) and p + q − 1 comparisons. For n = 8 the worst case total is ∑ over levels = 4×1 + 2×3 + 1×7 = 17 (= n log₂ n − n + 1).
 
 **Trace.**
@@ -1267,10 +1272,10 @@ assert OUTPUT.strip() == "[1, 1, 2, 3, 3, 4]" and ANSWER == 'B'
 - Total = 4 + 6 + 7 = **17**.
 
 **Statements.**
-- (A) **True.**
-- (B) **True** — the halves interleave perfectly, so every merge step but the last needs a comparison.
+- (A) **True** — the halves interleave perfectly, so every merge step but the last needs a comparison.
+- (B) **False** — it needs 3 comparisons, because 40 outlasts both 11 and 19.
 - (C) **True** — every merge here hit its maximum p + q − 1, and 17 is the worst case for n = 8.
-- (D) **False** — it needs 3 comparisons, because 40 outlasts both 11 and 19.
+- (D) **True.**
 
 **Trap:** assuming merging two lists of size 2 always takes 2 comparisons; it is 2 only when one list is entirely smaller than the other.''',
             'solution_diagrams': [
@@ -1294,7 +1299,9 @@ assert OUTPUT.strip() == "[1, 1, 2, 3, 3, 4]" and ANSWER == 'B'
                     'caption': 'Comparisons per merge in the recursion tree',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def ms(a, c):
     if len(a) <= 1: return a

@@ -460,7 +460,7 @@ def set_flow(S, total):
         flow += question_flow(i, q)
     flow += answer_key_flow(S)
     flow += [PageBreak(), RunningMark("Mock Test %02d — Solutions" % S["number"]),
-             Paragraph("Detailed Solutions — Mock Test %02d" % S["number"], ST["h2"]), Spacer(1, 4)]
+             Paragraph("Detailed Solutions — Mock Test %02d" % S["number"], H2TOC), Spacer(1, 4)]
     for i, q in enumerate(S["questions"], 1):
         flow += solution_flow(i, q)
     return flow

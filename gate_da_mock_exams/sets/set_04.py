@@ -146,21 +146,23 @@ assert OUTPUT.strip() == ANSWER
             'topic': 'Queues using linked lists — operation costs',
             'text': 'A FIFO queue holding n elements is implemented with a singly linked list (each node has only a `next` field). Which of the following statements is/are TRUE?',
             'options': [
-                'If both head and tail pointers are kept, enqueuing at the tail and dequeuing at the head both take O(1) worst-case time',
-                'If both head and tail pointers are kept, enqueuing at the head and dequeuing at the tail both take O(1) worst-case time',
-                'If the list is circular and only a pointer to the last node is kept, both enqueue and dequeue take O(1) worst-case time',
                 'If the list is non-circular and only a head pointer is kept, enqueue at the tail takes Θ(n) time',
+                'If both head and tail pointers are kept, enqueuing at the tail and dequeuing at the head both take O(1) worst-case time',
+                'If the list is circular and only a pointer to the last node is kept, both enqueue and dequeue take O(1) worst-case time',
+                'If both head and tail pointers are kept, enqueuing at the head and dequeuing at the tail both take O(1) worst-case time',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Concept.** In a singly linked list you can insert after any node you hold, and delete the node *after* any node you hold, in O(1). Deleting a node needs its predecessor.
 
-- (A) **True.** Enqueue: `tail.next = new; tail = new`. Dequeue: `head = head.next`. Both O(1).
-- (B) **False.** Dequeuing at the tail needs the predecessor of the tail so that its `next` can be set to None; finding it requires walking from the head — Θ(n).
+- (A) **True.** Without a tail pointer, reaching the last node needs n − 1 hops.
+- (B) **True.** Enqueue: `tail.next = new; tail = new`. Dequeue: `head = head.next`. Both O(1).
 - (C) **True.** With a circular list and pointer `last`, the front is `last.next`. Enqueue: `new.next = last.next; last.next = new; last = new`. Dequeue: `last.next = last.next.next`. Both O(1) — one pointer suffices.
-- (D) **True.** Without a tail pointer, reaching the last node needs n − 1 hops.
+- (D) **False.** Dequeuing at the tail needs the predecessor of the tail so that its `next` can be set to None; finding it requires walking from the head — Θ(n).
 
 **Tip:** the circular-list-with-last-pointer trick is a favourite GATE question — it gives both ends for the price of one pointer.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class N:
     def __init__(s, v): s.v, s.next = v, None
 # circular queue with only `last`: count hops, must not depend on n
@@ -434,23 +436,26 @@ assert A == [8, 12, 31, 47, 25, 19] and ANSWER == 'A'
                 },
             ],
             'options': [
-                'A, B, C, D, E, F, G',
-                'A, D, C, B, F, E, G',
                 'A, B, C, D, F, E, G',
+                'A, B, C, D, E, F, G',
                 'A, C, B, D, F, E, G',
+                'A, D, C, B, F, E, G',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** In BFS, when a vertex u is dequeued, all its *not-yet-discovered* neighbours are enqueued together. So the next-level vertices appear grouped by the parent that discovered them, in the order of the parents.
 
 Level 1 = {B, C, D} in any order; level 2 = {E, F}; level 3 = {G}.
 
-- (A) B first discovers E; C then discovers F; D nothing. Order E, F. **Valid.**
-- (B) D first discovers F; C then discovers E; B nothing new. Order F, E. **Valid.**
-- (C) B is dequeued first and discovers E, so E must come before F. **Invalid.**
-- (D) C is dequeued first and discovers both E and F (any order, here F then E); B and D add nothing. **Valid.**
+- (A) B is dequeued first and discovers E, so E must come before F. **Invalid.**
+- (B) B first discovers E; C then discovers F; D nothing. Order E, F. **Valid.**
+- (C) C is dequeued first and discovers both E and F (any order, here F then E); B and D add nothing. **Valid.**
+- (D) D first discovers F; C then discovers E; B nothing new. Order F, E. **Valid.**
 
-**Trap:** checking only the *levels* is not enough — (C) has correct levels but violates the FIFO order of discovery.''',
-            'verify': '''
+**Trap:** checking only the *levels* is not enough — (A) has correct levels but violates the FIFO order of discovery.''',
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'A': 'BCD', 'B': 'AE', 'C': 'AEF', 'D': 'AF', 'E': 'BCG',
      'F': 'CDG', 'G': 'EF'}
 def ok(seq):
@@ -719,23 +724,26 @@ Which of the following statements is/are TRUE?''',
     return head''',
             'run_code': False,
             'options': [
+                'Called on a one-node list (x is head), it returns None without raising an error',
                 'It correctly deletes any node that is neither the first nor the last node',
                 'It correctly deletes the last node of a list having at least two nodes',
                 'It correctly deletes the first node of a list having at least two nodes',
-                'Called on a one-node list (x is head), it returns None without raising an error',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept.** Deleting x needs `x.prev.next = x.next` (unless x is first) and `x.next.prev = x.prev` (unless x is last). Every dereference of `x.prev` or `x.next` must be guarded by a None check.
 
-- (A) **True.** Interior node: both neighbours exist; the two writes splice them together, and `x is head` is false.
-- (B) **True.** Last node: `x.prev` exists, so `x.prev.next = None`; the `if x.next` guard skips the second write. The predecessor becomes the new last node.
-- (C) **False.** For the first node `x.prev` is None, so the very first line evaluates `None.next = …` and raises `AttributeError` before the `x is head` check is reached.
-- (D) **False.** Same reason: the single node is also the first node, `x.prev` is None, and an `AttributeError` is raised.
+- (A) **False.** Same reason: the single node is also the first node, `x.prev` is None, and an `AttributeError` is raised.
+- (B) **True.** Interior node: both neighbours exist; the two writes splice them together, and `x is head` is false.
+- (C) **True.** Last node: `x.prev` exists, so `x.prev.next = None`; the `if x.next` guard skips the second write. The predecessor becomes the new last node.
+- (D) **False.** For the first node `x.prev` is None, so the very first line evaluates `None.next = …` and raises `AttributeError` before the `x is head` check is reached.
 
 **Fix:** write `if x.prev: x.prev.next = x.next` `else: head = x.next` — i.e. test the head case *before* dereferencing `x.prev`.
 
 **Trap:** the head check exists in the code, so it *looks* handled — but its position after the unguarded dereference makes it unreachable for the head node.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 class N:
     def __init__(s, v): s.val, s.prev, s.next = v, None, None
 def build(vals):
@@ -1018,12 +1026,12 @@ assert upd == int(ANSWER) and d['T'] == 9
     return i + 1''',
             'run_code': False,
             'options': [
-                'The returned index (final position of the pivot) is 3',
-                'After the call A = [2, 4, 1, 5, 9, 8, 7]',
                 'The number of swap statements executed (including the final one) is 3',
                 'If the same procedure is then called on the right part [9, 8, 7], its pivot ends at the first position of that part, so the left sub-part is empty',
+                'After the call A = [2, 4, 1, 5, 9, 8, 7]',
+                'The returned index (final position of the pivot) is 3',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** Lomuto keeps A[lo..i] ≤ pivot. Each element ≤ pivot found by j is swapped into position i + 1; at the end the pivot is swapped into i + 1.
 
 **Trace** (pivot 5):
@@ -1036,13 +1044,16 @@ assert upd == int(ANSWER) and d['T'] == 9
 - Final: swap A[3], A[6] → [2, 4, 1, 5, 9, 8, 7] (swap 4); return 3.
 
 **Statements.**
-- (A) **True** — returned index is 3 (three keys are smaller than 5).
-- (B) **True** — matches the trace.
-- (C) **False** — 4 swap statements execute (3 in the loop + the final one).
-- (D) **True** — for [9, 8, 7] the pivot 7 is the minimum, no j satisfies A[j] ≤ 7, i stays at lo − 1, and the pivot is swapped to the first position: [7, 8, 9] with an empty left part — the classic unbalanced split.
+- (A) **False** — 4 swap statements execute (3 in the loop + the final one).
+- (B) **True** — for [9, 8, 7] the pivot 7 is the minimum, no j satisfies A[j] ≤ 7, i stays at lo − 1, and the pivot is swapped to the first position: [7, 8, 9] with an empty left part — the classic unbalanced split.
+- (C) **True** — matches the trace.
+- (D) **True** — returned index is 3 (three keys are smaller than 5).
 
 **Trap:** forgetting the final pivot swap when counting swaps.''',
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def partition(A, lo, hi):
     global SW
     pivot, i = A[hi], lo - 1
@@ -1104,11 +1115,11 @@ assert sorted(k for k in t if t[k]) == sorted(ANSWER)
             ],
             'options': [
                 'The root of the final tree is 52',
-                'The height of the final tree is 4',
                 'The final tree has exactly 4 leaves',
                 'The pre-order traversal of the final tree begins 52, 24, 7, 28, 33',
+                'The height of the final tree is 4',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''**Concept.** The in-order successor of a node with two children is the minimum of its right subtree; it has no left child, so removing it is a 0- or 1-child deletion.
 
 **Delete 41.** Successor = leftmost node of the subtree rooted at 63 → 63 → 52 (no left child). Copy 52 into the root and delete the old 52, whose right child 57 moves up to become 63's left child.
@@ -1118,9 +1129,9 @@ assert sorted(k for k in t if t[k]) == sorted(ANSWER)
 **Final tree:** 52 → left 24 (children 7 and 28), 28 → right 33, 33 → left 30; 52 → right 63 (children 57 and 88), 88 → children 71 and 95.
 
 - (A) **True.**
-- (B) **True** — path 52 → 24 → 28 → 33 → 30 has 4 edges.
-- (C) **False** — the leaves are 7, 30, 57, 71, 95: five leaves.
-- (D) **True** — pre-order is 52, 24, 7, 28, 33, 30, 63, 57, 88, 71, 95.
+- (B) **False** — the leaves are 7, 30, 57, 71, 95: five leaves.
+- (C) **True** — pre-order is 52, 24, 7, 28, 33, 30, 63, 57, 88, 71, 95.
+- (D) **True** — path 52 → 24 → 28 → 33 → 30 has 4 edges.
 
 **Trap:** using the in-order *predecessor* (33 for 41) gives a completely different tree; always follow the convention stated in the question.''',
             'solution_diagrams': [
@@ -1155,7 +1166,9 @@ assert sorted(k for k in t if t[k]) == sorted(ANSWER)
                     'caption': 'Final BST',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins(t, k):
     if t is None: return [k, None, None]
     i = 1 if k < t[0] else 2

@@ -166,16 +166,16 @@ assert bad == [ANSWER]
             'marks': 1,
             'topic': 'Stacks — permutations',
             'text': 'The integers 1, 2, 3, 4, 5 are pushed onto an initially empty stack **in this order**; pops may be interleaved with pushes at any time, and every popped value is printed. Which of the following output sequences is/are possible?',
-            'options': ['3 2 5 4 1', '2 4 1 3 5', '1 5 4 2 3', '4 5 3 2 1'],
-            'answer': ['A', 'D'],
+            'options': ['2 4 1 3 5', '3 2 5 4 1', '4 5 3 2 1', '1 5 4 2 3'],
+            'answer': ['B', 'C'],
             'solution': '''Simulate greedily: to output x, push everything up to x (if not yet pushed) and pop; if x is already pushed it must be on **top**, otherwise the sequence is impossible.
 
-- (A) push 1,2,3 pop 3; pop 2; push 4,5 pop 5; pop 4; pop 1. **Possible.**
-- (B) push 1,2 pop 2; push 3,4 pop 4; stack is [1, 3] with 3 on top but 1 is needed. **Impossible.**
-- (C) push 1 pop 1; push 2..5 pop 5; pop 4; stack is [2, 3], top is 3 but 2 is needed. **Impossible.**
-- (D) push 1..4 pop 4; push 5 pop 5; pop 3, 2, 1. **Possible.**
+- (A) push 1,2 pop 2; push 3,4 pop 4; stack is [1, 3] with 3 on top but 1 is needed. **Impossible.**
+- (B) push 1,2,3 pop 3; pop 2; push 4,5 pop 5; pop 4; pop 1. **Possible.**
+- (C) push 1..4 pop 4; push 5 pop 5; pop 3, 2, 1. **Possible.**
+- (D) push 1 pop 1; push 2..5 pop 5; pop 4; stack is [2, 3], top is 3 but 2 is needed. **Impossible.**
 
-**Tip:** a sequence is impossible exactly when it contains a pattern a … b … c with c < a < b (the '3-1-2' pattern), e.g. 4 … 1 … 3 in (B) and 5 … 2 … 3 in (C).''',
+**Tip:** a sequence is impossible exactly when it contains a pattern a … b … c with c < a < b (the '3-1-2' pattern), e.g. 4 … 1 … 3 in (A) and 5 … 2 … 3 in (D).''',
             'solution_diagrams': [
                 {
                     'type': 'stack',
@@ -184,7 +184,9 @@ assert bad == [ANSWER]
                     'caption': 'In (B) 1 is buried under 3, so it cannot be printed next',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def possible(out):
     st, nxt = [], 1
     for x in out:
@@ -406,11 +408,11 @@ assert OUTPUT.strip() == '25' and ANSWER == 'B'
             ],
             'options': [
                 'The BFS visit order is A, B, C, D, E, F, G',
-                'The BFS level (distance from A) of G is 3',
-                'Edge E–G is an edge of the BFS tree',
                 'DFS visits F before E',
+                'Edge E–G is an edge of the BFS tree',
+                'The BFS level (distance from A) of G is 3',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['A', 'D'],
             'solution': '''BFS explores level by level with a FIFO queue; DFS goes as deep as possible (recursively) before backtracking.
 
 **BFS:** queue A → dequeue A, enqueue B, C → dequeue B, enqueue D, E → dequeue C, enqueue F (E already seen) → dequeue D, enqueue G (via D) → E, F, G. Order A, B, C, D, E, F, G; levels A0, B1, C1, D2, E2, F2, G3.
@@ -418,9 +420,9 @@ assert OUTPUT.strip() == '25' and ANSWER == 'B'
 **DFS:** A → B → D → G → E (G's smallest unvisited neighbour) → back to E: C → F. Order A, B, D, G, E, C, F.
 
 - (A) **True.**
-- (B) **True** — G is first reached via D at level 3.
+- (B) **False** — DFS reaches E (from G) before F.
 - (C) **False** — G is discovered from D, so the tree edge is D–G; E–G is a non-tree edge.
-- (D) **False** — DFS reaches E (from G) before F.
+- (D) **True** — G is first reached via D at level 3.
 
 **Trap:** in BFS a vertex's parent is the *first* vertex that discovers it, not every neighbour one level up.''',
             'solution_diagrams': [
@@ -459,7 +461,8 @@ assert OUTPUT.strip() == '25' and ANSWER == 'B'
                     'caption': 'BFS tree edges highlighted',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from collections import deque
 E = [("A","B"),("A","C"),("B","D"),("B","E"),("C","E"),("C","F"),("D","G"),("E","G"),("F","G")]
 G = {}
@@ -694,18 +697,18 @@ assert cnt == int(ANSWER)
             'topic': 'BST — valid pre-order sequences',
             'text': 'Which of the following sequences is/are valid **pre-order** traversals of some binary search tree with distinct keys?',
             'options': [
-                '30, 20, 10, 25, 40, 35, 50',
                 '30, 20, 25, 10, 40, 50',
-                '50, 30, 20, 40, 70, 60, 55, 65, 80',
                 '15, 10, 12, 11, 20, 18, 25, 17',
+                '50, 30, 20, 40, 70, 60, 55, 65, 80',
+                '30, 20, 10, 25, 40, 35, 50',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['C', 'D'],
             'solution': '''In a BST pre-order, once we move into the right subtree of a node v (i.e. see a key larger than v after v's left part), **no later key may be smaller than v**. A stack-based check keeps a running lower bound: when a key larger than the stack top arrives, pop and raise the bound to the popped key.
 
-- (A) 30 → left {20, 10, 25} = 20 with children 10, 25; right {40, 35, 50} = 40 with children 35, 50. **Valid.**
-- (B) 30, 20, then 25 > 20 means we are in 20's right subtree (bound 20). Then 10 < 20 violates the bound. **Invalid.**
+- (A) 30, 20, then 25 > 20 means we are in 20's right subtree (bound 20). Then 10 < 20 violates the bound. **Invalid.**
+- (B) 15 → left 10 → right 12 → left 11; then 20 (bound 15), 18 left of 20, 25 right of 20 (bound now 20); then 17 < 20 would have to lie in 20's right subtree — impossible. **Invalid.**
 - (C) 50 → left 30 (children 20, 40); right 70 → left 60 (children 55, 65), right 80. **Valid.**
-- (D) 15 → left 10 → right 12 → left 11; then 20 (bound 15), 18 left of 20, 25 right of 20 (bound now 20); then 17 < 20 would have to lie in 20's right subtree — impossible. **Invalid.**
+- (D) 30 → left {20, 10, 25} = 20 with children 10, 25; right {40, 35, 50} = 40 with children 35, 50. **Valid.**
 
 **Tip:** a sequence is a valid BST pre-order iff it avoids the pattern 'a, …, c, …, b' with b < a < c — exactly what the stack check detects.''',
             'solution_diagrams': [
@@ -731,7 +734,9 @@ assert cnt == int(ANSWER)
                     'caption': 'The unique BST with pre-order (C)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def valid(seq):
     st, low = [], float('-inf')
     for x in seq:
@@ -933,9 +938,9 @@ assert A == sorted(A) and sw == int(ANSWER)
                 },
             ],
             'options': [
-                'After build-heap, index 2 holds 25',
-                'After build-heap, key 12 is at index 5',
                 'After build-heap, 3 and 5 are the children of 7',
+                'After build-heap, key 12 is at index 5',
+                'After build-heap, index 2 holds 25',
                 'Exactly 4 swaps are performed in total',
             ],
             'answer': ['A', 'B', 'C'],
@@ -948,9 +953,9 @@ assert A == sorted(A) and sw == int(ANSWER)
 
 Final heap: [30, 21, 25, 7, 18, 12, 9, 3, 5]; total swaps = 5.
 
-- (A) index 2 = 25. **True.**
+- (A) index 3 = 7, its children (indices 7, 8) are 3 and 5. **True.**
 - (B) 12 sank two levels to index 5. **True.**
-- (C) index 3 = 7, its children (indices 7, 8) are 3 and 5. **True.**
+- (C) index 2 = 25. **True.**
 - (D) 5 swaps, not 4. **False** — the root's key sinks twice.
 
 **Trap:** stopping the root's sift-down after one swap; a sift-down continues until the key is ≥ both children.''',
@@ -963,7 +968,8 @@ Final heap: [30, 21, 25, 7, 18, 12, 9, 3, 5]; total swaps = 5.
                     'caption': 'Max-heap after build-heap (index 5 = key 12 highlighted)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 H = [12, 7, 25, 3, 18, 30, 9, 21, 5]; sw = 0
 def sift(i, n):
     global sw
@@ -1122,12 +1128,12 @@ assert OUTPUT.strip() == '[42, 16, 8]' and ANSWER == 'B'
 9, 17, 14, 26, 23, 35, 48, 41, 30.
 Which of the following statements is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)''',
             'options': [
+                'The in-order successor of 26 is 35',
+                'The tree has exactly 4 leaves',
                 'The pre-order traversal is 30, 23, 14, 9, 17, 26, 41, 35, 48',
                 'The height of the tree is 3',
-                'The tree has exactly 4 leaves',
-                'The in-order successor of 26 is 35',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['C', 'D'],
             'solution': '''In post-order the **last** key is the root; the earlier keys split into those smaller (left subtree) and larger (right subtree), each again in post-order. Since the in-order of a BST is the sorted order, the post-order alone determines the BST.
 
 - Root 30. Left part: 9, 17, 14, 26, 23 (all < 30). Right part: 35, 48, 41.
@@ -1136,12 +1142,12 @@ Which of the following statements is/are TRUE? (Height = number of edges on the 
 
 Tree: 30 → (23 → (14 → 9, 17), 26), (41 → 35, 48).
 
-- (A) Pre-order 30, 23, 14, 9, 17, 26, 41, 35, 48. **True.**
-- (B) Longest path 30 → 23 → 14 → 9 has 3 edges. **True.**
-- (C) Leaves are 9, 17, 26, 35, 48 — five, not four. **False.**
-- (D) 26 has no right child; it is in 30's left subtree, so its successor is **30**. **False.**
+- (A) 26 has no right child; it is in 30's left subtree, so its successor is **30**. **False.**
+- (B) Leaves are 9, 17, 26, 35, 48 — five, not four. **False.**
+- (C) Pre-order 30, 23, 14, 9, 17, 26, 41, 35, 48. **True.**
+- (D) Longest path 30 → 23 → 14 → 9 has 3 edges. **True.**
 
-**Trap:** in (D), 35 is the next key *within the right subtree*, but the root 30 lies between 26 and 35.''',
+**Trap:** in (A), 35 is the next key *within the right subtree*, but the root 30 lies between 26 and 35.''',
             'solution_diagrams': [
                 {
                     'type': 'bintree',
@@ -1165,7 +1171,10 @@ Tree: 30 → (23 → (14 → 9, 17), 26), (41 → 35, 48).
                     'caption': 'BST reconstructed from the post-order',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 post = [9, 17, 14, 26, 23, 35, 48, 41, 30]
 def build(p):
     if not p: return None

@@ -130,21 +130,22 @@ assert Fraction(sum(len(T.get(s, [])) for s in range(7)), 7) == Fraction(9, 7)
             'topic': 'Python — hashability',
             'text': 'Which of the following statements about Python 3 is/are TRUE?',
             'options': [
-                'Evaluating `{[1, 2]: 3}` raises a `TypeError`',
+                "After `d = {(1, 2): 'x'}`, the expression `(2, 1) in d` evaluates to `True`",
                 'Evaluating `hash((1, [2]))` raises a `TypeError`',
                 "`len({0, 0.0, False, ''})` evaluates to 2",
-                "After `d = {(1, 2): 'x'}`, the expression `(2, 1) in d` evaluates to `True`",
+                'Evaluating `{[1, 2]: 3}` raises a `TypeError`',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''Only hashable objects can be dict keys or set members. Lists are mutable and unhashable; a tuple is hashable only if **all** its elements are.
 
-- (A) a list as a key → `TypeError: unhashable type: 'list'`. **True.**
+- (A) tuples are ordered: (2, 1) ≠ (1, 2). **False.**
 - (B) hashing a tuple hashes its elements; the inner list fails. **True.**
 - (C) 0, 0.0 and False are equal with equal hashes → one element; '' is different → size 2. **True.**
-- (D) tuples are ordered: (2, 1) ≠ (1, 2). **False.**
+- (D) a list as a key → `TypeError: unhashable type: 'list'`. **True.**
 
 **Trap:** (B) — a tuple *looks* immutable but is only as hashable as its contents. **Tip:** for unordered pairs use `frozenset`.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def raises(f):
     try:
         f(); return False
@@ -315,20 +316,22 @@ assert (passes, sw) == (4, 6) and ANSWER == "A"
             ],
             'options': [
                 'G is bipartite',
-                'The trace (sum of diagonal entries) of A² is 12',
                 'The (a, d) entry of A² is 2',
                 'G contains a cycle of length 5',
+                'The trace (sum of diagonal entries) of A² is 12',
             ],
-            'answer': ['B', 'D'],
+            'answer': ['C', 'D'],
             'solution': '''Edges: a–b, a–c, b–c, b–d, c–e, d–e (6 edges). (A²)[u][v] counts walks of length 2 from u to v, i.e. common neighbours.
 
 - (A) a, b, c form a triangle (odd cycle). **False.**
-- (B) (A²)[v][v] = deg(v), so trace(A²) = Σ deg = 2|E| = 12. **True.**
-- (C) N(a) = {b, c}, N(d) = {b, e}; common neighbour only b → entry 1. **False.**
-- (D) a–b–d–e–c–a uses edges ab, bd, de, ec, ca — all present. **True.**
+- (B) N(a) = {b, c}, N(d) = {b, e}; common neighbour only b → entry 1. **False.**
+- (C) a–b–d–e–c–a uses edges ab, bd, de, ec, ca — all present. **True.**
+- (D) (A²)[v][v] = deg(v), so trace(A²) = Σ deg = 2|E| = 12. **True.**
 
 **Tip:** trace(A³) = 6 × (number of triangles); here it is 6, confirming exactly one triangle.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [[0,1,1,0,0],[1,0,1,1,0],[1,1,0,0,1],[0,1,0,0,1],[0,0,1,1,0]]
 n = 5
 A2 = [[sum(A[i][k] * A[k][j] for k in range(n)) for j in range(n)] for i in range(n)]
@@ -366,11 +369,11 @@ assert sorted(ANSWER) == [c for c, t in zip("ABCD", truth) if t]
             ],
             'options': [
                 '61 was inserted before 31',
-                '72 was inserted before 13',
                 '24 could have been inserted before 72',
+                '72 was inserted before 13',
                 'Exactly one insertion order produces this table',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''A key stored at distance d from its home slot proves that, when it was inserted, **all** of slots home … home + d − 1 were already occupied.
 
 Homes: 61→1, 31→1, 72→2, 13→3, 24→4, 91→1.
@@ -385,12 +388,13 @@ Homes: 61→1, 31→1, 72→2, 13→3, 24→4, 91→1.
 The constraints form a chain 61 < 31 < 72 < 13 < 24 < 91, so the order is forced.
 
 - (A) **True.**
-- (B) **True.**
-- (C) 24 needs 13 already in slot 4, and 13 needs 72 → **False.**
+- (B) 24 needs 13 already in slot 4, and 13 needs 72 → **False.**
+- (C) **True.**
 - (D) the chain is total → exactly **1** order. **True.**
 
 **Trap:** assuming the 'probe-chain' constraint applies only to keys with the same home slot; with linear probing a cluster is shared by all homes inside it (primary clustering).''',
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 fin = {1: 61, 2: 31, 3: 72, 4: 13, 5: 24, 6: 91}
 good = []
@@ -721,10 +725,10 @@ assert sum(d.values()) == int(ANSWER)
             'topic': 'Merge sort — comparison counts',
             'text': 'Top-down merge sort (split [lo, hi) at mid = (lo + hi) // 2, sort the halves recursively, merge with the standard two-pointer merge; a comparison is one key-vs-key test) is applied to [6, 2, 9, 4, 7, 1, 8, 3]. Which of the following statements is/are TRUE?',
             'options': [
-                'The total number of comparisons is 17',
+                'Just before the final merge, the two sorted halves are [2, 4, 6, 9] and [1, 3, 7, 8]',
                 'The final merge makes exactly 6 comparisons',
                 'No permutation of 8 distinct keys makes this algorithm perform more than 17 comparisons',
-                'Just before the final merge, the two sorted halves are [2, 4, 6, 9] and [1, 3, 7, 8]',
+                'The total number of comparisons is 17',
             ],
             'answer': ['A', 'C', 'D'],
             'solution': '''Merging runs of sizes p and q costs at most p + q − 1 comparisons (the maximum is reached when the runs interleave until the very end).
@@ -735,13 +739,14 @@ assert sum(d.values()) == int(ANSWER)
 
 Total = 4 + 6 + 7 = **17**.
 
-- (A) **True.**
+- (A) **True** — the left half [6, 2, 9, 4] sorts to [2, 4, 6, 9], the right to [1, 3, 7, 8].
 - (B) the final merge makes **7**. **False.**
 - (C) every merge here already hit its maximum p + q − 1, so 17 is the worst case for n = 8 (formula n⌈log₂ n⌉ − 2^{⌈log₂ n⌉} + 1 = 24 − 8 + 1 = 17). **True.**
-- (D) **True** — the left half [6, 2, 9, 4] sorts to [2, 4, 6, 9], the right to [1, 3, 7, 8].
+- (D) **True.**
 
 **Tip:** the best case for n = 8 is 12 comparisons (each merge stops after min(p, q) comparisons, e.g. on sorted input).''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import itertools
 def ms(a, c):
     if len(a) <= 1: return a
@@ -802,23 +807,25 @@ assert cnt == 20 and ANSWER == "A"
             'topic': 'Open addressing — expected probe counts',
             'text': "An open-addressing hash table has load factor α = 0.75. Use the standard asymptotic estimates (uniform hashing for (A)–(B), Knuth's linear-probing estimates for (C)). Which of the following statements is/are TRUE?",
             'options': [
+                'Under linear probing, the expected number of probes in an unsuccessful search is about 8.5',
                 'Under uniform hashing, the expected number of probes in an unsuccessful search is at most 4',
                 'Under uniform hashing, the expected number of probes in a successful search is about 1.85',
-                'Under linear probing, the expected number of probes in an unsuccessful search is about 8.5',
                 'Separate chaining could not be used at this load factor, since chaining requires α ≤ 0.5',
             ],
             'answer': ['A', 'B', 'C'],
             'solution': '''Standard results for open addressing (α = n/m < 1):
 
-- Uniform hashing, unsuccessful: ≤ 1/(1 − α) = 1/0.25 = **4**. (A) **True.**
-- Uniform hashing, successful: ≤ (1/α) ln(1/(1 − α)) = (4/3) ln 4 ≈ (4/3)(1.386) ≈ **1.85**. (B) **True.**
-- Linear probing (Knuth): unsuccessful ≈ ½(1 + 1/(1 − α)²) = ½(1 + 16) = **8.5**; successful ≈ ½(1 + 1/(1 − α)) = 2.5. (C) **True.**
+- Uniform hashing, unsuccessful: ≤ 1/(1 − α) = 1/0.25 = **4**. (B) **True.**
+- Uniform hashing, successful: ≤ (1/α) ln(1/(1 − α)) = (4/3) ln 4 ≈ (4/3)(1.386) ≈ **1.85**. (C) **True.**
+- Linear probing (Knuth): unsuccessful ≈ ½(1 + 1/(1 − α)²) = ½(1 + 16) = **8.5**; successful ≈ ½(1 + 1/(1 − α)) = 2.5. (A) **True.**
 - (D) Chaining works for **any** α (even α > 1); the expected search cost is Θ(1 + α). **False.**
 
-Comparing (A) with (C): at the same load factor, primary clustering makes linear probing's unsuccessful search more than twice as expensive as ideal uniform hashing.
+Comparing (B) with (A): at the same load factor, primary clustering makes linear probing's unsuccessful search more than twice as expensive as ideal uniform hashing.
 
 **Trap:** mixing up the successful and unsuccessful formulas — successful searches are always cheaper because they stop at the key, on average part-way along the probe sequence.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import math, random
 a = 0.75
 uns = 1 / (1 - a); suc = (1 / a) * math.log(1 / (1 - a)); lin = 0.5 * (1 + 1 / (1 - a) ** 2)

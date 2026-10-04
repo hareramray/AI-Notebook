@@ -277,21 +277,24 @@ assert tot == int(ANSWER)
                 },
             ],
             'options': [
-                'The pre-order traversal is A, B, D, E, G, C, F, H, I',
-                'The in-order traversal is D, B, E, G, A, C, H, F, I',
                 'The post-order traversal is D, G, E, B, H, I, F, C, A',
+                'The pre-order traversal is A, B, D, E, G, C, F, H, I',
                 'Exactly three nodes have exactly one child',
+                'The in-order traversal is D, B, E, G, A, C, H, F, I',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['A', 'B'],
             'solution': '''Pre-order = node, left, right; in-order = left, node, right; post-order = left, right, node.
 
-- (A) Pre-order: A, then subtree B (B, D, E, G), then subtree C (C, F, H, I) → A, B, D, E, G, C, F, H, I. **TRUE.**
-- (B) In subtree E, G is the *left* child, so in-order lists G before E: D, B, G, E, A, C, H, F, I. The option puts E before G. **FALSE.**
-- (C) Post-order: D, G, E, B (left subtree), H, I, F, C (right subtree), A. **TRUE.**
-- (D) Nodes with exactly one child: E (only G) and C (only F) → two nodes. **FALSE.**
+- (A) Post-order: D, G, E, B (left subtree), H, I, F, C (right subtree), A. **TRUE.**
+- (B) Pre-order: A, then subtree B (B, D, E, G), then subtree C (C, F, H, I) → A, B, D, E, G, C, F, H, I. **TRUE.**
+- (C) Nodes with exactly one child: E (only G) and C (only F) → two nodes. **FALSE.**
+- (D) In subtree E, G is the *left* child, so in-order lists G before E: D, B, G, E, A, C, H, F, I. The option puts E before G. **FALSE.**
 
 **Trap:** in-order depends on whether a lone child is left or right; for pre-order and post-order the side of a lone child does not change the sequence — which is why a pre-order + post-order pair cannot always determine a binary tree uniquely.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 T = ["A", ["B", ["D", None, None], ["E", ["G", None, None], None]],
      ["C", None, ["F", ["H", None, None], ["I", None, None]]]]
 def pre(t): return [] if t is None else [t[0]] + pre(t[1]) + pre(t[2])
@@ -638,12 +641,12 @@ assert abs(r1 / r2 - 1) < 0.1 and work(16) > 0 and ANSWER == "B"
             'topic': 'Heaps — repeated insertion into a min-heap',
             'text': 'The keys 35, 22, 41, 18, 9, 27, 14, 30 are inserted one at a time, in that order, into an initially empty binary **min-heap** stored in an array (0-indexed; each insertion appends the key and sifts it up). A *swap* is one child–parent exchange. Which of the following statements is/are TRUE?',
             'options': [
-                'The final heap array is [9, 18, 14, 30, 22, 41, 27, 35]',
                 'The insertions perform 7 swaps in total',
+                'The final heap array is [9, 18, 14, 30, 22, 41, 27, 35]',
                 'Bottom-up build-heap applied to the array [35, 22, 41, 18, 9, 27, 14, 30] produces the same final array',
                 'After one DELETE-MIN on the final heap, the root holds 14',
             ],
-            'answer': ['A', 'D'],
+            'answer': ['B', 'D'],
             'solution': '''Insertion = append at the end, then swap upward while the parent is larger.
 
 - 35 → [35]
@@ -655,8 +658,8 @@ assert abs(r1 / r2 - 1) < 0.1 and work(16) > 0 and ANSWER == "B"
 - 14 → swap with 27 → [9, 18, 14, 35, 22, 41, 27] (1)
 - 30 → swap with 35 → [9, 18, 14, 30, 22, 41, 27, 35] (1)
 
-- (A) **TRUE.**
-- (B) Swaps = 1 + 0 + 2 + 2 + 1 + 1 + 1 = 8, not 7. **FALSE.**
+- (A) Swaps = 1 + 0 + 2 + 2 + 1 + 1 + 1 = 8, not 7. **FALSE.**
+- (B) **TRUE.**
 - (C) Bottom-up build-heap (sift-down at i = 3, 2, 1, 0) gives [9, 18, 14, 30, 22, 27, 41, 35]: at i = 2 the key 41 is swapped with the *smaller* child 14, leaving 27 at index 5. The arrays differ at indices 5, 6. **FALSE.**
 - (D) DELETE-MIN moves 35 to the root: [35, 18, 14, 30, 22, 41, 27]; 35 swaps with the smaller child 14, then with 27 → [14, 18, 27, 30, 22, 41, 35]. Root = 14. **TRUE.**
 
@@ -668,7 +671,8 @@ assert abs(r1 / r2 - 1) < 0.1 and work(16) > 0 and ANSWER == "B"
                     'caption': 'Min-heap after the eight insertions',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 h = []; sw = 0
 for x in [35, 22, 41, 18, 9, 27, 14, 30]:
     h.append(x); i = len(h) - 1
@@ -899,12 +903,12 @@ recs = [(2, 'a'), (1, 'b'), (2, 'c'), (1, 'd'), (2, 'e')]
 res = msort(recs)
 print(''.join(t for _, t in res))''',
             'options': [
-                'The program prints `dbeca`',
-                'If `<` is replaced by `<=`, the program prints `bdace`',
                 'The list `recs` is modified by the call `msort(recs)`',
+                'The program prints `dbeca`',
                 'In the output, the records with key 2 appear in the exact reverse of their input order',
+                'If `<` is replaced by `<=`, the program prints `bdace`',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''Merge sort is stable only if, on equal keys, the merge takes the element from the **left** run. With `<`, ties go to the right run, so equal keys can be reordered.
 
 Trace (split 2 | 3):
@@ -913,13 +917,16 @@ Trace (split 2 | 3):
 - Right [(2,c)] | [(1,d), (2,e)]: inner merge gives [d, e]; then c vs d: 2 < 1 false → d; c vs e: 2 < 2 false → e; then c → [d, e, c].
 - Top: b vs d: 1 < 1 false → d; b vs e: 1 < 2 → b; a vs e: 2 < 2 false → e; a vs c: false → c; then a. Output **dbeca**.
 
-- (A) TRUE.
-- (B) With `<=` ties go left and the sort is stable: key-1 records b, d then key-2 records a, c, e → `bdace`. TRUE.
-- (C) FALSE — `msort` only slices (`a[:m]` makes copies) and pops from those new lists; a 1-element `recs` would be returned as is, but nothing ever mutates it.
-- (D) TRUE — input order a, c, e; output order e, c, a.
+- (A) FALSE — `msort` only slices (`a[:m]` makes copies) and pops from those new lists; a 1-element `recs` would be returned as is, but nothing ever mutates it.
+- (B) TRUE.
+- (C) TRUE — input order a, c, e; output order e, c, a.
+- (D) With `<=` ties go left and the sort is stable: key-1 records b, d then key-2 records a, c, e → `bdace`. TRUE.
 
 **Trap:** the sorted *keys* are correct either way; only the tags reveal the instability. (Also note `pop(0)` is O(len) on Python lists, so this version is slower than index-based merging.)''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import copy
 r0 = [(2, 'a'), (1, 'b'), (2, 'c'), (1, 'd'), (2, 'e')]
 assert OUTPUT.strip() == "dbeca" and recs == r0

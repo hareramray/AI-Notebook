@@ -134,12 +134,12 @@ y[2].append(5)
 z.append(6)
 y[0] = 9''',
             'options': [
-                '`x == [1, 2, [3, 4, 5], 6]`',
                 '`y == [9, 2, [3, 4, 5]]`',
-                '`x[2] is y[2]`',
+                '`x == [1, 2, [3, 4, 5], 6]`',
                 '`len(y) == 4`',
+                '`x[2] is y[2]`',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** `x[:]` is a *shallow* copy: a new outer list whose elements are the same objects. `z = x` creates no copy at all, only a second name.
 
 Trace:
@@ -150,11 +150,13 @@ Trace:
 
 - (A) True.
 - (B) True.
-- (C) True — the shallow copy shares the inner list object.
-- (D) False — y has 3 elements; the append went to x.
+- (C) False — y has 3 elements; the append went to x.
+- (D) True — the shallow copy shares the inner list object.
 
 **Trap:** mutating a nested object through a shallow copy is visible in the original; rebinding a top-level slot is not.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 assert x == [1, 2, [3, 4, 5], 6] and y == [9, 2, [3, 4, 5]]
 assert x[2] is y[2] and len(y) != 4
 assert sorted(ANSWER) == ['A', 'B', 'C']
@@ -486,12 +488,12 @@ Sum = 4 − 8 − 9 − 7 = **−20** → (A).
 
 Which of the following statements about this tree is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)''',
             'options': [
-                'Its pre-order traversal is 1, 5, 2, 4, 9, 7, 3, 6, 8',
-                'Its height is 3',
                 'Node 3 has a left child',
+                'Its height is 3',
+                'Its pre-order traversal is 1, 5, 2, 4, 9, 7, 3, 6, 8',
                 'It has exactly 4 leaves',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** In post-order the root is the **last** symbol. Locate it in the in-order sequence to split left/right subtrees; the post-order sequence splits at the same sizes (left block first, then right block).
 
 Reconstruction:
@@ -500,9 +502,9 @@ Reconstruction:
 - Right block: root 3 (last of 8, 6, 3). In-order 3 | [8, 6] → nothing left of 3, so 3 has only a right subtree {8, 6}; post-order 8, 6 → root 6, and 8 precedes 6 in in-order, so 8 is 6's **left** child.
 
 Option analysis:
-- (A) Pre-order (root, left, right): 1, 5, 2, 4, 9, 7, 3, 6, 8. **True.**
+- (A) 3 has only a right child (6). **False.**
 - (B) Longest paths 1→5→2→4, 1→5→2→9 and 1→3→6→8 all have 3 edges. **True.**
-- (C) 3 has only a right child (6). **False.**
+- (C) Pre-order (root, left, right): 1, 5, 2, 4, 9, 7, 3, 6, 8. **True.**
 - (D) Leaves are 4, 9, 7, 8 — exactly 4. **True.**
 
 **Trap:** students often read the post-order from the front and pick 4 as the root. Another slip is attaching 8 as the right child of 6; the in-order sequence (…, 8, 6) forces it to be the left child.''',
@@ -534,7 +536,8 @@ Option analysis:
                     'caption': 'Reconstructed tree (leaves highlighted)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def build(post, ino):
     if not post: return None
     r = post[-1]; k = ino.index(r)
@@ -736,12 +739,12 @@ assert r == post(T)[::-1]
     A[i + 1], A[hi] = A[hi], A[i + 1]
     return i + 1''',
             'options': [
-                'After partition A = [2, 4, 3, 5, 9, 8, 7]',
-                'The returned index is 3',
                 'Exactly 3 swap statements (including the final one) are executed',
+                'After partition A = [2, 4, 3, 5, 9, 8, 7]',
                 'The sub-array to the right of the pivot is [9, 8, 7]',
+                'The returned index is 3',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** Lomuto keeps A[lo..i] ≤ pivot. Each element ≤ pivot advances i and is swapped into place; finally the pivot is swapped into position i + 1.
 
 Pivot = 5, i = −1:
@@ -754,10 +757,10 @@ Pivot = 5, i = −1:
 - final: swap A[3], A[6] → [2, 4, 3, 5, 9, 8, 7]; return 3.
 
 Option analysis:
-- (A) **True** — matches the final state.
-- (B) **True** — pivot lands at index 3.
-- (C) **False** — swaps happen at j = 1, 3, 4 plus the final one: **4** in total.
-- (D) **True** — A[4..6] = [9, 8, 7].
+- (A) **False** — swaps happen at j = 1, 3, 4 plus the final one: **4** in total.
+- (B) **True** — matches the final state.
+- (C) **True** — A[4..6] = [9, 8, 7].
+- (D) **True** — pivot lands at index 3.
 
 **Trap:** forgetting the final pivot swap when counting swaps, or assuming the right part keeps its original relative order (it does not: 7 moved to the end). Lomuto is not stable.''',
             'solution_diagrams': [
@@ -771,7 +774,10 @@ Option analysis:
                     'caption': 'Array after partition',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [7, 2, 9, 4, 3, 8, 5]; swaps = 0
 pivot, i = A[6], -1
 for j in range(0, 6):
@@ -1005,12 +1011,12 @@ assert bsearch(A, 50)[1] + bsearch(A, 69)[1] == int(ANSWER)
                 },
             ],
             'options': [
+                'In the BFS tree, E is at level 3',
+                'Exactly 3 edges of the graph are not DFS-tree edges',
                 'The DFS visit order is A, B, D, C, G, F, E',
                 'In the DFS tree, the depth of E (edges from A) is 5',
-                'Exactly 3 edges of the graph are not DFS-tree edges',
-                'In the BFS tree, E is at level 3',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'C'],
             'solution': '''**Concept.** Recursive DFS goes as deep as possible before backtracking; in an undirected graph every non-tree edge is a back edge. BFS levels equal hop distances.
 
 DFS from A (alphabetical):
@@ -1024,10 +1030,10 @@ DFS from A (alphabetical):
 BFS from A: level 1 {B, C}, level 2 {D, G}, level 3 {E, F}.
 
 Option analysis:
-- (A) **True** (derived above).
-- (B) **False** — the DFS tree is the path A–B–D–C–G–F–E, so E is at depth **6**.
-- (C) **True** — 9 edges − 6 tree edges = 3 back edges (AC, DE, DF).
-- (D) **True** — E is reached via D (level 2) → level 3.
+- (A) **True** — E is reached via D (level 2) → level 3.
+- (B) **True** — 9 edges − 6 tree edges = 3 back edges (AC, DE, DF).
+- (C) **True** (derived above).
+- (D) **False** — the DFS tree is the path A–B–D–C–G–F–E, so E is at depth **6**.
 
 **Trap:** E is adjacent to D, so it is tempting to place it at DFS depth 3; but DFS commits to C before ever looking at E, and E is finally reached from F.''',
             'solution_diagrams': [
@@ -1066,7 +1072,10 @@ Option analysis:
                     'caption': 'DFS tree edges in red',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from collections import deque
 E = [("A","B"),("A","C"),("B","D"),("C","D"),("D","E"),("E","F"),("D","F"),("F","G"),("C","G")]
 adj = {}
@@ -1101,12 +1110,12 @@ assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
                 },
             ],
             'options': [
-                'After the first delete-min, H = [5, 9, 7, 14, 10, 8, 12, 20, 17]',
                 'After the second delete-min, the root is 7 and its children are 9 and 8',
                 'After the second delete-min, key 17 is at index 5',
                 'After the second delete-min, key 14 is a leaf',
+                'After the first delete-min, H = [5, 9, 7, 14, 10, 8, 12, 20, 17]',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept.** delete-min removes H[0], moves the last element to the root, then sifts down along a path of smaller children: O(log n) work.
 
 First delete-min (remove 3, move 12 to root): [12, 9, 5, 14, 10, 8, 7, 20, 17]
@@ -1120,10 +1129,10 @@ Second delete-min (remove 5, move 17 to root): [17, 9, 7, 14, 10, 8, 12, 20]
 - index 5 has no children (11 > 7) → stop.
 
 Option analysis:
-- (A) **True**.
-- (B) **True** — H[0] = 7, H[1] = 9, H[2] = 8.
-- (C) **True** — 17 ends at index 5.
-- (D) **False** — with 8 elements, index 3 (key 14) has child index 7 (key 20).
+- (A) **True** — H[0] = 7, H[1] = 9, H[2] = 8.
+- (B) **True** — 17 ends at index 5.
+- (C) **False** — with 8 elements, index 3 (key 14) has child index 7 (key 20).
+- (D) **True**.
 
 **Trap:** sifting toward the *left* child by habit (9 instead of 5) breaks the heap property; always compare both children.''',
             'solution_diagrams': [
@@ -1133,7 +1142,10 @@ Option analysis:
                     'caption': 'Heap after two delete-min operations',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def popmin(h):
     h = h[:]; h[0] = h.pop(); i, n = 0, len(h)
     while True:

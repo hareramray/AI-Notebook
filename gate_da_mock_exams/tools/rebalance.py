@@ -72,13 +72,18 @@ def apply_swap(q, x, y):
     ix, iy = L.index(x), L.index(y)
     opts[ix], opts[iy] = opts[iy], opts[ix]
     q["options"] = opts
-    q["answer"] = y if q["answer"] == x else (x if q["answer"] == y else q["answer"])
+    m = {x: y, y: x}
+    if isinstance(q["answer"], list):
+        q["answer"] = sorted(m.get(a, a) for a in q["answer"])
+    else:
+        q["answer"] = m.get(q["answer"], q["answer"])
     for f in ("solution", "solution_after"):
         if q.get(f):
             q[f] = sort_option_bullets(swap_letters_text(q[f], x, y))
     if q.get("verify"):
         # verify was written against the original option order: map the key back first
-        q["verify"] = "ANSWER = {%r: %r, %r: %r}.get(ANSWER, ANSWER)\n" % (x, y, y, x) + q["verify"]
+        q["verify"] = ("_m = {%r: %r, %r: %r}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) "
+                       "if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)\n" % (x, y, y, x)) + q["verify"]
     return q
 
 
@@ -109,7 +114,7 @@ def ser(v, ind=0):
     return repr(v)
 
 
-def rebalance(path):
+def rebalance(path, do_mcq=True):
     S = load_set(path)
     qs = S["questions"]
     mcq = [i for i, q in enumerate(qs) if q["type"] == "MCQ"]
@@ -117,7 +122,7 @@ def rebalance(path):
     targets = ["ABCD"[k % 4] for k in range(len(mcq))]
     rnd.shuffle(targets)
     changed = 0
-    for i, tgt in zip(mcq, targets):
+    for i, tgt in (zip(mcq, targets) if do_mcq else []):
         q = qs[i]
         cur = q["answer"]
         if cur == tgt:
@@ -131,6 +136,25 @@ def rebalance(path):
                 continue
         qs[i] = nq
         changed += 1
+    for i, q in enumerate(qs):
+        if q["type"] != "MSQ":
+            continue
+        perm = list("ABCD")
+        rnd.shuffle(perm)          # option at old position k moves to position perm[k]
+        nq = q
+        cur = list("ABCD")         # cur[k] = current position letter of original option k
+        for k in range(4):
+            tgt = perm[k]
+            if cur[k] != tgt:
+                a, b = cur[k], tgt
+                nq = apply_swap(nq, a, b)
+                cur = [b if c == a else (a if c == b else c) for c in cur]
+        if nq.get("verify"):
+            code = nq.get("code") if nq.get("run_code", True) else None
+            if run_snippet(code, nq["verify"], nq["answer"]):
+                print("  set %02d Q%d: MSQ permutation failed verify, kept original" % (S["number"], i + 1))
+                continue
+        qs[i] = nq
     src = open(path).read()
     header = src[:src.index("SET =")] if "SET =" in src else ""
     with open(path, "w") as f:
@@ -140,5 +164,6 @@ def rebalance(path):
 
 
 if __name__ == "__main__":
-    for p in sys.argv[1:]:
-        rebalance(p)
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    for p in args:
+        rebalance(p, do_mcq="--msq-only" not in sys.argv)

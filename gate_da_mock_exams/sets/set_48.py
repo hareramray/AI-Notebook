@@ -74,12 +74,12 @@ Printed: 35 + 0 + 5 + 0 = **40**.
                 },
             ],
             'options': [
-                '`res == [8, 5, 8, 4, 8, -1, 7, -1]`',
-                '`pops == 6`',
                 'At some moment the stack holds 4 indices',
+                '`pops == 6`',
                 'When the function returns, the stack holds the indices of the values 8 and 7 (bottom to top)',
+                '`res == [8, 5, 8, 4, 8, -1, 7, -1]`',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''The stack keeps indices whose values are **strictly decreasing** from bottom to top; a new value pops every smaller value and becomes their next greater element. Each index is pushed once and popped at most once → O(n).
 
 Trace (stack shown as values):
@@ -92,13 +92,15 @@ Trace (stack shown as values):
 - 3 → [8, 3]
 - 7 pops 3 (res=7) → [8, 7]
 
-- (A) res = [8, 5, 8, 4, 8, −1, 7, −1]. **True.**
+- (A) The maximum size is 3. **False.**
 - (B) pops = 1 + 1 + 3 + 1 = 6 (= 8 pushes − 2 left). **True.**
-- (C) The maximum size is 3. **False.**
-- (D) Final stack = indices 5, 7 = values 8, 7. **True.**
+- (C) Final stack = indices 5, 7 = values 8, 7. **True.**
+- (D) res = [8, 5, 8, 4, 8, −1, 7, −1]. **True.**
 
-**Trap:** in (C), 4 does not stack on top of 1 — it pops 1 first, so the size stays 3.''',
-            'verify': '''
+**Trap:** in (A), 4 does not stack on top of 1 — it pops 1 first, so the size stays 3.''',
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 r, p, s = nge([6,2,5,1,4,8,3,7])
 a = [6,2,5,1,4,8,3,7]
 st, mx = [], 0
@@ -349,22 +351,24 @@ assert c == 9 and ANSWER == 'A'
             'topic': 'Graph theory — cycles, degrees, connectivity',
             'text': 'Which of the following statements about simple undirected graphs is/are TRUE?',
             'options': [
-                'A graph with 10 vertices, 12 edges and exactly 2 connected components contains at least 4 distinct cycles',
-                'Every graph with n ≥ 2 vertices has two vertices of equal degree',
-                'A connected graph with n vertices and n edges contains exactly one cycle',
                 'If every vertex has degree at least 2, the graph is connected',
+                'A connected graph with n vertices and n edges contains exactly one cycle',
+                'Every graph with n ≥ 2 vertices has two vertices of equal degree',
+                'A graph with 10 vertices, 12 edges and exactly 2 connected components contains at least 4 distinct cycles',
             ],
-            'answer': ['A', 'B', 'C'],
-            'solution': '''- (A) A spanning forest of a graph with n vertices and c components has n − c edges. Each of the remaining e − (n − c) = 12 − 8 = **4** edges closes a different *fundamental cycle* with the forest (each contains its own non-forest edge, so they are distinct). **True.**
+            'answer': ['B', 'C', 'D'],
+            'solution': '''- (D) A spanning forest of a graph with n vertices and c components has n − c edges. Each of the remaining e − (n − c) = 12 − 8 = **4** edges closes a different *fundamental cycle* with the forest (each contains its own non-forest edge, so they are distinct). **True.**
 
-- (B) Degrees lie in {0, …, n−1}, but 0 and n−1 cannot both occur (a vertex of degree n−1 is adjacent to everything). So n vertices take at most n−1 distinct values → by pigeonhole two are equal. **True.**
+- (C) Degrees lie in {0, …, n−1}, but 0 and n−1 cannot both occur (a vertex of degree n−1 is adjacent to everything). So n vertices take at most n−1 distinct values → by pigeonhole two are equal. **True.**
 
-- (C) Take a spanning tree (n − 1 edges); exactly one edge uv is left over. A tree has no cycle, so every cycle must use uv, and the rest of such a cycle is a u–v path inside the tree — which is unique. Hence exactly one cycle. **True.**
+- (B) Take a spanning tree (n − 1 edges); exactly one edge uv is left over. A tree has no cycle, so every cycle must use uv, and the rest of such a cycle is a u–v path inside the tree — which is unique. Hence exactly one cycle. **True.**
 
-- (D) Two disjoint triangles: every degree is 2, but the graph has two components. **False.**
+- (A) Two disjoint triangles: every degree is 2, but the graph has two components. **False.**
 
 **Trap:** confusing 'minimum degree ≥ 2 ⇒ contains a cycle' (true) with '⇒ connected' (false).''',
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import random
 from itertools import combinations
 def count_cycles(n, E):
@@ -545,12 +549,12 @@ assert cnt[0] == 22
                 },
             ],
             'options': [
-                'The height of T is 3',
-                'In H, the root is 2 and its two children are 4 and 19',
                 'Exactly two keys have the same depth in T as in H',
                 'The post-order traversal of T ends with 22, 15, and the last element of the array H is 13',
+                'The height of T is 3',
+                'In H, the root is 2 and its two children are 4 and 19',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Build H by sift-up insertion:
 - 15 → [15];  9 → swap → [9, 15];  22 → [9, 15, 22].
 - 4 (index 3): swap with 15, then with 9 → [4, 9, 22, 15].
@@ -560,10 +564,10 @@ assert cnt[0] == 22
 - 13 (index 8): parent 11 < 13 → stays.
 - 2 (index 9): swap with 12, then 9, then 4 → H = [2, 4, 19, 11, 9, 22, 30, 15, 13, 12].
 
-- (A) Longest root-to-leaf path in T: 15→9→4→2 or 15→9→12→11 → 3 edges. **True.**
-- (B) H[0] = 2, H[1] = 4, H[2] = 19. **True.**
-- (C) Depths (T, H): 15 (0, 3), 9 (1, 2), 22 (1, 2), 4 (2, 1), 12 (2, 3), 19 (2, 1), 30 (2, 2) ✓, 11 (3, 2), 13 (3, 3) ✓, 2 (3, 0). Exactly 30 and 13 match. **True.**
-- (D) Post-order of T = 2, 4, 11, 13, 12, 9, 19, 30, 22, 15 — ends with 22, 15 ✓, but the last array element of H is **12**, not 13. **False.**
+- (A) Depths (T, H): 15 (0, 3), 9 (1, 2), 22 (1, 2), 4 (2, 1), 12 (2, 3), 19 (2, 1), 30 (2, 2) ✓, 11 (3, 2), 13 (3, 3) ✓, 2 (3, 0). Exactly 30 and 13 match. **True.**
+- (B) Post-order of T = 2, 4, 11, 13, 12, 9, 19, 30, 22, 15 — ends with 22, 15 ✓, but the last array element of H is **12**, not 13. **False.**
+- (C) Longest root-to-leaf path in T: 15→9→4→2 or 15→9→12→11 → 3 edges. **True.**
+- (D) H[0] = 2, H[1] = 4, H[2] = 19. **True.**
 
 **Trap:** in H the last inserted key 2 travels all the way to the root, dragging 12 (not 13) into the last slot.''',
             'solution_diagrams': [
@@ -573,7 +577,9 @@ assert cnt[0] == 22
                     'caption': 'Min-heap H after all insertions',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq, math
 keys = [15,9,22,4,12,19,30,11,13,2]
 def ins(t, k):
@@ -771,23 +777,26 @@ assert D == 8 and len(on) == int(ANSWER)
             'topic': 'Hashing — collision probabilities',
             'text': 'Three keys are inserted into a hash table with 5 slots using separate chaining. Each key independently hashes to each slot with probability 1/5. Which of the following statements is/are TRUE?',
             'options': [
+                'The expected length of the longest chain is 1.6',
+                'The expected number of non-empty slots is 2.44',
                 'The probability that no two keys share a slot is 12/25',
                 'The probability that all three keys land in the same slot is 1/25',
-                'The expected number of non-empty slots is 2.44',
-                'The expected length of the longest chain is 1.6',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''There are 5³ = 125 equally likely outcomes.
 
-- (A) All distinct: 5 · 4 · 3 = 60 outcomes → 60/125 = **12/25** = 0.48. **True.**
-- (B) All in one slot: 5 outcomes → 5/125 = **1/25**. **True.**
-- (C) Linearity of expectation: a slot stays empty with probability (4/5)³ = 64/125, so E[non-empty] = 5 · (1 − 64/125) = 5 · 61/125 = **2.44**. **True.**
-- (D) Longest chain L: P(L = 1) = 60/125, P(L = 3) = 5/125, so P(L = 2) = 60/125. E[L] = (60·1 + 60·2 + 5·3)/125 = 195/125 = **1.56**, not 1.6. **False.**
+- (A) Longest chain L: P(L = 1) = 60/125, P(L = 3) = 5/125, so P(L = 2) = 60/125. E[L] = (60·1 + 60·2 + 5·3)/125 = 195/125 = **1.56**, not 1.6. **False.**
+- (B) Linearity of expectation: a slot stays empty with probability (4/5)³ = 64/125, so E[non-empty] = 5 · (1 − 64/125) = 5 · 61/125 = **2.44**. **True.**
+- (C) All distinct: 5 · 4 · 3 = 60 outcomes → 60/125 = **12/25** = 0.48. **True.**
+- (D) All in one slot: 5 outcomes → 5/125 = **1/25**. **True.**
 
 Even with load factor α = 0.6, a collision happens with probability 0.52 — the birthday effect.
 
-**Trap:** in (D), guessing 1 + α = 1.6 — that is the expected cost of a successful search pattern, not the expected *maximum* chain length.''',
-            'verify': '''
+**Trap:** in (A), guessing 1 + α = 1.6 — that is the expected cost of a successful search pattern, not the expected *maximum* chain length.''',
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from fractions import Fraction as Fr
 from itertools import product
 outs = list(product(range(5), repeat=3))
@@ -937,22 +946,22 @@ Output → option **(A)**.
             'topic': 'Counting BSTs by height',
             'text': 'Consider all binary search trees containing exactly the keys 1, 2, 3, 4, 5. Height is the number of edges on the longest root-to-leaf path. Which of the following statements is/are TRUE?',
             'options': [
-                'There are exactly 32 such BSTs',
                 'Exactly 16 of them have height 4',
-                'Exactly 6 of them have the minimum possible height, 2',
                 'Exactly 5 of them have 3 at the root',
+                'There are exactly 32 such BSTs',
+                'Exactly 6 of them have the minimum possible height, 2',
             ],
-            'answer': ['B', 'C'],
+            'answer': ['A', 'D'],
             'solution': '''The number of BSTs on n keys is the Catalan number Cₙ: C₀..C₅ = 1, 1, 2, 5, 14, 42. With root r there are C_{r−1} · C_{5−r} trees.
 
-- (A) Total = C₅ = 42 (= 14 + 5 + 4 + 5 + 14 by root). **False.**
-- (B) Height 4 with 5 nodes means a path: the root is 1 or 5 (otherwise both sides are non-empty and the height ≤ 3), and the same holds at every level → each of the 4 non-leaf steps chooses min or max of the remaining keys → 2⁴ = 16. **True.**
-- (C) Height 2 holds at most 7 nodes; with 5 keys the root's two subtrees must both have height ≤ 1, i.e. sizes ≤ 3 and summing to 4: (1, 3), (2, 2), (3, 1). A 3-node subtree of height 1 must be perfect (1 way); a 2-node subtree has 2 shapes. Count = 1·1 + 2·2 + 1·1 = 6. **True.**
-- (D) Root 3: left {1, 2} → C₂ = 2, right {4, 5} → 2 → 4 trees. **False.**
+- (A) Height 4 with 5 nodes means a path: the root is 1 or 5 (otherwise both sides are non-empty and the height ≤ 3), and the same holds at every level → each of the 4 non-leaf steps chooses min or max of the remaining keys → 2⁴ = 16. **True.**
+- (B) Root 3: left {1, 2} → C₂ = 2, right {4, 5} → 2 → 4 trees. **False.**
+- (C) Total = C₅ = 42 (= 14 + 5 + 4 + 5 + 14 by root). **False.**
+- (D) Height 2 holds at most 7 nodes; with 5 keys the root's two subtrees must both have height ≤ 1, i.e. sizes ≤ 3 and summing to 4: (1, 3), (2, 2), (3, 1). A 3-node subtree of height 1 must be perfect (1 way); a 2-node subtree has 2 shapes. Count = 1·1 + 2·2 + 1·1 = 6. **True.**
 
 Height distribution: h=2: 6, h=3: 20, h=4: 16 (sum 42).
 
-**Trap:** in (A), confusing 2^{n} (or 2^{n−1} chains) with the Catalan count.''',
+**Trap:** in (C), confusing 2^{n} (or 2^{n−1} chains) with the Catalan count.''',
             'solution_diagrams': [
                 {
                     'type': 'bintree',
@@ -993,7 +1002,10 @@ Height distribution: h=2: 6, h=3: 20, h=4: 16 (sum 42).
                     'caption': 'One of the 16 BSTs of height 4 (a zig-zag path)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from functools import lru_cache
 @lru_cache(None)
 def le(n, h):

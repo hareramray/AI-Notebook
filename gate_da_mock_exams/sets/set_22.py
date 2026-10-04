@@ -176,10 +176,10 @@ assert [c for c, o in zip("ABCD", opts) if not ok(o)] == [ANSWER]
                 },
             ],
             'options': [
-                '(C, A) is a back edge',
-                '(B, E) is a cross edge',
                 'The DFS finds exactly 3 back edges',
+                '(B, E) is a cross edge',
                 'D is discovered at time 6 and finished at time 7',
+                '(C, A) is a back edge',
             ],
             'answer': ['A', 'C', 'D'],
             'solution': '''**Concept:** for an edge u → v examined during DFS: v undiscovered → *tree*; v discovered but not finished (an ancestor on the stack) → *back*; v finished and d[u] < d[v] → *forward*; v finished and d[u] > d[v] → *cross*.
@@ -190,7 +190,7 @@ Trace (d/f times):
 - Back at B: B → E: E already finished, d[B] = 2 < d[E] = 4 → **forward**. B finishes (11), A (12).
 - Restart at G(13): G → A and G → C go to finished vertices discovered earlier → **cross**. G finishes (14).
 
-**Verdicts:** (A) **True**. (B) **False** — it is a forward edge (E is a descendant of B reached via C). (C) back edges C→A, D→B, D→E → exactly 3, **True**. (D) d[D] = 6, f[D] = 7, **True**.
+**Verdicts:** (D) **True**. (B) **False** — it is a forward edge (E is a descendant of B reached via C). (A) back edges C→A, D→B, D→E → exactly 3, **True**. (C) d[D] = 6, f[D] = 7, **True**.
 
 **Trap:** calling (B, E) a cross edge because E was reached 'from another branch' — what matters is that E is a descendant of B in the DFS tree.''',
             'solution_diagrams': [
@@ -205,7 +205,9 @@ Trace (d/f times):
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 V = "ABCDEFG"
 E = [('A','B'),('B','C'),('B','E'),('C','A'),('C','E'),('D','B'),('D','E'),('E','F'),
      ('F','D'),('G','A'),('G','C')]
@@ -370,12 +372,12 @@ assert T.index(31) == int(ANSWER)
 
 Which of the following statements is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)''',
             'options': [
-                'The post-order traversal is A, D, B, H, K, F, R, S, P, M',
-                'The height of the tree is 4',
-                'The tree has exactly 4 leaves',
                 'The level-order traversal is M, F, P, B, K, S, A, D, H, R',
+                'The tree has exactly 4 leaves',
+                'The height of the tree is 4',
+                'The post-order traversal is A, D, B, H, K, F, R, S, P, M',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Concept:** the first pre-order element is the root; its position in the in-order splits the remaining labels into the left and right subtrees. Recurse.
 
 - Root M; in-order left {A, B, D, F, H, K}, right {P, R, S}.
@@ -385,10 +387,10 @@ Which of the following statements is/are TRUE? (Height = number of edges on the 
 - Right pre-order P, S, R → root P; in-order {P | R, S} → P has no left child; right subtree pre-order S, R with in-order R, S → S with left child R.
 
 **Verdicts:**
-- (A) post-order: A, D, B, H, K, F, R, S, P, M. **True.**
-- (B) longest paths M–F–B–A, M–F–K–H, M–P–S–R all have 3 edges → height 3. **False.**
-- (C) leaves A, D, H, R → 4. **True.**
-- (D) levels: M | F, P | B, K, S | A, D, H, R. **True.**
+- (A) levels: M | F, P | B, K, S | A, D, H, R. **True.**
+- (B) leaves A, D, H, R → 4. **True.**
+- (C) longest paths M–F–B–A, M–F–K–H, M–P–S–R all have 3 edges → height 3. **False.**
+- (D) post-order: A, D, B, H, K, F, R, S, P, M. **True.**
 
 **Trap:** counting nodes instead of edges for height gives 4.''',
             'solution_diagrams': [
@@ -422,7 +424,9 @@ Which of the following statements is/are TRUE? (Height = number of edges on the 
                     'caption': 'Reconstructed tree',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def build(pre, ino):
     if not pre: return None
     r = pre[0]; k = ino.index(r)
@@ -679,10 +683,10 @@ assert ", ".join(out) == "B, D, H, A, C, E, F, G" and ANSWER == "B"
             'options': [
                 'd[E] = 5 and f[E] = 6',
                 '(D, E) is a back edge',
-                'Listing the vertices in decreasing order of finish time gives F, G, A, D, B, E, C, which is a topological order',
                 'The DFS classifies exactly 3 edges as cross edges',
+                'Listing the vertices in decreasing order of finish time gives F, G, A, D, B, E, C, which is a topological order',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['A', 'D'],
             'solution': '''**Concept:** in a DAG, DFS never finds a back edge, and for every edge u → v we have f[u] > f[v]; hence sorting by decreasing finish time is a topological order.
 
 Trace:
@@ -695,10 +699,10 @@ Times: A 1/10, B 2/7, C 3/4, D 8/9, E 5/6, F 11/14, G 12/13.
 **Verdicts:**
 - (A) **True.**
 - (B) **False** — E was already finished; a DAG has no back edges at all.
-- (C) decreasing f: F 14, G 13, A 10, D 9, B 7, E 6, C 4 → F, G, A, D, B, E, C. Every edge goes left to right. **True.**
-- (D) cross edges: E→C, D→E, F→D, G→E → **4**, not 3. **False.** (Tree edges: A→B, B→C, B→E, A→D, F→G.)
+- (C) cross edges: E→C, D→E, F→D, G→E → **4**, not 3. **False.** (Tree edges: A→B, B→C, B→E, A→D, F→G.)
+- (D) decreasing f: F 14, G 13, A 10, D 9, B 7, E 6, C 4 → F, G, A, D, B, E, C. Every edge goes left to right. **True.**
 
-**Trap:** in (D), forgetting that edges from a later DFS tree into an earlier one (F→D, G→E) are cross edges too.''',
+**Trap:** in (C), forgetting that edges from a later DFS tree into an earlier one (F→D, G→E) are cross edges too.''',
             'solution_diagrams': [
                 {
                     'type': 'matrix',
@@ -711,7 +715,8 @@ Times: A 1/10, B 2/7, C 3/4, D 8/9, E 5/6, F 11/14, G 12/13.
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 V = "ABCDEFG"
 E = [('A','B'),('A','D'),('B','C'),('B','E'),('D','E'),('E','C'),('F','D'),('F','G'),('G','E')]
 G = {v: sorted(w for u, w in E if u == v) for v in V}
@@ -963,21 +968,24 @@ assert opts["ABCD".index(ANSWER)] == T(13) == 13*4 - 16 + 1 and T2(13) == 49 and
                 },
             ],
             'options': [
-                'Relaxing edges in topological order gives the shortest distance S → T as 6',
-                "Dijkstra's algorithm, in an implementation where a vertex once extracted is never updated again, reports the distance S → T as 7",
                 'Adding 4 to every edge weight (making all weights non-negative) and running Dijkstra returns a path that is also a shortest S → T path in the original graph',
+                'Relaxing edges in topological order gives the shortest distance S → T as 6',
                 'The DAG has exactly 2 topological orderings',
+                "Dijkstra's algorithm, in an implementation where a vertex once extracted is never updated again, reports the distance S → T as 7",
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'D'],
             'solution': '''**Concept:** in a DAG, relaxing the out-edges of each vertex in topological order computes correct shortest paths in Θ(V + E) even with negative weights. Dijkstra's greedy choice fails with negative edges. Adding a constant to every edge penalises paths with more edges, so it does not preserve shortest paths.
 
-- (A) Topological order (unique): S, B, A, C, T. d(S) = 0; from S: A = 2, B = 5; from B: A = min(2, 5 − 4) = 1, T = 11; from A: C = 5; from C: T = min(11, 6) = **6**. **True.**
-- (B) Dijkstra: extract S → A = 2, B = 5. Extract A (2) → C = 6. Extract B (5): A is already final, so the improvement to 1 is lost; T = 11. Extract C (6) → T = 7. Extract T → **7**. **True** (and wrong — the real distance is 6).
-- (C) New weights: S→A 6, S→B 9, B→A 0, A→C 8, C→T 5, B→T 10. Path costs: S–A–C–T 19, S–B–T 19, S–B–A–C–T 22. Dijkstra returns a 3-edge path or S–B–T, both of original cost 7, but the true shortest is S–B–A–C–T (cost 6). **False.**
-- (D) S must be first; B → A forces B before A; then C, then T: only S, B, A, C, T. **False.**
+- (A) New weights: S→A 6, S→B 9, B→A 0, A→C 8, C→T 5, B→T 10. Path costs: S–A–C–T 19, S–B–T 19, S–B–A–C–T 22. Dijkstra returns a 3-edge path or S–B–T, both of original cost 7, but the true shortest is S–B–A–C–T (cost 6). **False.**
+- (B) Topological order (unique): S, B, A, C, T. d(S) = 0; from S: A = 2, B = 5; from B: A = min(2, 5 − 4) = 1, T = 11; from A: C = 5; from C: T = min(11, 6) = **6**. **True.**
+- (C) S must be first; B → A forces B before A; then C, then T: only S, B, A, C, T. **False.**
+- (D) Dijkstra: extract S → A = 2, B = 5. Extract A (2) → C = 6. Extract B (5): A is already final, so the improvement to 1 is lost; T = 11. Extract C (6) → T = 7. Extract T → **7**. **True** (and wrong — the real distance is 6).
 
 **Trap:** believing that 'shifting all weights to be non-negative' fixes Dijkstra.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import heapq
 E = [('S','A',2),('S','B',5),('B','A',-4),('A','C',4),('C','T',1),('B','T',6)]
 def dag_sp(E, order):

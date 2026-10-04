@@ -264,20 +264,20 @@ assert 20 + 13 + (20 - 1) == 52 and ANSWER == 'A'
             'topic': 'Heaps — recognising max-heaps',
             'text': 'Which of the following arrays (0-based; children of index i at 2i+1 and 2i+2) represent a binary **max**-heap?',
             'options': [
-                '[92, 85, 70, 60, 85, 40, 65, 10]',
-                '[92, 70, 85, 75, 60, 80, 50]',
-                '[92, 88, 90, 50, 88, 89, 20, 49, 50]',
                 '[92, 80, 90, 81, 70, 60, 30]',
+                '[92, 88, 90, 50, 88, 89, 20, 49, 50]',
+                '[92, 70, 85, 75, 60, 80, 50]',
+                '[92, 85, 70, 60, 85, 40, 65, 10]',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'D'],
             'solution': '''Check a[parent] ≥ a[child] for every internal index i = 0 … ⌊n/2⌋ − 1. Equal keys are allowed.
 
-- (A) i=0: 92 ≥ 85, 70 · i=1: 85 ≥ 60, 85 · i=2: 70 ≥ 40, 65 · i=3: 60 ≥ 10. **Max-heap.**
-- (B) i=1: 70 has child a[3] = 75 > 70. **Not a heap.**
-- (C) i=0: 92 ≥ 88, 90 · i=1: 88 ≥ 50, 88 · i=2: 90 ≥ 89, 20 · i=3: 50 ≥ 49, 50. **Max-heap.**
-- (D) i=1: 80 has child a[3] = 81. **Not a heap.**
+- (A) i=1: 80 has child a[3] = 81. **Not a heap.**
+- (B) i=0: 92 ≥ 88, 90 · i=1: 88 ≥ 50, 88 · i=2: 90 ≥ 89, 20 · i=3: 50 ≥ 49, 50. **Max-heap.**
+- (C) i=1: 70 has child a[3] = 75 > 70. **Not a heap.**
+- (D) i=0: 92 ≥ 85, 70 · i=1: 85 ≥ 60, 85 · i=2: 70 ≥ 40, 65 · i=3: 60 ≥ 10. **Max-heap.**
 
-**Trap:** checking only that the array is 'roughly decreasing' or that each level's values are smaller than the previous level's — the heap property is only between a parent and its own children (in (C), 89 at depth 2 exceeds 88 at depth 1, which is fine).''',
+**Trap:** checking only that the array is 'roughly decreasing' or that each level's values are smaller than the previous level's — the heap property is only between a parent and its own children (in (B), 89 at depth 2 exceeds 88 at depth 1, which is fine).''',
             'solution_diagrams': [
                 {
                     'type': 'heap',
@@ -285,7 +285,9 @@ assert 20 + 13 + (20 - 1) == 52 and ANSWER == 'A'
                     'caption': 'Array (C) drawn as a tree',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def is_heap(a):
     return all(a[(i-1)//2] >= a[i] for i in range(1, len(a)))
 opts = {'A':[92,85,70,60,85,40,65,10], 'B':[92,70,85,75,60,80,50],
@@ -391,21 +393,24 @@ assert p == int(ANSWER)
             'topic': 'Graph theory — degree sequences',
             'text': 'Which of the following sequences is/are the degree sequence of some **simple** undirected graph?',
             'options': [
-                '(4, 4, 3, 3, 2, 2)',
-                '(5, 5, 4, 3, 2, 1)',
                 '(3, 3, 3, 3, 3, 3, 3)',
                 '(6, 1, 1, 1, 1, 1, 1)',
+                '(5, 5, 4, 3, 2, 1)',
+                '(4, 4, 3, 3, 2, 2)',
             ],
-            'answer': ['A', 'D'],
+            'answer': ['B', 'D'],
             'solution': '''Necessary: the degree sum is even (handshaking). Sufficient test: **Havel–Hakimi** — remove the largest degree d, subtract 1 from the next d degrees, re-sort, repeat; the sequence is graphical iff this ends with all zeros and never goes negative.
 
-- (A) sum 18. (4,4,3,3,2,2) → remove 4: (3,2,2,1,2) → sort (3,2,2,2,1) → remove 3: (1,1,1,1) → remove 1: (0,1,1) → (1,1,0) → (0,0). **Graphical.**
-- (B) sum 20 (even), but: remove 5 → (4,3,2,1,0) → remove 4 → (2,1,0,−1) **negative** → not graphical. Intuition: two vertices of degree 5 in a 6-vertex simple graph are adjacent to *every* other vertex, so no vertex can have degree 1. **Not graphical.**
-- (C) seven vertices of odd degree → odd sum 21. **Not graphical.**
-- (D) the star K_{1,6}. **Graphical.**
+- (A) seven vertices of odd degree → odd sum 21. **Not graphical.**
+- (B) the star K_{1,6}. **Graphical.**
+- (C) sum 20 (even), but: remove 5 → (4,3,2,1,0) → remove 4 → (2,1,0,−1) **negative** → not graphical. Intuition: two vertices of degree 5 in a 6-vertex simple graph are adjacent to *every* other vertex, so no vertex can have degree 1. **Not graphical.**
+- (D) sum 18. (4,4,3,3,2,2) → remove 4: (3,2,2,1,2) → sort (3,2,2,2,1) → remove 3: (1,1,1,1) → remove 1: (0,1,1) → (1,1,0) → (0,0). **Graphical.**
 
-**Trap:** stopping at the parity check — (B) has an even sum yet is impossible.''',
-            'verify': '''
+**Trap:** stopping at the parity check — (C) has an even sum yet is impossible.''',
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def hh(seq):
     s = sorted(seq, reverse=True)
     while s and s[0] > 0:
@@ -525,12 +530,12 @@ repeat forever:
 
 Which of the following statements is/are TRUE?''',
             'options': [
-                'The value returned is 4',
                 'Exactly 3 swaps are performed',
                 'After the call, A[4] = 24, i.e. the pivot is in its final sorted position',
                 'After the call, every element of A[0..4] is ≤ every element of A[5..8]',
+                'The value returned is 4',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Hoare's scheme moves two pointers towards each other and swaps out-of-place pairs. It guarantees A[lo..j] ≤ pivot ≤ A[j+1..hi] but does **not** put the pivot in its final place. Pivot = 24.
 
 - Round 1: j stops at 8 (19 ≤ 24); i stops at 0 (24 is not < 24). Swap → [19, 31, 8, 47, 15, 24, 3, 52, 24].
@@ -538,10 +543,10 @@ Which of the following statements is/are TRUE?''',
 - Round 3: j: 5 (24, not > 24) stop; i: 2 (8 < 24), 3 (47) stop. Swap → [19, 3, 8, 24, 15, 47, 31, 52, 24].
 - Round 4: j: 4 (15) stop; i: 4 (15 < 24), 5 (47) stop. i = 5 ≥ j = 4 → return 4.
 
-- (A) Returns 4. **True.**
-- (B) Three swaps. **True.**
-- (C) A[4] = 15; the original pivot ended at index 8. **False.**
-- (D) A[0..4] = {19, 3, 8, 24, 15} ≤ 24 ≤ A[5..8] = {47, 31, 52, 24}. **True.**
+- (A) Three swaps. **True.**
+- (B) A[4] = 15; the original pivot ended at index 8. **False.**
+- (C) A[0..4] = {19, 3, 8, 24, 15} ≤ 24 ≤ A[5..8] = {47, 31, 52, 24}. **True.**
+- (D) Returns 4. **True.**
 
 **Trap:** applying Lomuto intuition ('the pivot lands at the returned index'). With Hoare, the next recursive calls are on [lo..j] and [j+1..hi] — the pivot is not excluded.''',
             'solution_diagrams': [
@@ -561,7 +566,10 @@ Which of the following statements is/are TRUE?''',
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A = [24,31,8,47,15,24,3,52,19]
 p = A[0]; i, j, sw = -1, 9, 0
 while True:
@@ -721,20 +729,20 @@ assert pre(T) == [58,29,12,35,41,38,84,63,90] and ANSWER == 'A'
             'topic': 'Hashing — limits of quadratic probing',
             'text': 'Keys 14, 21, 28, 35 are inserted in that order into an empty table of size 7 (slots 0–6) using quadratic probing h(k, i) = (k mod 7 + i²) mod 7, i = 0, 1, 2, …  Next, key 42 is to be inserted. Which of the following statements is/are TRUE?',
             'options': [
-                'Key 35 is stored in slot 2',
-                'Key 42 cannot be placed by this probe sequence, even though 3 slots are empty',
-                'If linear probing (step +1) had been used for all five keys, 42 would be stored in slot 3',
                 'If double hashing h(k, i) = (k mod 7 + i·(5 − k mod 5)) mod 7 had been used for all five keys, every key would have been placed',
+                'If linear probing (step +1) had been used for all five keys, 42 would be stored in slot 3',
+                'Key 42 cannot be placed by this probe sequence, even though 3 slots are empty',
+                'Key 35 is stored in slot 2',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''All five keys are multiples of 7, so all have home slot 0. Quadratic probing visits 0 + i² mod 7 for i = 0, 1, 2, …: the squares mod 7 are 0, 1, 4, 2, 2, 4, 1, 0, … — only the **4** quadratic residues {0, 1, 2, 4}.
 
 - 14 → slot 0; 21 → 0, **1**; 28 → 0, 1, **4**; 35 → 0, 1, 4, 9 mod 7 = **2**.
 
-- (A) 35 lands in slot 2. **True.**
-- (B) 42 can only probe {0, 1, 2, 4}, all full; slots 3, 5, 6 are empty but unreachable. **True.** (Quadratic probing is guaranteed to succeed only when the load factor is ≤ 1/2 for prime m.)
-- (C) With linear probing: 14 → 0, 21 → 1, 28 → 2, 35 → 3, 42 → **4**, not 3. **False.**
-- (D) h₂(k) = 5 − (k mod 5) ∈ {1, …, 5} is never 0 and 7 is prime, so each probe sequence is a permutation of all 7 slots; with only 5 keys every insertion succeeds. **True.**
+- (A) h₂(k) = 5 − (k mod 5) ∈ {1, …, 5} is never 0 and 7 is prime, so each probe sequence is a permutation of all 7 slots; with only 5 keys every insertion succeeds. **True.**
+- (B) With linear probing: 14 → 0, 21 → 1, 28 → 2, 35 → 3, 42 → **4**, not 3. **False.**
+- (C) 42 can only probe {0, 1, 2, 4}, all full; slots 3, 5, 6 are empty but unreachable. **True.** (Quadratic probing is guaranteed to succeed only when the load factor is ≤ 1/2 for prime m.)
+- (D) 35 lands in slot 2. **True.**
 
 **Trap:** assuming 'table not full ⇒ insertion succeeds' for every open-addressing scheme.''',
             'solution_diagrams': [
@@ -750,7 +758,9 @@ assert pre(T) == [58,29,12,35,41,38,84,63,90] and ANSWER == 'A'
                     'caption': 'After four insertions; 42 can only probe slots 0, 1, 4, 2',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'C', 'C': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ins(seq, probe, m=7):
     T = [None]*m; ok = True
     for k in seq:
@@ -929,11 +939,11 @@ d.append([5])
 c[0][0] = 0''',
             'options': [
                 '`a == [[1, 2, 9], [3, 4], [5]]`',
-                '`b == [[1, 2, 9], [7]]`',
                 '`c[0] == [0, 2, 9]`',
                 '`a[0] is b[0]`',
+                '`b == [[1, 2, 9], [7]]`',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''- `b = a[:]` is a **shallow** copy: a new outer list whose elements are the *same* inner list objects.
 - `c = copy.deepcopy(a)` copies the inner lists too.
 - `d = a` is just another name for the same object.
@@ -947,12 +957,14 @@ Effects:
 Final values: a = d = [[1, 2, 9], [3, 4], [5]], b = [[1, 2, 9], [7]], c = [[0, 2], [3, 4]].
 
 - (A) **True.**
-- (B) **True.**
-- (C) c was copied *before* 9 was appended and does not share inner lists → c[0] = [0, 2]. **False.**
-- (D) Shallow copy shares inner objects. **True.**
+- (B) c was copied *before* 9 was appended and does not share inner lists → c[0] = [0, 2]. **False.**
+- (C) Shallow copy shares inner objects. **True.**
+- (D) **True.**
 
 **Trap:** thinking `b[1] = [7]` affects a (assignment to an index of the copy only touches the copy), or that `d.append` affects b.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 truth = {'A': a == [[1,2,9],[3,4],[5]], 'B': b == [[1,2,9],[7]],
          'C': c[0] == [0,2,9], 'D': a[0] is b[0]}
 assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)

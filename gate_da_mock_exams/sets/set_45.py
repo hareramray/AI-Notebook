@@ -82,21 +82,22 @@ assert L[0] * 10 + L[-1] == int(ANSWER) == int(OUTPUT)
             'topic': 'Trees — full binary trees',
             'text': 'A *full* binary tree is one in which every node has either 0 or 2 children. Consider full binary trees with exactly 21 nodes (height = number of edges on the longest root-to-leaf path). Which of the following statements is/are TRUE?',
             'options': [
-                'Every such tree has exactly 11 leaves',
-                'The minimum possible height is 4',
                 'The maximum possible height is 20',
+                'The minimum possible height is 4',
+                'Every such tree has exactly 11 leaves',
                 'Every such tree has exactly 20 edges',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** In a full binary tree with i internal nodes, there are i + 1 leaves, so n = 2i + 1 is always odd. Height is extreme when the tree is as bushy or as stringy as possible.
 
-- (A) n = 21 = 2i + 1 → i = 10 internal nodes, 11 leaves. **True.**
+- (A) The tallest full tree is a 'caterpillar': each internal node has one leaf child and one internal child, adding one level per internal node → height = i = 10, not 20. **False.**
 - (B) A tree of height h has at most 2^{h+1} − 1 nodes; h = 3 allows only 15 < 21, while h = 4 allows 31 ≥ 21 (and an odd count 21 is achievable). Minimum height 4. **True.**
-- (C) The tallest full tree is a 'caterpillar': each internal node has one leaf child and one internal child, adding one level per internal node → height = i = 10, not 20. **False.**
+- (C) n = 21 = 2i + 1 → i = 10 internal nodes, 11 leaves. **True.**
 - (D) Any tree with n nodes has n − 1 = 20 edges. **True.**
 
 **Trap:** height 20 would need a path of 21 nodes, each with one child — not allowed in a full binary tree.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from functools import lru_cache
 @lru_cache(None)
 def heights(n):
@@ -406,13 +407,13 @@ assert C(8) == int(ANSWER) == int(OUTPUT) and v == 15
             'marks': 2,
             'topic': 'Queues — input-restricted deque permutations',
             'text': 'The values 1, 2, 3, 4, 5 are inserted, in this order, at the **rear** of an initially empty deque (no insertion at the front). Deletions may be made from **either** end and may be interleaved arbitrarily with the insertions; each deleted value is appended to an output sequence. Which of the following output sequences is/are possible?',
-            'options': ['5, 1, 4, 2, 3', '5, 3, 1, 2, 4', '3, 1, 5, 2, 4', '4, 2, 1, 3, 5'],
-            'answer': ['A', 'C'],
+            'options': ['5, 3, 1, 2, 4', '3, 1, 5, 2, 4', '5, 1, 4, 2, 3', '4, 2, 1, 3, 5'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept.** The deque content is always a contiguous run of the inserted values in increasing order with some removed from its two ends. A value can be output only when it is at the front or at the rear at that moment.
 
-- (A) Insert 1–5, delete rear 5 → deque [1, 2, 3, 4]; front 1; rear 4; front 2; then 3. **Possible.**
-- (B) After outputting 5 first, the deque is [1, 2, 3, 4]; 3 is in the middle and cannot be deleted next. **Impossible.**
-- (C) Insert 1, 2, 3; delete rear 3 → [1, 2]; delete front 1 → [2]; insert 4, 5 → [2, 4, 5]; delete rear 5; delete front 2; delete 4. **Possible.**
+- (A) After outputting 5 first, the deque is [1, 2, 3, 4]; 3 is in the middle and cannot be deleted next. **Impossible.**
+- (B) Insert 1, 2, 3; delete rear 3 → [1, 2]; delete front 1 → [2]; insert 4, 5 → [2, 4, 5]; delete rear 5; delete front 2; delete 4. **Possible.**
+- (C) Insert 1–5, delete rear 5 → deque [1, 2, 3, 4]; front 1; rear 4; front 2; then 3. **Possible.**
 - (D) 4 first means 1, 2, 3 are all in the deque [1, 2, 3]; 2 is in the middle. **Impossible.**
 
 **Tip:** for an input-restricted deque the only way to fail is to need an element strictly inside the current run. Of the 120 permutations of 1–5, 90 are achievable.''',
@@ -423,7 +424,9 @@ assert C(8) == int(ANSWER) == int(OUTPUT) and v == 15
                     'caption': 'Options (A)/(B): deque after 5 is deleted first',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def outs(n):
     res = set()
     def go(nxt, dq, out):
@@ -572,12 +575,12 @@ assert pos == {1, 2, 3, 4, 5, 6} and len(pos) == int(ANSWER)
                 },
             ],
             'options': [
-                'The graph is bipartite',
                 'H is at BFS level 3',
-                'The BFS tree contains the edge C–E',
                 'Adding the single edge B–C would make the graph non-bipartite',
+                'The BFS tree contains the edge C–E',
+                'The graph is bipartite',
             ],
-            'answer': ['A', 'C', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** BFS levels give a 2-colouring candidate (even/odd level). A connected graph is bipartite iff no edge joins two vertices on the **same** level (such an edge closes an odd cycle).
 
 BFS from A:
@@ -588,10 +591,10 @@ BFS from A:
 
 Every edge joins consecutive levels (A–B, A–C, B–D, C–D, C–E, D–F, E–F, E–G, F–H, G–H), so the graph is bipartite with parts {A, D, E, H} and {B, C, F, G}.
 
-- (A) **True.**
-- (B) **False** — H is at level 4.
+- (A) **False** — H is at level 4.
+- (B) **True** — B and C are both on level 1; B–C would create the triangle A–B–C, an odd cycle.
 - (C) **True** — E is first discovered from C.
-- (D) **True** — B and C are both on level 1; B–C would create the triangle A–B–C, an odd cycle.
+- (D) **True.**
 
 **Trap:** the graph has many cycles, but all of them have length 4 or 6 — cycles alone do not break bipartiteness, only *odd* cycles do.''',
             'solution_diagrams': [
@@ -634,7 +637,9 @@ Every edge joins consecutive levels (A–B, A–C, B–D, C–D, C–E, D–F, E
                     'caption': 'BFS tree (red); one side of the bipartition highlighted',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 from collections import deque
 E = [("A","B"),("A","C"),("B","D"),("C","D"),("C","E"),("D","F"),("E","F"),("E","G"),
      ("F","H"),("G","H")]
@@ -674,12 +679,12 @@ def quicksort(A, lo, hi):
         quicksort(A, lo, p - 1)
         quicksort(A, p + 1, hi)''',
             'options': [
-                'After the first partition, A = [5, 3, 1, 2, 7, 8, 9]',
-                'The total number of key comparisons is 11',
                 'The second call to partition uses 5 as its pivot',
                 'partition is called exactly 4 times',
+                'After the first partition, A = [5, 3, 1, 2, 7, 8, 9]',
+                'The total number of key comparisons is 11',
             ],
-            'answer': ['A', 'B', 'D'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''**Concept.** Trace partition calls in the order the recursion makes them (left sub-array first).
 
 Call 1 — A[0..6], pivot 7: elements ≤ 7 are 5, 3, 1, 2 → moved to the front in order; 8, 9 end up after. Swaps give [5, 3, 1, 2, 9, 8, 7], then the pivot swap → [5, 3, 1, 2, 7, 8, 9], p = 4. Comparisons 6.
@@ -693,9 +698,9 @@ Call 4 — A[5..6] = [8, 9], pivot 9: 8 ≤ 9 → unchanged. Comparisons 1.
 
 Totals: comparisons 6 + 3 + 1 + 1 = 11; partition calls 4.
 
-- (A) **True.**
+- (A) **False** — the second partition works on [5, 3, 1, 2] whose last element is 2.
 - (B) **True.**
-- (C) **False** — the second partition works on [5, 3, 1, 2] whose last element is 2.
+- (C) **True.**
 - (D) **True.**
 
 **Trap:** picking the *first* element (5) as pivot out of habit, or counting the calls on size-0/1 sub-arrays as partition calls.''',
@@ -720,7 +725,9 @@ Totals: comparisons 6 + 3 + 1 + 1 = 11; partition calls 4.
                     ],
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 calls = []
 orig = partition
 def traced(A, lo, hi):
@@ -789,12 +796,12 @@ Output `0 [(4, 3), (16, 5), (36, 7), (64, 9)]` → (B).
             'topic': 'Elementary sorting — stability and counts',
             'text': 'The array [4_{a}, 3, 4_{b}, 1] contains two equal keys 4, distinguished by the labels a and b. It is sorted in ascending order by (i) selection sort that picks the **first** minimum (strict `<`) and swaps it into place, (ii) bubble sort that swaps adjacent elements only if the left one is strictly greater, and (iii) insertion sort that shifts elements strictly greater than the key. Which of the following statements is/are TRUE?',
             'options': [
+                'Insertion sort performs exactly 5 shifts',
+                'Bubble sort produces 1, 3, 4_{a}, 4_{b}',
                 'Selection sort produces 1, 3, 4_{b}, 4_{a}',
                 'Selection sort performs exactly 2 swaps (a swap of an element with itself is not counted)',
-                'Bubble sort produces 1, 3, 4_{a}, 4_{b}',
-                'Insertion sort performs exactly 5 shifts',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'C'],
             'solution': '''**Concept.** Bubble and insertion sort move elements only past *strictly* larger neighbours, so equal keys never overtake each other (stable). Selection sort's long-distance swap can jump an element over an equal key (unstable).
 
 Selection sort:
@@ -807,13 +814,16 @@ Bubble sort: pass 1: 4_{a}>3 swap → [3, 4_{a}, 4_{b}, 1]; 4_{a} vs 4_{b} no sw
 
 Insertion sort shifts = number of inversions: (4_{a},3), (4_{a},1), (3,1), (4_{b},1) = 4.
 
-- (A) **True** — the equal keys end up in reversed order.
-- (B) **False** — only 1 real swap.
-- (C) **True** — bubble sort is stable.
-- (D) **False** — 4 shifts (equal keys do not form an inversion).
+- (A) **False** — 4 shifts (equal keys do not form an inversion).
+- (B) **True** — bubble sort is stable.
+- (C) **True** — the equal keys end up in reversed order.
+- (D) **False** — only 1 real swap.
 
 **Trap:** counting (4_{a}, 4_{b}) as an inversion, or assuming selection sort is stable because it uses strict `<`.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'D', 'D': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'C', 'C': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 A0 = [(4, 'a'), (3, ''), (4, 'b'), (1, '')]
 S = A0[:]; sw = 0
 for i in range(len(S)):

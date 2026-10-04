@@ -126,8 +126,8 @@ assert [L for L, s in zip('ABCD', opts) if hh(s)] == [ANSWER]
             'topic': 'Circular queue arithmetic',
             'text': 'A circular queue of capacity 8 is stored in an array Q[0..7] with two variables: `front` (index of the first element) and `count`. Enqueue stores at Q[(front + count) mod 8]; dequeue returns Q[front] and sets front = (front + 1) mod 8. Initially front = 6 and count = 0. The operations are: enqueue 10, 20, 30, 40, 50; dequeue twice; enqueue 60, 70, 80, 90. Which of the following statements is/are TRUE afterwards?',
             'options': [
-                'front = 0',
                 '90 is stored at Q[6]',
+                'front = 0',
                 'One more enqueue would succeed and store its value at Q[7]',
                 'The next dequeue returns 40',
             ],
@@ -138,8 +138,8 @@ assert [L for L, s in zip('ABCD', opts) if hh(s)] == [ANSWER]
 - Dequeue twice → returns 10 then 20; front = (6 + 2) mod 8 = 0; count = 3 (30, 40, 50).
 - Enqueue 60, 70, 80, 90 → indices (0 + 3) = 3, 4, 5, 6; count = 7.
 
-- (A) **True** — front = 0.
-- (B) **True** — 90 is at index 6.
+- (A) **True** — 90 is at index 6.
+- (B) **True** — front = 0.
 - (C) **True** — count = 7 < 8, the next slot is (0 + 7) mod 8 = 7 (it still holds the stale value 20, which is simply overwritten).
 - (D) **False** — Q[front] = Q[0] = 30 is returned next.
 
@@ -156,7 +156,8 @@ assert [L for L, s in zip('ABCD', opts) if hh(s)] == [ANSWER]
                     'caption': 'Array after all operations (index 7 free)',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 Q = [None]*8; front, count = 6, 0; out = []
 def enq(x):
     global count
@@ -345,21 +346,22 @@ assert s == 12 and ['9','11','12','21'][ord(ANSWER) - 65] == '12'
             'topic': 'Adjacency matrix identities',
             'text': 'Let A be the adjacency matrix of a simple undirected graph G with m edges and t triangles. Which of the following statements is/are TRUE for every such G?',
             'options': [
-                'A is symmetric and every diagonal entry of A is 0',
+                'The sum of all entries of A equals m',
                 'trace(A²) = 2m',
                 'trace(A³) = 6t',
-                'The sum of all entries of A equals m',
+                'A is symmetric and every diagonal entry of A is 0',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['B', 'C', 'D'],
             'solution': '''(A^{k})[i][j] counts walks of length k from i to j.
 
-- (A) **True.** Undirected → A[i][j] = A[j][i]; simple (no self-loops) → zero diagonal.
+- (A) **False.** Each edge contributes two 1s (A[u][v] and A[v][u]), so the sum is 2m.
 - (B) **True.** (A²)[i][i] = number of closed walks of length 2 from i = deg(i). Summing: ∑ deg(i) = 2m (handshake lemma).
 - (C) **True.** A closed walk of length 3 is a triangle traversed from one of its 3 vertices in one of 2 directions; each triangle is counted 3 × 2 = 6 times.
-- (D) **False.** Each edge contributes two 1s (A[u][v] and A[v][u]), so the sum is 2m.
+- (D) **True.** Undirected → A[i][j] = A[j][i]; simple (no self-loops) → zero diagonal.
 
 **Trap:** for (C) dividing by 3 only (forgetting direction) or by 2 only. For a *directed* graph the analogues differ: the sum of entries is m and trace(A²) counts 2-cycles.''',
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import random, itertools
 random.seed(3)
 for _ in range(30):
@@ -571,20 +573,21 @@ assert o2 == [1, 2, 4, 3, 6, 5]
             'options': [
                 'Y uses fewer bits than X',
                 'Testing whether the edge (u, v) exists takes O(1) time in X but may take Θ(out-deg(u)) time in Y',
-                'Computing the in-degrees of all vertices takes Θ(n + m) time in Y',
                 'Computing the transpose (reverse) graph takes Θ(n + m) time in X',
+                'Computing the in-degrees of all vertices takes Θ(n + m) time in Y',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''**Space.** X: n² = 4 000 000 bits. Y: 32n + 64m = 64 000 + 640 000 = 704 000 bits. So Y is about 5.7 times smaller → (A) **True**. (The break-even is 32n + 64m = n², i.e. m ≈ 62 000 edges; denser graphs favour the bit-matrix.)
 
 **Edge test.** X: read one bit M[u][v] → O(1). Y: scan u's list → Θ(out-deg(u)) in the worst case → (B) **True**.
 
-**All in-degrees in Y.** One pass over all n lists and m nodes, incrementing in[v] for each node → Θ(n + m) → (C) **True**.
+**All in-degrees in Y.** One pass over all n lists and m nodes, incrementing in[v] for each node → Θ(n + m) → (D) **True**.
 
-**Transpose in X.** Every one of the n² entries must be read/written (M^{T}[i][j] = M[j][i]) → Θ(n²), not Θ(n + m) → (D) **False**. (In Y, transposing takes Θ(n + m).)
+**Transpose in X.** Every one of the n² entries must be read/written (M^{T}[i][j] = M[j][i]) → Θ(n²), not Θ(n + m) → (C) **False**. (In Y, transposing takes Θ(n + m).)
 
 **Trap:** assuming the matrix is always larger. With 1-bit entries and sparse lists the comparison depends on m relative to n²/64.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 n, m = 2000, 10000
 X = n * n; Y = 32 * n + 64 * m
 assert Y < X and Y == 704000
@@ -795,19 +798,20 @@ assert d == [0, 3, 1, 6, 8] and sum(d) == int(ANSWER)
                 },
             ],
             'options': [
-                'The graph is strongly connected',
                 '(A³)[1][1] = 1',
+                'The graph is strongly connected',
                 '(A²)[3][5] = 1',
                 'The sum of all entries of A² equals ∑_{v} in-deg(v) · out-deg(v)',
             ],
-            'answer': ['B', 'C', 'D'],
-            'solution': '''- (A) **False.** From 4 or 5 the only edges are 4 ↔ 5, so vertices 1, 2, 3 are unreachable from 4. The strongly connected components are {1, 2, 3} and {4, 5}.
-- (B) **True.** Closed walks of length 3 from 1: 1 → 2 → 3 → 1 is the only one (1 has the single out-edge to 2, 2 only to 3, and 3 → 1 closes it).
+            'answer': ['A', 'C', 'D'],
+            'solution': '''- (A) **True.** Closed walks of length 3 from 1: 1 → 2 → 3 → 1 is the only one (1 has the single out-edge to 2, 2 only to 3, and 3 → 1 closes it).
+- (B) **False.** From 4 or 5 the only edges are 4 ↔ 5, so vertices 1, 2, 3 are unreachable from 4. The strongly connected components are {1, 2, 3} and {4, 5}.
 - (C) **True.** Walks of length 2 from 3 to 5 must be 3 → x → 5 with x ∈ out(3) = {1, 4}; only x = 4 has 4 → 5. Exactly one walk.
 - (D) **True.** The sum of all entries of A² counts all length-2 walks u → v → w. Grouping by the middle vertex v gives in-deg(v) choices for u and out-deg(v) choices for w. Here: v=1: 1·1, v=2: 1·1, v=3: 1·2, v=4: 2·1, v=5: 1·1 → total 7.
 
-**Trap:** in (A), a graph can contain a cycle through every vertex of one part yet fail to be strongly connected — the edge 3 → 4 has no return path.''',
-            'verify': '''
+**Trap:** in (B), a graph can contain a cycle through every vertex of one part yet fail to be strongly connected — the edge 3 → 4 has no return path.''',
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 E = [(1,2),(2,3),(3,1),(3,4),(4,5),(5,4)]
 A = [[0]*5 for _ in range(5)]
 for u, v in E: A[u-1][v-1] = 1
@@ -940,18 +944,18 @@ assert [k for k, v in opts.items() if v == pre(t)] == [ANSWER]
             'topic': 'Reading structure from A²',
             'text': 'G is a simple undirected graph on 7 vertices whose adjacency matrix A satisfies (A²)[i][i] = 2 for every vertex i. Which of the following statements is/are **necessarily** TRUE?',
             'options': [
-                'G has exactly 7 edges',
                 'G is connected',
+                'G has exactly 7 edges',
                 'G contains a cycle of odd length',
                 'G is bipartite',
             ],
-            'answer': ['A', 'C'],
+            'answer': ['B', 'C'],
             'solution': '''(A²)[i][i] = deg(i), so G is **2-regular**. A 2-regular graph is a disjoint union of cycles, each of length ≥ 3, whose lengths add up to 7.
 
 Possible cycle structures: a single C₇, or C₃ ∪ C₄ (lengths ≥ 3 summing to 7).
 
-- (A) **True.** ∑ deg = 7 × 2 = 14 = 2m → m = 7 (also: a cycle on k vertices has k edges).
-- (B) **False.** C₃ ∪ C₄ is 2-regular on 7 vertices but disconnected.
+- (A) **False.** C₃ ∪ C₄ is 2-regular on 7 vertices but disconnected.
+- (B) **True.** ∑ deg = 7 × 2 = 14 = 2m → m = 7 (also: a cycle on k vertices has k edges).
 - (C) **True.** The cycle lengths sum to 7 (odd), so at least one cycle has odd length (C₇ itself, or the C₃).
 - (D) **False.** A graph with an odd cycle is never bipartite — in fact (C) shows G is *never* bipartite.
 
@@ -982,7 +986,8 @@ Possible cycle structures: a single C₇, or C₃ ∪ C₄ (lengths ≥ 3 summin
                     'caption': 'C₃ ∪ C₄: 2-regular on 7 vertices but disconnected',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def parts(n, mn=3):
     if n == 0: yield []
     for k in range(mn, n + 1):

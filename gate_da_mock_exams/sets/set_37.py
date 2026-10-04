@@ -182,19 +182,20 @@ assert T.index(83) == int(ANSWER) and T[12] == 31
             'options': [
                 '90, 20, 70, 30, 60, 50, 55',
                 '10, 80, 35, 75, 40, 70, 55',
-                '60, 25, 58, 40, 62, 55',
                 '52, 70, 54, 65, 53, 55',
+                '60, 25, 58, 40, 62, 55',
             ],
             'answer': ['A', 'B'],
             'solution': '''Each examined key narrows the interval in which all later keys must lie: going left after key k sets the upper bound to k, going right sets the lower bound to k. A sequence is valid iff every key lies inside the current interval.
 
 - (A) (−∞,∞) → 90 L (−∞,90) → 20 R (20,90) → 70 L (20,70) → 30 R (30,70) → 60 L (30,60) → 50 R (50,60) → 55 ✓. **Possible.**
 - (B) 10 R (10,∞) → 80 L (10,80) → 35 R (35,80) → 75 L (35,75) → 40 R (40,75) → 70 L (40,70) → 55 ✓. **Possible.**
-- (C) 60 L (−∞,60) → 25 R (25,60) → 58 L (25,58) → 40 R (40,58) → **62** ∉ (40,58). **Impossible** — 62 cannot lie in the left subtree of 60.
-- (D) 52 R (52,∞) → 70 L (52,70) → 54 R (54,70) → 65 L (54,65) → **53** ∉ (54,65). **Impossible.**
+- (C) 52 R (52,∞) → 70 L (52,70) → 54 R (54,70) → 65 L (54,65) → **53** ∉ (54,65). **Impossible.**
+- (D) 60 L (−∞,60) → 25 R (25,60) → 58 L (25,58) → 40 R (40,58) → **62** ∉ (40,58). **Impossible** — 62 cannot lie in the left subtree of 60.
 
 **Trap:** checking only consecutive pairs (each step “moves toward 55”) is not enough — all earlier bounds still apply.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'D', 'D': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def ok(seq, x=55):
     lo, hi = float('-inf'), float('inf')
     for k in seq[:-1]:
@@ -324,12 +325,12 @@ Printed value = 25 − 9 = **16**.
             'topic': 'Queue using two stacks',
             'text': 'A queue is implemented with two stacks S1 and S2. Enqueue pushes onto S1. Dequeue pops from S2; if S2 is empty it first pops **every** element of S1 and pushes it onto S2. Starting empty, the operations are: enqueue 1, 2, 3, 4; dequeue; enqueue 5, 6; dequeue; enqueue 7. Which of the following statements is/are TRUE afterwards?',
             'options': [
-                'S2 holds exactly 2 elements and 3 is on its top',
                 'S1 holds 5, 6, 7 with 7 on top',
-                'Exactly 4 element transfers from S1 to S2 have taken place so far',
                 'The next dequeue will trigger a transfer from S1 to S2',
+                'Exactly 4 element transfers from S1 to S2 have taken place so far',
+                'S2 holds exactly 2 elements and 3 is on its top',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'C', 'D'],
             'solution': '''Trace (stacks written bottom → top):
 
 - enqueue 1..4 → S1 = [1, 2, 3, 4], S2 = []
@@ -338,10 +339,10 @@ Printed value = 25 − 9 = **16**.
 - dequeue: S2 non-empty → pop → returns 2; S2 = [4, 3]
 - enqueue 7 → S1 = [5, 6, 7]
 
-- (A) **True** — S2 = [4, 3], top 3 (the next element to leave the queue).
-- (B) **True.**
+- (A) **True.**
+- (B) **False** — S2 is non-empty, so the next dequeue just pops 3.
 - (C) **True** — only the first dequeue transferred, moving 4 elements.
-- (D) **False** — S2 is non-empty, so the next dequeue just pops 3.
+- (D) **True** — S2 = [4, 3], top 3 (the next element to leave the queue).
 
 **Tip:** each element is pushed and popped at most twice in total, so any sequence of n operations costs O(n) — amortised O(1) per operation, although one dequeue can cost Θ(n).''',
             'solution_diagrams': [
@@ -356,7 +357,9 @@ Printed value = 25 − 9 = **16**.
                     'label': 'S2',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 S1, S2 = [], []; moves = 0; out = []
 def enq(x): S1.append(x)
 def deq():
@@ -504,12 +507,12 @@ assert h == [5, 8, 6, 12, 9, 7, 11, 15, 20] and h[6] == int(ANSWER)
                 },
             ],
             'options': [
-                'Exactly 3 edges are back edges',
-                'F → C is a cross edge',
-                'The DFS has at least one forward edge',
                 'E → D is a back edge',
+                'Exactly 3 edges are back edges',
+                'The DFS has at least one forward edge',
+                'F → C is a cross edge',
             ],
-            'answer': ['A', 'B'],
+            'answer': ['B', 'D'],
             'solution': '''Classify edge u → v using discovery/finish times: **tree** (v first discovered via it), **back** (v is an ancestor still active), **forward** (v is a finished descendant), **cross** (v finished, not a descendant).
 
 Trace (time: discover/finish):
@@ -521,10 +524,10 @@ Trace (time: discover/finish):
 
 Tree: A→B, B→D, B→E, A→C, A→F, F→G (6). Back: D→A, E→B, G→F (3). Cross: E→D, C→E, F→C (3). Forward: none.
 
-- (A) **True.**
+- (A) **False** — D had already finished, so E → D is a cross edge.
 - (B) **True.**
 - (C) **False** — no edge goes from an ancestor to an already-finished descendant.
-- (D) **False** — D had already finished, so E → D is a cross edge.
+- (D) **True.**
 
 **Trap:** calling E → D a back edge because D was discovered earlier; a back edge requires the target to be an *active ancestor* (discovered but not finished).''',
             'solution_diagrams': [
@@ -566,7 +569,9 @@ Tree: A→B, B→D, B→E, A→C, A→F, F→G (6). Back: D→A, E→B, G→F (3
                     'caption': 'DFS tree edges highlighted',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 G = {'A':'BCF','B':'DE','C':'E','D':'A','E':'BD','F':'CG','G':'F'}
 t = [0]; d = {}; f = {}; par = {}
 def dfs(u):
@@ -781,12 +786,12 @@ pre-order: M D B A H F K L T W U
 in-order: A B D F H K L M T U W
 Which of the following statements is/are TRUE? (Height = number of edges on the longest root-to-leaf path.)''',
             'options': [
-                'Its post-order is A B F L K H D U W T M',
-                'Its height is 4',
                 'It has exactly 4 leaves',
+                'Its post-order is A B F L K H D U W T M',
                 'Exactly 3 nodes have exactly one child',
+                'Its height is 4',
             ],
-            'answer': ['A', 'B', 'C'],
+            'answer': ['A', 'B', 'D'],
             'solution': '''Pre-order gives the root first; its position in the in-order splits the remaining labels into left and right subtrees. Recurse.
 
 - Root M. In-order left of M: A B D F H K L (7 nodes); right: T U W.
@@ -794,10 +799,10 @@ Which of the following statements is/are TRUE? (Height = number of edges on the 
 - B with left child A. H with left child F and right child K; K has right child L.
 - Right subtree pre-order T W U → root T; in-order T is first → no left child; right {U, W} with pre-order W U → W with left child U.
 
-- (A) Post-order = A B | F L K H | D | U W T | M → **True.**
-- (B) Longest path M → D → H → K → L has 4 edges → **True.**
-- (C) Leaves: A, F, L, U → 4 → **True.**
-- (D) One-child nodes: B (left only), K (right only), T (right only), W (left only) → **4**, not 3 → **False.**
+- (A) Leaves: A, F, L, U → 4 → **True.**
+- (B) Post-order = A B | F L K H | D | U W T | M → **True.**
+- (C) One-child nodes: B (left only), K (right only), T (right only), W (left only) → **4**, not 3 → **False.**
+- (D) Longest path M → D → H → K → L has 4 edges → **True.**
 
 **Check:** in a binary tree, leaves = (nodes with two children) + 1. Two-child nodes are M, D, H (3), so leaves = 4 ✓.
 
@@ -837,7 +842,10 @@ Which of the following statements is/are TRUE? (Height = number of edges on the 
                     'caption': 'Reconstructed tree',
                 },
             ],
-            'verify': '''
+            'verify': '''_m = {'C': 'A', 'A': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'B', 'B': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 def build(pre, ino):
     if not pre: return None
     r = pre[0]; k = ino.index(r)
@@ -976,19 +984,22 @@ assert (s, k) == (6, 5) and (a, mu) == (4, 3) and ANSWER == 'B'
             'topic': 'Solving recurrences',
             'text': 'Which of the following recurrences (with T(1) = 1) are solved correctly?',
             'options': [
-                'T(n) = 2T(n/2) + n log n  ⇒  T(n) = Θ(n log² n)',
                 'T(n) = T(n − 1) + n  ⇒  T(n) = Θ(n²)',
                 'T(n) = 4T(n/2) + n²  ⇒  T(n) = Θ(n²)',
                 'T(n) = 3T(n/2) + n  ⇒  T(n) = Θ(n^{log₂ 3})',
+                'T(n) = 2T(n/2) + n log n  ⇒  T(n) = Θ(n log² n)',
             ],
-            'answer': ['A', 'B', 'D'],
-            'solution': '''- (A) **Correct.** Recursion tree: level i has 2^{i} nodes each costing (n/2^{i})·log(n/2^{i}), level total n(log n − i). Summing i = 0..log n gives n·Θ(log² n). (The basic Master theorem does not apply since n log n is not polynomially larger than n; the extended case 2 gives Θ(n log^{k+1} n) with k = 1.)
-- (B) **Correct.** T(n) = 1 + 2 + … + n = n(n + 1)/2 = Θ(n²).
-- (C) **Incorrect.** a = 4, b = 2 → n^{log₂ 4} = n², which matches f(n) = n² (case 2) → Θ(n² log n), not Θ(n²).
-- (D) **Correct.** n^{log₂ 3} ≈ n^{1.585} dominates f(n) = n polynomially (case 1) → Θ(n^{log₂ 3}).
+            'answer': ['A', 'C', 'D'],
+            'solution': '''- (A) **Correct.** T(n) = 1 + 2 + … + n = n(n + 1)/2 = Θ(n²).
+- (B) **Incorrect.** a = 4, b = 2 → n^{log₂ 4} = n², which matches f(n) = n² (case 2) → Θ(n² log n), not Θ(n²).
+- (C) **Correct.** n^{log₂ 3} ≈ n^{1.585} dominates f(n) = n polynomially (case 1) → Θ(n^{log₂ 3}).
+- (D) **Correct.** Recursion tree: level i has 2^{i} nodes each costing (n/2^{i})·log(n/2^{i}), level total n(log n − i). Summing i = 0..log n gives n·Θ(log² n). (The basic Master theorem does not apply since n log n is not polynomially larger than n; the extended case 2 gives Θ(n log^{k+1} n) with k = 1.)
 
 **Trap:** in case 2 the answer always picks up an extra log factor; equating it with f(n) is the most common error.''',
-            'verify': '''
+            'verify': '''_m = {'C': 'B', 'B': 'C'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'B': 'A', 'A': 'B'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+_m = {'A': 'D', 'D': 'A'}; ANSWER = sorted(_m.get(a, a) for a in ANSWER) if isinstance(ANSWER, list) else _m.get(ANSWER, ANSWER)
+
 import math
 from functools import lru_cache
 @lru_cache(None)
