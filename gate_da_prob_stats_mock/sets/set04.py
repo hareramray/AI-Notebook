@@ -122,13 +122,13 @@ def fig_q13():
     for y0 in (0.80, 0.20):
         ax.plot([0.42, 0.74], [y0, y0 + 0.12], color=MAROON)
         ax.plot([0.42, 0.74], [y0, y0 - 0.10], color="#bbbbbb")
-    ax.text(0.46, 0.93, "both flag: 0.98 × 0.98", color=MAROON, fontsize=8)
-    ax.text(0.46, 0.33, "both flag: 0.03 × 0.03", color=MAROON, fontsize=8)
-    ax.text(0.76, 0.92, "0.005 × 0.9604 = 0.004802", va="center", fontsize=8.5, color=MAROON)
-    ax.text(0.76, 0.32, "0.995 × 0.0009 = 0.000896", va="center", fontsize=8.5, color=MAROON)
+    ax.text(0.50, 0.92, "0.98²", color=MAROON, fontsize=8.5)
+    ax.text(0.50, 0.32, "0.03²", color=MAROON, fontsize=8.5)
+    ax.text(0.76, 0.92, "both flag: 0.005 × 0.9604 = 0.004802", va="center", fontsize=8.5, color=MAROON)
+    ax.text(0.76, 0.32, "both flag: 0.995 × 0.0009 = 0.000896", va="center", fontsize=8.5, color=MAROON)
     ax.text(0.76, 0.70, "(other outcomes)", va="center", fontsize=8, color="#777777")
     ax.text(0.76, 0.10, "(other outcomes)", va="center", fontsize=8, color="#777777")
-    ax.set_xlim(0, 1.3)
+    ax.set_xlim(0, 1.5)
     ax.set_ylim(0, 1)
     return fig
 
