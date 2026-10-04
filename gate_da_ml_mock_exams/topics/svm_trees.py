@@ -133,10 +133,10 @@ def _draw_tree(ax, root, fs=7.0, leaf_fc="#e6e6e6"):
         for lab, c in n["children"]:
             cx, cy = pos[id(c)]
             ax.annotate("", xy=(cx, cy), xytext=(x, y),
-                        arrowprops=dict(arrowstyle="-|>", color="#333333", lw=0.8, shrinkA=11, shrinkB=11),
+                        arrowprops=dict(arrowstyle="-|>", color="#333333", lw=0.8, shrinkA=7, shrinkB=9),
                         zorder=1)
             if lab:
-                ax.text(x + 0.55 * (cx - x), y + 0.55 * (cy - y), lab, fontsize=fs - 0.6, ha="center", va="center",
+                ax.text(x + 0.6 * (cx - x), y + 0.6 * (cy - y), lab, fontsize=fs - 0.6, ha="center", va="center",
                         color="#111111", zorder=4,
                         bbox=dict(boxstyle="round,pad=0.12", fc="white", ec="none"))
             rec(c)
@@ -272,6 +272,13 @@ def _svm_axes(ax, X, y, hi=6, lines=None, labels=True, test=None):
     ax.set_xlabel("x₁")
     ax.set_ylabel("x₂")
     ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), frameon=False)
+
+
+def _eval_str(w, t, b):
+    """'w1·t1 + w2·t2 + b' with exact fractions and proper signs."""
+    s = f"({_q(w[0])})({fmt(t[0])}) + ({_q(w[1])})({fmt(t[1])})"
+    s += (" − " if b < 0 else " + ") + _q(abs(b))
+    return s
 
 
 def _pts_table(X, y, extra=None, extra_head=None):
@@ -459,20 +466,20 @@ def svm_dual_constraint(rng):
                            f"So α<sub>{miss + 1}</sub>({'+1' if y[miss] > 0 else '−1'}) = {fmt(y[miss] * val)} ⇒ "
                            f"α<sub>{miss + 1}</sub> = <b>{fmt(val)}</b> (it must be ≥ 0)."])
     # w component
-    X = rng.integers(-2, 5, size=(3, 2)).astype(float)
-    y = np.array([1, 1, -1]) if rng.random() < 0.5 else np.array([1, -1, -1])
-    y = y[rng.permutation(3)]
     while True:
+        X = rng.integers(-2, 5, size=(3, 2)).astype(float)
+        if len({tuple(r) for r in X}) < 3:
+            continue
+        y = np.array([1, 1, -1]) if rng.random() < 0.5 else np.array([1, -1, -1])
+        y = y[rng.permutation(3)]
         al = rng.integers(1, 9, size=3) / 4
-        if abs(sum(al * y)) < 1e-12:
+        al[2] = -y[2] * sum(al[i] * y[i] for i in range(2))  # enforce Σ α_i y_i = 0
+        if al[2] <= 0:
+            continue
+        w = (al * y) @ X
+        comp = int(rng.integers(2))
+        if abs(w[comp]) > 0.2:
             break
-        # enforce Σαy = 0 by adjusting the last
-        j = 2
-        al[j] = -y[j] * sum(al[i] * y[i] for i in range(2))
-        if al[j] > 0:
-            break
-    w = (al * y) @ X
-    comp = int(rng.integers(2))
     rows = [["i", "x<sub>i</sub>", "y<sub>i</sub>", "α<sub>i</sub>"]] + \
            [[str(i + 1), vec(X[i]), "+1" if y[i] > 0 else "−1", fmt(al[i])] for i in range(3)]
     terms = " + ".join(f"({fmt(al[i])})({'+1' if y[i] > 0 else '−1'})({fmt(X[i, comp])})" for i in range(3))
@@ -498,7 +505,7 @@ def kernel_poly_value(rng):
             z = x
         base = int(x @ z) + c
         val = base ** d
-        if 0 < abs(val) <= 3000 and base != 0:
+        if 0 < abs(val) <= 3000 and base != 0 and int(x @ z) != 0:
             break
     kstr = f"(xᵀz + {c})<super>{d}</super>" if c else f"(xᵀz)<super>{d}</super>"
     what = "K(x, x)" if v == 2 else "K(x, z)"
@@ -802,7 +809,7 @@ def _svm_geom_solution(X, y, w, b, m, sv):
     if len(sv) == 2:
         i, j = sv
         out.append(f"The closest pair of opposite-class points is P{i + 1} = {vec(X[i])} and P{j + 1} = {vec(X[j])}, "
-                   f"and the perpendicular bisector of this pair separates all points with both of them closest. "
+                   f"Their perpendicular bisector separates the classes and no other point comes closer to it, so "
                    f"Hence w ∥ (x<sub>+</sub> − x<sub>−</sub>) and the support vectors are {names}.")
     else:
         cls = [i for i in sv if sum(1 for j in sv if y[j] == y[i]) == 2]
@@ -853,7 +860,7 @@ def svm_max_margin(rng):
     elif v == 1:
         sol.append(f"‖w‖ = <b>{fmt(ans, 2)}</b>.")
     else:
-        sol.append(f"f({vec(t)}) = {_q(w[0])}·{fmt(t[0])} + {_q(w[1])}·{fmt(t[1])} + ({_q(b)}) = <b>{fmt(ans, 2)}</b>.")
+        sol.append(f"f({vec(t)}) = {_eval_str(w, t, b)} = <b>{fmt(ans, 2)}</b>.")
     return Q(text=f"The labelled training points shown below are linearly separable. A hard-margin linear SVM is "
                   f"trained on them. Compute {ask}. {nat_hint(2)}",
              qtype="NAT", marks=2, answer=nat_range(ans, 2), nat_hint=nat_hint(2),
@@ -915,10 +922,9 @@ def svm_dual_to_primal(rng):
            f"w = {terms1} = ({_q(w[0])}, {_q(w[1])}).",
            f"b from any support vector, e.g. P{s0 + 1}: y = wᵀx + b ⇒ b = {'+1' if y[s0] > 0 else '−1'} − "
            f"({fmt(w @ X[s0], 3)}) = {_q(b)}.",
-           f"Check Σα<sub>i</sub>y<sub>i</sub> = {fmt(float(alpha @ y), 3)} = 0 ✓."]
+           f"Check: Σα<sub>i</sub>y<sub>i</sub> = {fmt(float(alpha @ y), 3)} (= 0, as required)."]
     if v == 1:
-        sol.append(f"f({vec(t)}) = {fmt(w[0], 3)}·{fmt(t[0])} + {fmt(w[1], 3)}·{fmt(t[1])} + ({fmt(b, 3)}) = "
-                   f"<b>{fmt(ans, 2)}</b>.")
+        sol.append(f"f({vec(t)}) = {_eval_str(w, t, b)} = <b>{fmt(ans, 2)}</b>.")
     elif v == 2:
         sol.append(f"‖w‖ = {fmt(np.linalg.norm(w), 4)} ⇒ margin = <b>{fmt(ans, 2)}</b>.")
     else:
@@ -1418,7 +1424,7 @@ def tree_traverse(rng):
         path.append(f"{nm} = {rec[nm]} vs threshold {t}: {'≤' if rec[nm] <= t else '&gt;'}.")
     return Q(text=f"The decision tree below predicts the {dom['noun']}. Edges labelled Yes/No answer the test in the "
                   f"node. What is the prediction for the record shown in the table?",
-             qtype="MCQ", marks=1, options=opts, answer=a, blocks=[Figure(draw, 10, 5.2), tbl],
+             qtype="MCQ", marks=1, options=opts, answer=a, blocks=[Figure(draw, 10, 6.2), tbl],
              solution=["Follow the record from the root, taking the branch that matches each test:"] + path +
                       [f"(Only the tests on the actual path matter.) The record reaches the leaf <b>{pred}</b>.",
                        "Note: “≤” includes equality, so a value equal to the threshold goes to the Yes branch."])
@@ -1597,7 +1603,7 @@ def _split_fig(attr, vals, par, counts):
     def draw(fig):
         ax = fig.add_subplot(111)
         _draw_tree(ax, root, fs=7.5, leaf_fc="#f2f2f2")
-    return Figure(draw, 8 if len(vals) <= 2 else 9.5, 3.6)
+    return Figure(draw, 8 if len(vals) <= 2 else 9.5, 4.2)
 
 
 @template(TOPIC, S_SPLIT, marks=2, qtype="NAT")
@@ -1606,15 +1612,13 @@ def tree_info_gain(rng):
     k = len(vals)
     par, counts, ig = _rand_split(rng, k)
     N = sum(par)
-    v = int(rng.choice(3, p=[0.6, 0.2, 0.2]))
+    v = int(rng.choice(2, p=[0.7, 0.3]))
     hc = [_H(c) for c in counts]
     wsum = sum(sum(c) / N * h for c, h in zip(counts, hc))
     if v == 0:
         ask, ans = "the information gain (in bits) of splitting on " + attr, ig
     elif v == 1:
         ask, ans = f"the weighted average entropy (in bits) of the children after splitting on {attr}", wsum
-    else:
-        ask, ans = "the entropy (in bits) of the parent node minus the entropy of the purest child", _H(par) - min(hc)
     sol = [f"Parent {_cstr(par)}: H = {_H_expr(par)} = {fmt(_H(par), 4)}."]
     for vv, c, h in zip(vals, counts, hc):
         sol.append(f"{attr} = {vv}: {_cstr(c)}, H = {_H_expr(c)} = {fmt(h, 4)}.")
@@ -1781,12 +1785,14 @@ def tree_continuous_threshold(rng):
         ax.scatter(x[~yes], np.zeros((~yes).sum()), marker="s", s=40, facecolors="white", edgecolors=INK,
                    label="No", zorder=3)
         ax.axhline(0, color=GREY, lw=0.8, zorder=1)
-        for xi in x:
-            ax.annotate(str(int(xi)), (xi, 0), textcoords="offset points", xytext=(0, -12), ha="center",
-                        fontsize=6.5)
+        for k_, xi in enumerate(x):
+            ax.annotate(str(int(xi)), (xi, 0), textcoords="offset points", xytext=(0, -13 if k_ % 2 == 0 else 7),
+                        ha="center", fontsize=6.5)
         ax.set_yticks([])
         ax.set_ylim(-1, 1)
         ax.spines["left"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.set_xticks([])
         ax.set_xlabel(nm)
         ax.legend(loc="upper center", ncol=2, frameon=False)
 
@@ -1863,7 +1869,7 @@ def tree_ccp_alpha(rng):
                   f"training records that would be misclassified if t were a leaf; R(t) = e(t)/N. " + text + " " +
                   nat_hint(d),
              qtype="NAT", marks=2, answer=nat_range(ans, d, tol=0.0015), nat_hint=nat_hint(d),
-             blocks=[Figure(draw, 9, 5)], solution=sol)
+             blocks=[Figure(draw, 9, 6.8)], solution=sol)
 
 
 @template(TOPIC, S_REG, marks=2, qtype="NAT")
@@ -1991,7 +1997,7 @@ def tree_training_errors(rng):
     rows = [["#"] + names + ["Actual"]] + [[str(i + 1)] + [r[nm] for nm in names] + [actual[i]]
                                            for i, r in enumerate(recs)]
     srows = [["#", "Predicted", "Actual", "Correct?"]] + [[str(i + 1), preds[i], actual[i],
-                                                          "✓" if preds[i] == actual[i] else "✗"] for i in range(n)]
+                                                          "yes" if preds[i] == actual[i] else "<b>no</b>"] for i in range(n)]
 
     def draw(fig):
         ax = fig.add_subplot(111)
@@ -2000,7 +2006,7 @@ def tree_training_errors(rng):
     ansr = (ans, ans) if d == 0 else nat_range(ans, d, tol=0.05 if d == 1 else 0.01)
     return Q(text=f"The decision tree shown is applied to the {n} labelled records in the table (attributes not "
                   f"tested on a path are ignored). Find {ask}. {nat_hint(d)}",
-             qtype="NAT", marks=2, answer=ansr, nat_hint=nat_hint(d), blocks=[Figure(draw, 10, 4.6), Table(rows)],
+             qtype="NAT", marks=2, answer=ansr, nat_hint=nat_hint(d), blocks=[Figure(draw, 10, 6.0), Table(rows)],
              solution=["Route each record from the root to a leaf:", Table(srows),
                        f"Misclassified: {wrong} of {n} (accuracy {fmt(100 * (n - wrong) / n, 2)}%). "
                        f"Answer: <b>{fmt(ans, d)}</b>."])
@@ -2150,7 +2156,7 @@ def adaboost_reweight(rng):
         j = j_cor
         ask, ans = f"the normalised weight of example {j + 1} for the next round", float(wn[j])
     else:
-        ask, ans = "the normalisation constant Z = Σ<sub>i</sub> w<sub>i</sub>e<super>−α y<sub>i</sub>h(x<sub>i</sub>)</super>", \
+        ask, ans = "the normalisation constant Z = Σ<sub>i</sub> w<sub>i</sub>·exp(−α y<sub>i</sub>h(x<sub>i</sub>))", \
             float(Z)
     wshow = [_q(x_, 100) for x_ in w]
     rows = [["Example i"] + [str(i + 1) for i in range(n)],
@@ -2158,7 +2164,7 @@ def adaboost_reweight(rng):
             ["h(x<sub>i</sub>) correct?"] + ["No" if mm else "Yes" for mm in mis]]
     return Q(text=f"In one AdaBoost round the current example weights and whether the chosen weak classifier h "
                   f"classifies each example correctly are given. Using α = ½ ln((1 − ε)/ε) and the update "
-                  f"w<sub>i</sub> ← w<sub>i</sub>e<super>−α y<sub>i</sub>h(x<sub>i</sub>)</super>/Z, find {ask}. "
+                  f"w<sub>i</sub> ← w<sub>i</sub>·exp(−α y<sub>i</sub>h(x<sub>i</sub>))/Z, find {ask}. "
                   f"{nat_hint(3)}",
              qtype="NAT", marks=2, answer=nat_range(ans, 3, tol=0.002), nat_hint=nat_hint(3), blocks=[Table(rows)],
              solution=[f"ε = Σ<sub>misclassified</sub> w<sub>i</sub> = {fmt(eps, 4)}; α = ½ ln({fmt(1 - eps, 4)}/"
