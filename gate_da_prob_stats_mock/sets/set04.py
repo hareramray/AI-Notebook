@@ -639,8 +639,8 @@ SET = {
                 f"$$n \\geq \\dfrac{{0.9604}}{{0.0004}} = {Q20_N:.0f}",
                 "The bound is met exactly at 2401 (98² × 0.25), so n = 2401. 2400 would give a margin slightly "
                 "above 0.02.",
-                "(C) uses z = 1.645 (a 90% interval: 1691.3 → 1692). (D) doubles n, as if E were the full width "
-                "0.02 divided wrongly.",
+                "(C) uses z = 1.645 (a 90% interval: 1691.3 → 1692). (D) 4802 uses p(1 − p) = 0.5 "
+                "instead of its maximum 0.25, doubling the requirement.",
                 ("note", "p(1 − p) ≤ 1/4 — the conservative choice p = 0.5 guarantees the margin whatever the true "
                          "CTR.", "Key idea"),
             ],
