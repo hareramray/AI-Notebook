@@ -215,7 +215,7 @@ assert sorted(k for k in opts if valid(opts[k])) == sorted(ANSWER)
                 "- 31 → idx 3, swap with 15, then with 22 → [31, 22, 9, 15] (2 swaps, total 3).\n"
                 "- 40 → idx 4, swap with 22, then with 31 → [40, 31, 9, 15, 22] (2, total 5).\n"
                 "- 12 → idx 5, swap with 9 → [40, 31, 12, 15, 22, 9] (1, total 6).\n"
-                "- 27 → idx 6, swap with 12 → [40, 31, 27, 15, 22, 9, 12] (1, total **7**).\n\n"
+                "- 27 → idx 6, swap with 12 → [40, 31, 27, 15, 22, 9, 12] (1, total **7**).\n"
                 "- (A) **True.**  (B) **True.**\n"
                 "- (C) **False.** Build-heap sifts down from index 2: 9 vs children 12, 27 → swap with 27; "
                 "index 1: 22 vs 31, 40 → swap with 40; index 0: 15 vs 40, 27 → 40, then 15 vs 31, 22 → 31. "
@@ -496,7 +496,8 @@ assert len(T) == 132 and sum(1 for t in T if ht(t) == 4) == int(ANSWER)
                 "every time → also 120 comparisons, the same as (A).\n\n"
                 "Answer: (A), (B), (C).\n\n"
                 "**Insight:** merge sort's comparison count varies only between (n/2)log₂ n = 32 and "
-                "n log₂ n − n + 1 = 49 for n = 16, whereas quicksort ranges from about 49 to 120."
+                "n log₂ n − n + 1 = 49 for n = 16, whereas quicksort's count can climb all the way to "
+                "n(n − 1)/2 = 120."
             ),
             "verify": '''
 def qs(a):
@@ -632,3 +633,212 @@ opts = {'A': "ABCDEFG", 'B': "ACBDEGF", 'C': "ACBDEFG", 'D': "ACBEDFG"}
 assert [k for k in opts if opts[k] == "".join(order)] == [ANSWER]
 ''',
         },
+        # ------------------------------------------------------------ Q16
+        {
+            "type": "NAT", "marks": 2, "topic": "Hashing — expected number of empty slots",
+            "text": ("Ten keys are inserted into a hash table with 10 slots using separate chaining. Assume "
+                     "simple uniform hashing: each key independently hashes to each slot with probability "
+                     "1/10. The expected number of slots that remain **empty** (rounded off to two decimal "
+                     "places) is ______."),
+            "answer": ["3.48", "3.50"],
+            "solution": (
+                "Use **linearity of expectation** with indicator variables. Let Xⱼ = 1 if slot j is empty.\n\n"
+                "- A particular key misses slot j with probability 1 − 1/10 = 0.9.\n"
+                "- All 10 keys miss slot j (independently) with probability 0.9¹⁰.\n"
+                "- E[Xⱼ] = 0.9¹⁰ ≈ 0.348678.\n\n"
+                "E[# empty slots] = ∑ⱼ E[Xⱼ] = 10 × 0.9¹⁰ ≈ 10 × 0.348678 = **3.49**.\n\n"
+                "So even with load factor α = 1, about 35 % of the slots are empty and the 10 keys crowd into "
+                "≈ 6.5 slots — collisions are unavoidable (for large m the fraction tends to e^{−α} ≈ 0.368).\n\n"
+                "Related quantities: expected number of colliding pairs = C(10, 2)/10 = 4.5; expected chain "
+                "length seen by an unsuccessful search = α = 1.\n\n"
+                "**Trap:** assuming that 10 keys in 10 slots ‘fill’ the table (0 empty), or computing "
+                "(1 − 1/10)·10 = 9 by forgetting that all ten keys must miss the slot."
+            ),
+            "verify": '''
+import itertools, random
+exact = 10 * 0.9 ** 10
+assert float(ANSWER[0]) <= exact <= float(ANSWER[1])
+random.seed(7)
+trials = 20000
+sim = sum(10 - len({random.randrange(10) for _ in range(10)}) for _ in range(trials)) / trials
+assert abs(sim - exact) < 0.05
+''',
+        },
+        # ------------------------------------------------------------ Q17
+        {
+            "type": "MCQ", "marks": 2, "topic": "Heapsort — trace",
+            "text": ("Heapsort is applied to [12, 45, 7, 33, 21, 50, 18]: first bottom-up build-max-heap, then "
+                     "repeatedly swap the root with the last element of the heap, shrink the heap by one and "
+                     "sift the new root down (always toward the **larger** child). What is the array after "
+                     "build-max-heap and **two** such extraction steps?"),
+            "diagrams": [{"type": "heap", "values": [12, 45, 7, 33, 21, 50, 18],
+                          "caption": "Input array viewed as a complete binary tree"}],
+            "options": ["[33, 21, 18, 12, 7, 45, 50]", "[33, 21, 18, 7, 12, 45, 50]",
+                        "[45, 33, 18, 12, 21, 7, 50]", "[33, 12, 18, 21, 7, 45, 50]"],
+            "answer": "A",
+            "solution": (
+                "**Build-max-heap** (sift down indices 2, 1, 0):\n\n"
+                "- i = 2: 7 vs children 50, 18 → swap with 50 → [12, 45, 50, 33, 21, 7, 18].\n"
+                "- i = 1: 45 vs 33, 21 → already a heap.\n"
+                "- i = 0: 12 vs 45, 50 → swap with 50; at index 2, 12 vs 7, 18 → swap with 18 → "
+                "[50, 45, 18, 33, 21, 7, 12].\n\n"
+                "**Extraction 1:** swap 50 ↔ 12 → [12, 45, 18, 33, 21, 7 | 50]; sift 12: children 45, 18 → "
+                "45; then children 33, 21 → 33 → [45, 33, 18, 12, 21, 7 | 50].\n\n"
+                "**Extraction 2:** swap 45 ↔ 7 → [7, 33, 18, 12, 21 | 45, 50]; sift 7: children 33, 18 → 33; "
+                "then children 12, 21 → 21 → [33, 21, 18, 12, 7 | 45, 50].\n\n"
+                "Answer (A).\n\n"
+                "- (B) sifts 7 toward the *smaller* child 12 in the second extraction.\n"
+                "- (C) is the state after only one extraction.\n"
+                "- (D) stops the second sift after one level and mis-orders 12 and 21.\n\n"
+                "**Tip:** after k extractions the last k cells hold the k largest keys in sorted order — "
+                "a quick sanity check (45, 50 here)."
+            ),
+            "solution_diagrams": [{"type": "heap", "values": [50, 45, 18, 33, 21, 7, 12],
+                                   "caption": "After build-max-heap"},
+                                  {"type": "array", "values": [33, 21, 18, 12, 7, 45, 50],
+                                   "highlight": [5, 6], "caption": "After two extractions (sorted suffix shaded)"}],
+            "verify": '''
+def sift(a, i, n):
+    while True:
+        l, r, m = 2*i + 1, 2*i + 2, i
+        if l < n and a[l] > a[m]: m = l
+        if r < n and a[r] > a[m]: m = r
+        if m == i: return
+        a[i], a[m] = a[m], a[i]; i = m
+a = [12, 45, 7, 33, 21, 50, 18]; n = 7
+for i in range(n // 2 - 1, -1, -1): sift(a, i, n)
+assert a == [50, 45, 18, 33, 21, 7, 12]
+for _ in range(2):
+    a[0], a[n - 1] = a[n - 1], a[0]; n -= 1; sift(a, 0, n)
+opts = {'A': [33, 21, 18, 12, 7, 45, 50], 'B': [33, 21, 18, 7, 12, 45, 50],
+        'C': [45, 33, 18, 12, 21, 7, 50], 'D': [33, 12, 18, 21, 7, 45, 50]}
+assert [k for k in opts if opts[k] == a] == [ANSWER]
+''',
+        },
+        # ------------------------------------------------------------ Q18
+        {
+            "type": "NAT", "marks": 2, "topic": "DAGs — counting topological orders",
+            "text": "The number of distinct topological orderings of the directed acyclic graph below is ______.",
+            "diagrams": [{"type": "graph", "directed": True,
+                          "nodes": ["A", "B", "C", "D", "E", "F", "G"],
+                          "edges": [["A", "C"], ["B", "C"], ["C", "E"], ["B", "D"], ["D", "E"], ["D", "F"],
+                                    ["E", "G"], ["F", "G"]],
+                          "pos": {"A": [0, 2], "B": [0, 0], "C": [1.5, 2], "D": [1.5, 0], "E": [3, 2],
+                                  "F": [3, 0], "G": [4.5, 1]}}],
+            "answer": "14",
+            "solution": (
+                "Every vertex reaches G (via E or F), so G is always **last**; count orders of A–F.\n\n"
+                "Ignore A first. B must precede C and D, so B comes first among {B, C, D, E, F}. The "
+                "remaining constraints are C < E, D < E, D < F. Orders of {C, D, E, F}:\n\n"
+                "- C D E F, C D F E, D C E F, D C F E, D F C E → **5** orders.\n\n"
+                "Now insert A; its only constraint is A < C. For each order (with B in front), count the "
+                "slots before C:\n\n"
+                "- B C D E F → A can go before B or between B and C: 2.\n"
+                "- B C D F E → 2.\n"
+                "- B D C E F → before B, after B, after D: 3.\n"
+                "- B D C F E → 3.\n"
+                "- B D F C E → 4.\n\n"
+                "Total = 2 + 2 + 3 + 3 + 4 = **14**.\n\n"
+                "**Trap:** treating A and B symmetrically (both are sources) — B has more successors (C and "
+                "D), so it is far more constrained than A."
+            ),
+            "verify": '''
+import itertools
+E = [("A","C"),("B","C"),("C","E"),("B","D"),("D","E"),("D","F"),("E","G"),("F","G")]
+c = 0
+for p in itertools.permutations("ABCDEFG"):
+    pos = {v: i for i, v in enumerate(p)}
+    c += all(pos[u] < pos[v] for u, v in E)
+assert c == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q19
+        {
+            "type": "MCQ", "marks": 2, "topic": "Monotonic stack — next greater element",
+            "text": "Consider the following Python program. What is printed?",
+            "code": '''def nge(a):
+    res = [-1] * len(a)
+    st = []                      # stack of indices
+    for i, x in enumerate(a):
+        while st and a[st[-1]] < x:
+            res[st.pop()] = x
+        st.append(i)
+    return res
+
+print(nge([4, 7, 3, 5, 9, 1, 6]))''',
+            "options": ["`[7, 9, 9, 9, -1, 6, -1]`", "`[7, 9, 5, 9, -1, 6, 6]`",
+                        "`[7, -1, 5, 9, -1, 6, -1]`", "`[7, 9, 5, 9, -1, 6, -1]`"],
+            "answer": "D",
+            "solution": (
+                "The stack holds indices whose next greater element is still unknown; their values are "
+                "decreasing from bottom to top. A new x pops every smaller value — x is their answer.\n\n"
+                "- i=0 (4): push → st = [4].\n"
+                "- i=1 (7): pop 4 → res[0] = 7; push → [7].\n"
+                "- i=2 (3): push → [7, 3].\n"
+                "- i=3 (5): pop 3 → res[2] = 5; 7 > 5 stop; push → [7, 5].\n"
+                "- i=4 (9): pop 5 → res[3] = 9; pop 7 → res[1] = 9; push → [9].\n"
+                "- i=5 (1): push → [9, 1].\n"
+                "- i=6 (6): pop 1 → res[5] = 6; push → [9, 6].\n"
+                "- End: 9 and 6 remain → −1.\n\n"
+                "Output `[7, 9, 5, 9, -1, 6, -1]` → option (D).\n\n"
+                "- (A) gives the *maximum to the right* for index 2, not the next greater.\n"
+                "- (B) assigns the last element its own value.\n"
+                "- (C) misses that 7 is popped by 9.\n\n"
+                "**Complexity:** each index is pushed and popped at most once → Θ(n) total, even though "
+                "there is a nested `while` loop (amortised analysis)."
+            ),
+            "solution_diagrams": [{"type": "stack", "values": [9, 6], "label": "st (values)",
+                                   "caption": "Stack at the end — these keep −1"}],
+            "verify": "assert OUTPUT.strip() == '[7, 9, 5, 9, -1, 6, -1]' and ANSWER == 'D'",
+        },
+        # ------------------------------------------------------------ Q20
+        {
+            "type": "NAT", "marks": 2, "topic": "Binary search on the answer",
+            "text": ("Packages with weights `w` must be shipped **in the given order** within D = 3 days; each "
+                     "day a contiguous block of packages is loaded and its total weight may not exceed the "
+                     "ship's capacity c. The program below binary-searches for the minimum feasible c. "
+                     "The value printed is ______."),
+            "code": '''w = [7, 2, 5, 10, 8, 3, 6]
+D = 3
+
+def days(c):
+    d, cur = 1, 0
+    for x in w:
+        if cur + x > c:
+            d, cur = d + 1, 0
+        cur += x
+    return d
+
+lo, hi = max(w), sum(w)
+while lo < hi:
+    mid = (lo + hi) // 2
+    if days(mid) <= D:
+        hi = mid
+    else:
+        lo = mid + 1
+print(lo)''',
+            "answer": "17",
+            "solution": (
+                "`days(c)` is non-increasing in c, so feasibility is monotone and the smallest feasible c can "
+                "be found by a lower-bound binary search over [max(w), sum(w)] = [10, 41].\n\n"
+                "- lo=10, hi=41: mid=25 → loads 7+2+5+10 = 24 | 8+3+6 = 17 → 2 days ≤ 3 → hi = 25.\n"
+                "- lo=10, hi=25: mid=17 → 7+2+5 = 14 | 10 | 8+3+6 = 17 → 3 days → hi = 17.\n"
+                "- lo=10, hi=17: mid=13 → 9 | 5 | 10 | 8+3 | 6 → 5 days → lo = 14.\n"
+                "- lo=14, hi=17: mid=15 → 14 | 10 | 11 | 6 → 4 days → lo = 16.\n"
+                "- lo=16, hi=17: mid=16 → 14 | 10 | 11 | 6 → 4 days → lo = 17.\n"
+                "- lo = hi = 17 → print **17**.\n\n"
+                "Check: c = 17 works (14 | 10 | 17) and c = 16 does not (the last block 8 + 3 + 6 = 17 must "
+                "be split).\n\n"
+                "Cost: O(n log(∑w)) — 5 iterations of an O(n) check here.\n\n"
+                "**Trap:** starting with lo = 1 is still correct but slower; starting with lo = sum/D ≈ 13.7 "
+                "and *rounding down* is fine too, but returning `mid` instead of `lo` can be off by one."
+            ),
+            "verify": '''
+import itertools
+best = min(max(sum(w[a:b]) for a, b in zip((0,) + cuts, cuts + (7,)))
+           for cuts in itertools.combinations(range(1, 7), 2))
+assert int(OUTPUT) == best == int(ANSWER)
+''',
+        },
+    ],
+}

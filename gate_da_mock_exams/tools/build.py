@@ -119,16 +119,21 @@ def paras(s, style="body"):
     res = []
     if not s:
         return res
+    bst = ParagraphStyle("b_" + style, parent=ST[style], leftIndent=14, bulletIndent=4)
     for block in re.split(r"\n\s*\n", str(s).strip()):
-        lines = block.split("\n")
-        if all(l.lstrip().startswith(("- ", "• ")) for l in lines if l.strip()):
-            for l in lines:
-                if l.strip():
-                    txt = l.lstrip()[2:]
-                    res.append(Paragraph(md(txt), ParagraphStyle("b", parent=ST[style], leftIndent=14,
-                                                                 bulletIndent=4), bulletText="•"))
-        else:
-            res.append(Paragraph(md(block), ST[style]))
+        buf = []
+
+        def flush():
+            if buf:
+                res.append(Paragraph(md("\n".join(buf)), ST[style]))
+                buf.clear()
+        for l in block.split("\n"):
+            if l.lstrip().startswith(("- ", "• ")):
+                flush()
+                res.append(Paragraph(md(l.lstrip()[2:]), bst, bulletText="•"))
+            else:
+                buf.append(l)
+        flush()
         res.append(Spacer(1, 3))
     return res
 

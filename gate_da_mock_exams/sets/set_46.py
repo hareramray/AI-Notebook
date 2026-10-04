@@ -359,5 +359,488 @@ def ht(t): return -1 if t is None else 1 + max(ht(t[0]), ht(t[1]))
 assert sum(1 for t in shapes(5) if ht(t) == 4) == 16 and ANSWER == 'A'
 ''',
         },
+        # ---------------------------------------------------------------- Q11
+        {
+            "type": "NAT", "marks": 2, "topic": "BST — insertion orders of minimum height",
+            "text": ("The keys 1, 2, 3, 4, 5, 6 are inserted in some order into an initially empty BST. Of the 720 "
+                     "possible insertion orders, the number that produce a BST of the **minimum possible height** "
+                     "(height = number of edges on the longest root-to-leaf path) is ______."),
+            "answer": "80",
+            "solution": (
+                "With 6 keys the minimum height is ⌈log₂ 7⌉ − 1 = **2** (a height-2 tree holds at most 7 keys).\n\n"
+                "**Which roots work?** The two subtrees must each have height ≤ 1, i.e. ≤ 3 keys. With 5 non-root "
+                "keys, the split must be 2 + 3 or 3 + 2 → root is **3** or **4**.\n\n"
+                "**Root 3:** left {1, 2} (any order: 2 orders, both give height 1); right {4, 5, 6} must have "
+                "height 1, so its root must be 5, i.e. 5 is inserted before 4 and 6 → 2 orders. The two "
+                "subsequences can be interleaved in C(5, 2) = 10 ways. Count = 10 × 2 × 2 = 40.\n\n"
+                "**Root 4:** symmetric (left {1, 2, 3} needs 2 first; right {5, 6} free) → 40.\n\n"
+                "Total = 40 + 40 = **80**.\n\n"
+                "**Trap:** remembering '80' as the classic answer for 7 keys and a *perfect* tree is a "
+                "coincidence here — derive it: forgetting the interleaving factor C(5, 2) gives only 8."
+            ),
+            "solution_diagrams": [{"type": "bintree", "tree": [3, [1, None, [2]], [5, [4], [6]]],
+                                   "caption": "One minimum-height BST (e.g. order 3, 5, 1, 6, 2, 4)"}],
+            "verify": '''
+from itertools import permutations
+def ins(t, k):
+    if t is None: return [k, None, None]
+    if k < t[0]: t[1] = ins(t[1], k)
+    else: t[2] = ins(t[2], k)
+    return t
+def ht(t): return -1 if t is None else 1 + max(ht(t[1]), ht(t[2]))
+hs = []
+for p in permutations(range(1, 7)):
+    t = None
+    for k in p: t = ins(t, k)
+    hs.append(ht(t))
+assert hs.count(min(hs)) == int(ANSWER) and min(hs) == 2
+''',
+        },
+        # ---------------------------------------------------------------- Q12
+        {
+            "type": "MSQ", "marks": 2, "topic": "Dijkstra with a negative edge",
+            "text": ("The standard Dijkstra algorithm (a vertex, once extracted, is final and never updated again) is "
+                     "run from **S** on the directed graph below, which has one negative edge B → A. Which of the "
+                     "following statements is/are TRUE?"),
+            "diagrams": [{"type": "graph", "directed": True,
+                          "nodes": ["S", "A", "B", "C", "D"],
+                          "edges": [["S", "A", 2], ["S", "B", 4], ["A", "C", 3], ["B", "A", -4], ["C", "D", 2],
+                                    ["B", "D", 6]],
+                          "pos": {"S": [0, 1], "A": [2, 2.2], "B": [2, -0.2], "C": [4, 2.2], "D": [4, -0.2]}}],
+            "options": ["Dijkstra reports the correct shortest distance to B",
+                        "Dijkstra reports d(A) = 2, whereas the true shortest distance to A is 0",
+                        "Dijkstra reports the correct shortest distance to D",
+                        "Adding 4 to every edge weight and running Dijkstra yields shortest paths that are also "
+                        "shortest in the original graph"],
+            "answer": ["A", "B"],
+            "solution": (
+                "**Dijkstra trace:** extract S (0): A = 2, B = 4. Extract A (2): C = 5. Extract B (4): edge "
+                "B → A would give 0, but A is already final → ignored; D = 10. Extract C (5): D = 7. Extract D (7).\n"
+                "Reported: A 2, B 4, C 5, D 7.\n\n"
+                "**True distances** (no negative cycle): A = 4 − 4 = **0** (S→B→A), C = 3, D = 5 (S→B→A→C→D: "
+                "4 − 4 + 3 + 2), B = 4.\n\n"
+                "- (A) d(B) = 4 is correct (no path to B uses the negative edge). **True.**\n"
+                "- (B) **True** — A was finalised before B's negative edge was seen.\n"
+                "- (C) Reported 7 vs true 5 — the error propagates through C. **False.**\n"
+                "- (D) After +4: S→B→D costs 8 + 10 = 18, while S→B→A→C→D costs 8 + 0 + 7 + 6 = 21, so Dijkstra "
+                "picks S→B→D (original cost 10), not the true shortest (cost 5). Adding a constant penalises "
+                "paths with **more edges**. **False.**\n\n"
+                "**Trap:** uniform reweighting is not Johnson's reweighting (which uses vertex potentials "
+                "w'(u,v) = w(u,v) + h(u) − h(v))."
+            ),
+            "solution_diagrams": [{"type": "matrix", "title": "Reported vs true distances",
+                                   "col_labels": ["S", "A", "B", "C", "D"],
+                                   "row_labels": ["Dijkstra", "true"],
+                                   "rows": [[0, 2, 4, 5, 7], [0, 0, 4, 3, 5]],
+                                   "highlight": [[0, 1], [0, 3], [0, 4]]}],
+            "verify": '''
+E = [('S','A',2),('S','B',4),('A','C',3),('B','A',-4),('C','D',2),('B','D',6)]
+V = 'SABCD'
+def dijkstra(E):
+    G = {v: [] for v in V}
+    for u, v, w in E: G[u].append((v, w))
+    d = {v: float('inf') for v in V}; d['S'] = 0; done = set(); par = {}
+    while len(done) < len(V):
+        u = min((v for v in V if v not in done), key=lambda v: (d[v], v)); done.add(u)
+        for v, w in G[u]:
+            if v not in done and d[u] + w < d[v]: d[v] = d[u] + w; par[v] = u
+    return d, par
+d, _ = dijkstra(E)
+bf = {v: float('inf') for v in V}; bf['S'] = 0
+for _ in range(4):
+    for u, v, w in E: bf[v] = min(bf[v], bf[u] + w)
+W = {(u, v): w for u, v, w in E}
+_, par = dijkstra([(u, v, w + 4) for u, v, w in E])
+x, cost = 'D', 0
+while x != 'S': cost += W[(par[x], x)]; x = par[x]
+truth = {'A': d['B'] == bf['B'], 'B': d['A'] == 2 and bf['A'] == 0,
+         'C': d['D'] == bf['D'], 'D': cost == bf['D']}
+assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
+''',
+        },
+        # ---------------------------------------------------------------- Q13
+        {
+            "type": "NAT", "marks": 2, "topic": "Divide and conquer — inversion counting",
+            "text": ("Inversions of A = [7, 2, 9, 4, 11, 1, 8, 3, 10, 5] are counted by the merge-sort method: the "
+                     "array is split into A[0..4] and A[5..9], each half is sorted recursively (counting its own "
+                     "inversions), and the remaining *split* inversions — pairs (i, j) with i in the left half, j "
+                     "in the right half and A[i] > A[j] — are counted during the **final** merge. The number of "
+                     "inversions counted during that final merge is ______."),
+            "answer": "15",
+            "solution": (
+                "During a merge, whenever an element y of the right half is output before some remaining left "
+                "elements, it forms an inversion with **every** remaining left element.\n\n"
+                "Sorted halves: L = [2, 4, 7, 9, 11], R = [1, 3, 5, 8, 10]. Merge:\n"
+                "- 1 (from R) output while all 5 of L remain → +5\n"
+                "- 2 (L), then 3 (R): L has 4, 7, 9, 11 left → +4\n"
+                "- 4 (L), then 5 (R): 7, 9, 11 left → +3\n"
+                "- 7 (L), then 8 (R): 9, 11 left → +2\n"
+                "- 9 (L), then 10 (R): 11 left → +1\n"
+                "- 11 (L).\n\n"
+                "Split inversions = 5 + 4 + 3 + 2 + 1 = **15**.\n\n"
+                "(For completeness: the left half [7, 2, 9, 4, 11] has 3 inversions and the right half "
+                "[1, 8, 3, 10, 5] has 3, so the total is 21.)\n\n"
+                "**Trap:** counting the inversions of the whole array (21), or adding +1 per right element "
+                "instead of +(number of remaining left elements)."
+            ),
+            "solution_diagrams": [{"type": "matrix", "title": "Final merge: right elements and split inversions",
+                                   "col_labels": ["1", "3", "5", "8", "10"],
+                                   "row_labels": ["left items still pending"],
+                                   "rows": [[5, 4, 3, 2, 1]]}],
+            "verify": '''
+A = [7, 2, 9, 4, 11, 1, 8, 3, 10, 5]
+L, R = sorted(A[:5]), sorted(A[5:])
+i = j = c = 0
+while i < 5 and j < 5:
+    if L[i] <= R[j]: i += 1
+    else: c += 5 - i; j += 1
+assert c == int(ANSWER) == sum(1 for x in A[:5] for y in A[5:] if x > y)
+''',
+        },
+        # ---------------------------------------------------------------- Q14
+        {
+            "type": "MCQ", "marks": 2, "topic": "Python — mutable defaults, closures and try/finally",
+            "text": "Consider the following Python program. What is printed?",
+            "code": '''def make(n, acc=[]):
+    acc.append(n)
+    return lambda k: [a * k for a in acc]
+
+f = make(1)
+g = make(2)
+h = make(3, [])
+print(f(10), g(1), h(2))
+
+def t():
+    try:
+        return f(1)
+    finally:
+        make(4)
+
+print(t(), g(1))''',
+            "options": ["`[10, 20] [1, 2] [6]` / `[1, 2] [1, 2, 4]`",
+                        "`[10] [2] [6]` / `[1] [2]`",
+                        "`[10, 20] [1, 2] [6]` / `[1, 2, 4] [1, 2, 4]`",
+                        "`[10, 20] [1, 2] [2, 4, 6]` / `[1, 2] [1, 2, 4]`"],
+            "answer": "A",
+            "solution": (
+                "(`/` separates the two output lines.) Three mechanisms interact:\n\n"
+                "1. `acc=[]` is created **once**; `make(1)` and `make(2)` append to the same list → "
+                "acc = [1, 2]. `make(3, [])` uses a fresh list [3].\n"
+                "2. Each lambda closes over *its* `acc` object and reads it **when called**. So f and g see the "
+                "same list [1, 2]: f(10) = [10, 20], g(1) = [1, 2]; h(2) = [6].\n"
+                "3. In `t()`, the `return` expression `f(1)` is evaluated **before** the `finally` block runs: "
+                "it builds the new list [1, 2]. Then `finally` calls `make(4)`, appending 4 to the shared acc. "
+                "The already-computed return value is unaffected, but the later `g(1)` sees [1, 2, 4].\n\n"
+                "Output:\n`[10, 20] [1, 2] [6]`\n`[1, 2] [1, 2, 4]`\n\n"
+                "- (B) ignores the shared default list.\n"
+                "- (C) assumes `finally` runs before the return value is computed.\n"
+                "- (D) assumes `make(3, [])` also used the shared list.\n\n"
+                "**Trap:** `finally` runs after the return expression is evaluated but before the function "
+                "actually returns; it can mutate shared state (and could even override the return value with its "
+                "own `return`)."
+            ),
+            "verify": '''
+lines = OUTPUT.strip().splitlines()
+assert lines == ['[10, 20] [1, 2] [6]', '[1, 2] [1, 2, 4]'] and ANSWER == 'A'
+''',
+        },
+        # ---------------------------------------------------------------- Q15
+        {
+            "type": "NAT", "marks": 2, "topic": "Linear probing — dependence on insertion order",
+            "text": ("The keys 14, 24, 35, 4, 15 are inserted into an initially empty hash table with slots 0–9 using "
+                     "h(k) = k mod 10 and linear probing (step +1). Of the 5! = 120 possible insertion orders, the "
+                     "number in which key **15** ends up in slot **5** is ______."),
+            "answer": "42",
+            "solution": (
+                "Keys 14, 24, 4 hash to slot 4; 35 and 15 hash to slot 5. All five end up in the cluster of slots "
+                "4–8, and 15 lands in slot 5 **iff slot 5 is still empty when 15 is inserted**.\n\n"
+                "Who can fill slot 5 before 15?\n"
+                "- 35 (its home slot), or\n"
+                "- a 4-key (14, 24 or 4) that finds slot 4 occupied, i.e. the **second** 4-key to be inserted.\n\n"
+                "So 15 gets slot 5 iff, among the keys inserted before 15, there is no 35 and at most one 4-key. "
+                "Let p = number of keys before 15:\n"
+                "- p = 0: 15 first → any order of the other 4: 4! = 24.\n"
+                "- p = 1: the key before 15 is one of the three 4-keys (3 ways); the remaining 3 keys follow in "
+                "any order (3! = 6) → 18.\n"
+                "- p ≥ 2: impossible (either 35 or a second 4-key precedes 15).\n\n"
+                "Total = 24 + 18 = **42**.\n\n"
+                "**Trap:** assuming the first 4-key always takes slot 4 'and blocks nothing' — the second 4-key "
+                "spills into slot 5 and steals 15's home."
+            ),
+            "solution_diagrams": [{"type": "hashtable", "size": 10,
+                                   "slots": {4: 14, 5: 15, 6: 24, 7: 35, 8: 4},
+                                   "caption": "Result for the order 14, 15, 24, 35, 4"}],
+            "verify": '''
+from itertools import permutations
+cnt = 0
+for p in permutations([14, 24, 35, 4, 15]):
+    T = [None] * 10
+    for k in p:
+        i = k % 10
+        while T[i] is not None: i = (i + 1) % 10
+        T[i] = k
+    cnt += T[5] == 15
+assert cnt == int(ANSWER)
+''',
+        },
+        # ---------------------------------------------------------------- Q16
+        {
+            "type": "MSQ", "marks": 2, "topic": "Heaps — structural bounds",
+            "text": ("Consider binary heaps on **15 distinct** keys stored in A[0..14] (children of i at 2i+1, 2i+2). "
+                     "Which of the following statements is/are TRUE?"),
+            "diagrams": [{"type": "heap", "values": list(range(1, 16)), "show_index": False,
+                          "caption": "A min-heap on 15 keys (keys 1..15 in level order) — shape reference"}],
+            "options": ["Bottom-up build-heap performs at most 11 swaps on any input of 15 keys",
+                        "Inserting the keys 1, 2, …, 15 in this order, one at a time, into an initially empty "
+                        "**max**-heap performs 34 swaps in total",
+                        "In a **min**-heap, the largest key can be at index 6",
+                        "In a **min**-heap, the second smallest key is always at index 1 or 2"],
+            "answer": ["A", "B", "D"],
+            "solution": (
+                "- (A) A sift-down from a node of height h makes at most h swaps. Heights: root 3, two nodes 2, "
+                "four nodes 1, eight leaves 0 → at most 3 + 2·2 + 4·1 = **11** swaps (reached e.g. for "
+                "ascending input to a max-heap). **True.**\n"
+                "- (B) Each new key is the largest so far and sifts up to the root, making as many swaps as its "
+                "depth: depths 0 (1 key), 1 (2 keys), 2 (4 keys), 3 (8 keys) → 0 + 2 + 8 + 24 = **34**. **True.**\n"
+                "- (C) Index 6 has children 13 and 14, which must be larger than it in a min-heap — so the "
+                "largest key must be a **leaf** (indices 7–14). **False.**\n"
+                "- (D) The second smallest has only one smaller key (the root), so its parent must be the root "
+                "→ index 1 or 2. **True.**\n\n"
+                "**Trap:** (A) vs (B) shows why bottom-up build-heap is O(n) while repeated insertion can be "
+                "Θ(n log n): bottom-up sums *heights* (mostly small), insertion sums *depths* (mostly large)."
+            ),
+            "verify": '''
+import random
+def build_swaps(A):
+    A = A[:]; n = len(A); sw = 0
+    for i in range(n // 2 - 1, -1, -1):
+        j = i
+        while True:
+            l, r, m = 2 * j + 1, 2 * j + 2, j
+            if l < n and A[l] > A[m]: m = l
+            if r < n and A[r] > A[m]: m = r
+            if m == j: break
+            A[j], A[m] = A[m], A[j]; sw += 1; j = m
+    return sw
+random.seed(3)
+mx = max(build_swaps(random.sample(range(15), 15)) for _ in range(3000))
+asc = build_swaps(list(range(15)))
+H = []; ins_sw = 0
+for k in range(1, 16):
+    H.append(k); i = len(H) - 1
+    while i and H[(i - 1) // 2] < H[i]:
+        H[i], H[(i - 1) // 2] = H[(i - 1) // 2], H[i]; i = (i - 1) // 2; ins_sw += 1
+pos_max, pos_2nd = set(), set()
+for _ in range(3000):
+    M = []
+    for k in random.sample(range(15), 15):
+        M.append(k); i = len(M) - 1
+        while i and M[(i - 1) // 2] > M[i]:
+            M[i], M[(i - 1) // 2] = M[(i - 1) // 2], M[i]; i = (i - 1) // 2
+    pos_max.add(M.index(14)); pos_2nd.add(M.index(1))
+truth = {'A': mx <= 11 and asc == 11, 'B': ins_sw == 34,
+         'C': 6 in pos_max, 'D': pos_2nd <= {1, 2}}
+assert min(pos_max) >= 7
+assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
+''',
+        },
+        # ---------------------------------------------------------------- Q17
+        {
+            "type": "NAT", "marks": 2, "topic": "DFS — counting possible visit orders",
+            "text": ("Depth-first search (recursive) is started at **A** on the undirected graph shown below. "
+                     "The order in which a vertex scans its neighbours is **arbitrary** (any order may be used at "
+                     "any vertex). The number of distinct orders in which the five vertices can be first visited "
+                     "is ______."),
+            "diagrams": [{"type": "graph", "directed": False,
+                          "nodes": ["A", "B", "C", "D", "E"],
+                          "edges": [["A", "B"], ["A", "C"], ["A", "D"], ["B", "C"], ["C", "D"], ["C", "E"],
+                                    ["D", "E"]],
+                          "pos": {"A": [0, 1], "B": [1.5, 2.2], "C": [1.5, 1], "D": [1.5, -0.2],
+                                  "E": [3, 0.4]}}],
+            "answer": "9",
+            "solution": (
+                "DFS always continues from the **most recently discovered** vertex that still has an unvisited "
+                "neighbour. Branch on A's first choice.\n\n"
+                "**A → B:** B's only unvisited neighbour is C. From C: D then E (D–E), or E then D. "
+                "→ A B C D E, A B C E D (**2**).\n\n"
+                "**A → C:** C's unvisited neighbours are B, D, E.\n"
+                "- C → B: B is a dead end; back at C choose D (→ E) or E (→ D): A C B D E, A C B E D.\n"
+                "- C → D → E (E's neighbours C, D visited) → back to C → B: A C D E B.\n"
+                "- C → E → D → back to C → B: A C E D B.\n"
+                "(**4**)\n\n"
+                "**A → D:** D's unvisited neighbours C, E.\n"
+                "- D → C: then C → B (dead end) → C → E: A D C B E; or C → E first, then B: A D C E B.\n"
+                "- D → E → C → B: A D E C B.\n"
+                "(**3**)\n\n"
+                "Total = 2 + 4 + 3 = **9**.\n\n"
+                "**Trap:** orders like A, B, D, … are impossible — after B, DFS must continue from B (to C) "
+                "before backtracking to A. Not every 'A first' permutation of a connected graph is a DFS order."
+            ),
+            "verify": '''
+from itertools import permutations, product
+E = [('A','B'),('A','C'),('A','D'),('B','C'),('C','D'),('C','E'),('D','E')]
+G = {}
+for u, v in E: G.setdefault(u, []).append(v); G.setdefault(v, []).append(u)
+V = sorted(G)
+orders = set()
+for choice in product(*[list(permutations(G[v])) for v in V]):
+    adj = dict(zip(V, choice)); seen = []
+    def dfs(u):
+        seen.append(u)
+        for w in adj[u]:
+            if w not in seen: dfs(w)
+    dfs('A'); orders.add(tuple(seen))
+assert len(orders) == int(ANSWER)
+''',
+        },
+        # ---------------------------------------------------------------- Q18
+        {
+            "type": "MCQ", "marks": 2, "topic": "Output-restricted deque permutations",
+            "text": ("The values 1, 2, 3, 4 arrive in this order. Each arriving value must be inserted into a deque at "
+                     "**either end**; at any time the element at the **front** may be removed and output (removal "
+                     "only at the front). Which of the following output sequences is **impossible**?"),
+            "diagrams": [{"type": "queue", "values": [2, 1, 3], "caption": "e.g. after inserting 1, 2 at front, 3 at rear"}],
+            "options": ["4, 2, 1, 3", "3, 1, 2, 4", "4, 1, 3, 2", "1, 4, 2, 3"],
+            "answer": "C",
+            "solution": (
+                "Since 4 arrives last, a sequence starting with 4 needs **all of 1, 2, 3 inside the deque** in "
+                "exactly the order they will be output (front to rear), and that arrangement must be buildable by "
+                "adding 1, then 2, then 3 at either end. Adding at the ends means 1, 2, 3 form a sequence in which "
+                "each new value is at an end, i.e. the deque reads as something like 3 2 1, 2 1 3, 1 2 3, 3 1 2 "
+                "— the value 1 is always 'inside' a run that grows outward.\n\n"
+                "- (A) 4, 2, 1, 3: insert 1; 2 at front → [2, 1]; 3 at rear → [2, 1, 3]; 4 at front → output "
+                "4, 2, 1, 3. **Possible.**\n"
+                "- (B) 3, 1, 2, 4: [1], 2 at rear → [1, 2], 3 at front → [3, 1, 2]; output 3, 1, 2; then 4. "
+                "**Possible.**\n"
+                "- (C) 4, 1, 3, 2: the deque must read 1, 3, 2 (front to rear) before 4 is added. But 2 arrived "
+                "*before* 3, and it would have to be adjacent to 1 at insertion time — in 1, 3, 2 it is not "
+                "(3 sits between them, yet 3 could only have been added at an end). **Impossible.**\n"
+                "- (D) 1, 4, 2, 3: insert 1, output 1; [2], 3 at rear → [2, 3], 4 at front → 4, 2, 3. "
+                "**Possible.**\n\n"
+                "(The only impossible output sequences of length 4 are 4, 1, 3, 2 and 4, 2, 3, 1.)\n\n"
+                "**Tip:** for a deque fed in order, the contents always form a 'unimodal' arrangement: decreasing "
+                "towards the most recent insertions at each end."
+            ),
+            "verify": '''
+from functools import lru_cache
+from itertools import permutations
+def possible(target):
+    target = tuple(target)
+    @lru_cache(None)
+    def go(nxt, dq, k):
+        if k == len(target): return True
+        if dq and dq[0] == target[k] and go(nxt, dq[1:], k + 1): return True
+        if nxt <= 4 and (go(nxt + 1, (nxt,) + dq, k) or go(nxt + 1, dq + (nxt,), k)): return True
+        return False
+    return go(1, (), 0)
+opts = [(4,2,1,3), (3,1,2,4), (4,1,3,2), (1,4,2,3)]
+assert [L for L, s in zip('ABCD', opts) if not possible(s)] == [ANSWER]
+assert sorted(p for p in permutations(range(1, 5)) if not possible(p)) == [(4,1,3,2), (4,2,3,1)]
+''',
+        },
+        # ---------------------------------------------------------------- Q19
+        {
+            "type": "NAT", "marks": 2, "topic": "Recurrences — exact operation count",
+            "text": "Consider the following Python program. The value printed is ______.",
+            "code": '''c = 0
+def f(n):
+    global c
+    if n <= 1:
+        c += 1
+        return
+    for i in range(n // 2):
+        c += 1
+    f(n // 2)
+    f(n // 2)
+    f(n // 2)
+
+f(16)
+print(c)''',
+            "answer": "146",
+            "solution": (
+                "Let T(n) be the final increase of c caused by f(n). From the code:\n"
+                "T(1) = 1, T(n) = n/2 + 3T(n/2).\n\n"
+                "- T(2) = 1 + 3·1 = 4\n"
+                "- T(4) = 2 + 3·4 = 14\n"
+                "- T(8) = 4 + 3·14 = 46\n"
+                "- T(16) = 8 + 3·46 = **146**\n\n"
+                "Closed form check: with n = 2^{k}, T(n) = 3^{k} + (n/2)·Σ_{i=0}^{k−1} (3/2)^{i} = 3^{k} + "
+                "3^{k} − 2^{k} = 2·3^{k} − 2^{k}; for k = 4: 2·81 − 16 = 146 ✓. Asymptotically "
+                "T(n) = Θ(n^{log₂ 3}) ≈ Θ(n^{1.585}) (master theorem, case 1).\n\n"
+                "**Trap:** the loop runs n//2 times (not n), and leaves contribute 1 each (3^{4} = 81 leaves)."
+            ),
+            "verify": '''
+assert int(OUTPUT.strip()) == int(ANSWER) == 2 * 3 ** 4 - 2 ** 4
+''',
+        },
+        # ---------------------------------------------------------------- Q20
+        {
+            "type": "MSQ", "marks": 2, "topic": "Reversing a linked list that contains a cycle",
+            "text": ("A singly linked list has nodes with values 1, 2, 3, 4, 5, 6 linked in this order, and node 6 "
+                     "points back to node 3 (see figure). The standard iterative reversal below is applied with "
+                     "`cur` = node 1. Which of the following statements is/are TRUE?"),
+            "code": '''prev, cur, steps = None, head, 0
+while cur:
+    cur.nxt, prev, cur = prev, cur, cur.nxt
+    steps += 1
+head = prev''',
+            "diagrams": [{"type": "graph", "directed": True,
+                          "nodes": ["1", "2", "3", "4", "5", "6"],
+                          "edges": [["1", "2"], ["2", "3"], ["3", "4"], ["4", "5"], ["5", "6"], ["6", "3"]],
+                          "pos": {"1": [0, 0], "2": [1.3, 0], "3": [2.6, 0], "4": [3.6, 1.2], "5": [4.8, 0.6],
+                                  "6": [3.8, -1]}}],
+            "options": ["The loop terminates",
+                        "After the loop, `head` refers to the node with value 1",
+                        "The loop body executes exactly 9 times",
+                        "After the loop, following `nxt` from `head` visits 1, 2, 3, 4, 5, 6, 3, …"],
+            "answer": ["A", "B", "C"],
+            "solution": (
+                "Trace (each line: node processed → its new nxt; then prev, cur):\n\n"
+                "- 1: 1.nxt = None; cur → 2\n"
+                "- 2: 2.nxt = 1; cur → 3\n"
+                "- 3: 3.nxt = 2; cur → 4\n"
+                "- 4: 4.nxt = 3; cur → 5\n"
+                "- 5: 5.nxt = 4; cur → 6\n"
+                "- 6: 6.nxt = 5; cur → **3** (6's old nxt)\n"
+                "- 3 again: its current nxt is 2 (set in step 3), so cur → 2; 3.nxt = 6\n"
+                "- 2 again: cur → 1; 2.nxt = 3\n"
+                "- 1 again: cur → None (1.nxt was set to None); 1.nxt = 2. Loop ends.\n\n"
+                "9 iterations; prev = node 1. Final links: 1 → 2 → 3 → 6 → 5 → 4 → 3 (cycle).\n\n"
+                "- (A) **True** — the walk re-enters the tail and follows the already-reversed tail links back "
+                "to the head, whose nxt is None.\n"
+                "- (B) **True** — reversing a ρ-shaped list returns the original head.\n"
+                "- (C) **True** — 9 = 2μ + λ + 1 with tail length μ = 2 and cycle length λ = 4 (the tail is "
+                "walked twice, the cycle once).\n"
+                "- (D) **False** — the tail 1 → 2 → 3 is restored, but the **cycle is reversed**: "
+                "3 → 6 → 5 → 4 → 3.\n\n"
+                "**Tip:** comparing the returned head with the original head is a (slow) way to detect a cycle "
+                "with O(1) extra space."
+            ),
+            "solution_diagrams": [{"type": "graph", "directed": True,
+                                   "nodes": ["1", "2", "3", "4", "5", "6"],
+                                   "edges": [["1", "2"], ["2", "3"], ["3", "6"], ["6", "5"], ["5", "4"], ["4", "3"]],
+                                   "pos": {"1": [0, 0], "2": [1.3, 0], "3": [2.6, 0], "4": [3.6, 1.2],
+                                           "5": [4.8, 0.6], "6": [3.8, -1]},
+                                   "caption": "Links after the loop: the cycle direction is reversed"}],
+            "verify": '''
+class Node:
+    def __init__(s, v): s.v, s.nxt = v, None
+ns = [Node(i) for i in range(1, 7)]
+for a, b in zip(ns, ns[1:]): a.nxt = b
+ns[5].nxt = ns[2]
+head = ns[0]
+prev, cur, steps = None, head, 0
+while cur and steps < 100:
+    cur.nxt, prev, cur = prev, cur, cur.nxt
+    steps += 1
+walk, h = [], prev
+for _ in range(7): walk.append(h.v); h = h.nxt
+truth = {'A': cur is None, 'B': prev is ns[0], 'C': steps == 9,
+         'D': walk == [1, 2, 3, 4, 5, 6, 3]}
+assert walk == [1, 2, 3, 6, 5, 4, 3]
+assert sorted(k for k in truth if truth[k]) == sorted(ANSWER)
+''',
+            "run_code": False,
+        },
     ],
 }

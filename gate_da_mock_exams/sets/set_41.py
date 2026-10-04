@@ -379,5 +379,474 @@ from math import comb
 assert max(comb(k, 2) + comb(10 - k, 2) for k in range(1, 10)) == 36 and ANSWER == "C"
 ''',
         },
+        # ------------------------------------------------------------ Q11
+        {
+            "type": "NAT", "marks": 2, "topic": "Python — closures with nonlocal state",
+            "text": "Consider the following Python program. The value printed is ______.",
+            "code": '''def make():
+    c = 0
+    def inc(k=1):
+        nonlocal c
+        c += k
+        return c
+    return inc
+
+f = make()
+g = make()
+f(); f(3); g(10)
+h = f
+print(f() + g() + h(2))''',
+            "answer": "23",
+            "solution": (
+                "Each call of `make()` creates a **new** local variable `c` and a new closure that "
+                "captures it; `nonlocal c` lets `inc` rebind that captured variable. `h = f` creates no "
+                "new closure — `h` and `f` are the same function object sharing one `c`.\n\n"
+                "- f(): f's c = 1.\n"
+                "- f(3): f's c = 4.\n"
+                "- g(10): g's c = 10 (independent of f).\n"
+                "- In the print, operands are evaluated left to right: f() → f's c = 5, value 5; "
+                "g() → g's c = 11, value 11; h(2) → same counter as f: 5 + 2 = 7, value 7.\n\n"
+                "Sum = 5 + 11 + 7 = **23**.\n\n"
+                "Common wrong answers:\n\n"
+                "- 18 — treating `h` as a fresh counter (h(2) = 2).\n"
+                "- 29 — treating f and g as sharing one counter.\n"
+                "- An UnboundLocalError would occur only without `nonlocal`, because `c += k` makes "
+                "`c` local to `inc`.\n\n"
+                "**Tip:** default arguments (`k=1`) are evaluated once at definition time, but that "
+                "is harmless here because 1 is immutable."
+            ),
+            "verify": "assert OUTPUT.strip() == ANSWER",
+        },
+        # ------------------------------------------------------------ Q12
+        {
+            "type": "MCQ", "marks": 2, "topic": "Python — iterators and zip",
+            "text": "Consider the following Python program. What is printed?",
+            "code": '''a = [1, 2, 3, 4, 5, 6, 7]
+it = iter(a)
+p = list(zip(it, it))
+q = list(it)
+r = dict(zip("abc", range(5)))
+print(p, q, r)''',
+            "options": [
+                "`[(1, 2), (3, 4), (5, 6)] [7] {'a': 0, 'b': 1, 'c': 2}`",
+                "`[(1, 2), (3, 4), (5, 6)] [] {'a': 0, 'b': 1, 'c': 2}`",
+                "`[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)] [] {'a': 0, 'b': 1, 'c': 2}`",
+                "`[(1, 2), (3, 4), (5, 6), (7, None)] [] {'a': 0, 'b': 1, 'c': 2, 3: 4}`",
+            ],
+            "answer": "B",
+            "solution": (
+                "`zip(it, it)` pulls alternately from the **same** iterator, so it pairs consecutive "
+                "elements. `zip` stops as soon as **any** input is exhausted — but it only discovers "
+                "that by calling `next` on it.\n\n"
+                "- Pairs (1, 2), (3, 4), (5, 6) are produced.\n"
+                "- For the 4th pair, zip calls next(it) for the first slot and gets **7** (consumed!), "
+                "then calls next(it) for the second slot → StopIteration → zip stops and the 7 is "
+                "silently discarded.\n"
+                "- So `q = list(it)` is `[]`.\n"
+                "- `zip(\"abc\", range(5))` stops at the shorter input → {'a': 0, 'b': 1, 'c': 2}.\n\n"
+                "Output: `[(1, 2), (3, 4), (5, 6)] [] {'a': 0, 'b': 1, 'c': 2}` → (B).\n\n"
+                "Option analysis:\n\n"
+                "- (A) assumes the leftover 7 is still available — it was consumed by zip.\n"
+                "- (C) would be zip(a, a) on the *list*, which creates two independent iterators.\n"
+                "- (D) behaves like itertools.zip_longest and invents a key 3.\n\n"
+                "**Trap:** iterator exhaustion inside zip silently drops an element; "
+                "`itertools.zip_longest` or slicing (a[0::2], a[1::2]) avoids it."
+            ),
+            "verify": "assert OUTPUT.strip() == \"[(1, 2), (3, 4), (5, 6)] [] {'a': 0, 'b': 1, 'c': 2}\" and ANSWER == 'B'",
+        },
+        # ------------------------------------------------------------ Q13
+        {
+            "type": "MSQ", "marks": 2, "topic": "Heapsort — build-heap and extraction steps",
+            "text": ("Heapsort (ascending) is applied to A = [21, 35, 12, 40, 18, 27, 9, 33]. "
+                     "It first builds a max-heap bottom-up (sift-down at i = 3, 2, 1, 0) and then "
+                     "repeatedly swaps A[0] with the last element of the heap, shrinks the heap by "
+                     "one and sifts down the new root. Which of the following statements is/are TRUE?"),
+            "diagrams": [{"type": "heap", "values": [21, 35, 12, 40, 18, 27, 9, 33],
+                          "caption": "A as a complete binary tree before build-heap"}],
+            "options": [
+                "After build-heap, A = [40, 35, 27, 33, 18, 12, 9, 21]",
+                "After two extraction steps, A = [33, 21, 27, 9, 18, 12, 35, 40]",
+                "Build-heap performs exactly 4 parent–child swaps",
+                "After the two extraction steps, A[0 … 5] is a valid max-heap and A[6 … 7] holds the "
+                "two largest keys in increasing order",
+            ],
+            "answer": ["A", "B", "D"],
+            "solution": (
+                "Build-heap (sift-down swaps with the larger child):\n\n"
+                "- i = 3 (40): child 33 is smaller → no swap.\n"
+                "- i = 2 (12): children 27, 9 → swap with 27 (1).\n"
+                "- i = 1 (35): children 40, 18 → swap with 40 (2); at index 3, 35 vs child 33 → stop.\n"
+                "- i = 0 (21): children 40, 27 → swap with 40 (3); at index 1, children 35, 18 → swap "
+                "with 35 (4); at index 3, child 33 > 21 → swap (5).\n"
+                "- Result [40, 35, 27, 33, 18, 12, 9, 21].\n\n"
+                "Extraction 1: swap 40 ↔ 21 → [21, 35, 27, 33, 18, 12, 9 | 40]; sift 21: ↔35, ↔33 → "
+                "[35, 33, 27, 21, 18, 12, 9 | 40].\n"
+                "Extraction 2: swap 35 ↔ 9 → [9, 33, 27, 21, 18, 12 | 35, 40]; sift 9: ↔33, ↔21 → "
+                "[33, 21, 27, 9, 18, 12 | 35, 40].\n\n"
+                "- (A) **TRUE.**\n"
+                "- (B) **TRUE.**\n"
+                "- (C) Build-heap made **5** swaps (the root's 21 sank three levels). **FALSE.**\n"
+                "- (D) The heap part [33, 21, 27, 9, 18, 12] satisfies the heap property, and the sorted "
+                "tail is 35, 40. **TRUE.**\n\n"
+                "**Trap:** stopping sift-down after one swap; 21 must keep sinking while a child is larger."
+            ),
+            "solution_diagrams": [{"type": "heap", "values": [40, 35, 27, 33, 18, 12, 9, 21],
+                                   "caption": "Max-heap after build-heap"}],
+            "verify": '''
+sw = [0]
+def sift(a, i, n):
+    while True:
+        l, r, m = 2 * i + 1, 2 * i + 2, i
+        if l < n and a[l] > a[m]: m = l
+        if r < n and a[r] > a[m]: m = r
+        if m == i: return
+        a[i], a[m] = a[m], a[i]; sw[0] += 1; i = m
+h = [21, 35, 12, 40, 18, 27, 9, 33]
+for i in range(3, -1, -1): sift(h, i, 8)
+assert h == [40, 35, 27, 33, 18, 12, 9, 21] and sw[0] == 5
+n = 8
+for _ in range(2):
+    h[0], h[n - 1] = h[n - 1], h[0]; n -= 1; sift(h, 0, n)
+assert h == [33, 21, 27, 9, 18, 12, 35, 40]
+assert all(h[(i - 1) // 2] >= h[i] for i in range(1, 6)) and h[6:] == [35, 40]
+assert sorted(ANSWER) == ["A", "B", "D"]
+''',
+        },
+        # ------------------------------------------------------------ Q14
+        {
+            "type": "NAT", "marks": 2, "topic": "Merge sort — comparisons on structured input",
+            "text": ("Top-down merge sort (split into halves of equal size; the merge stops comparing "
+                     "as soon as one run is exhausted) sorts the 16-element array\n"
+                     "[2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15].\n"
+                     "The total number of element comparisons is ______."),
+            "answer": "39",
+            "solution": (
+                "Merging two runs where every element of one run is smaller than every element of the "
+                "other costs only min(p, q) comparisons; a perfectly interleaved merge costs p + q − 1.\n\n"
+                "Left half [2, 4, …, 16] is already sorted. At every merge inside it, the left run "
+                "is entirely smaller than the right run, so each merge of two runs of length s costs s:\n\n"
+                "- 4 merges of 1+1 → 4 × 1 = 4\n"
+                "- 2 merges of 2+2 → 2 × 2 = 4\n"
+                "- 1 merge of 4+4 → 4\n"
+                "- Left half total = 12.\n\n"
+                "The right half [1, 3, …, 15] is also sorted → another 12.\n\n"
+                "Final merge of [2, 4, …, 16] with [1, 3, …, 15]: the outputs alternate 1, 2, 3, …; "
+                "the right run is exhausted when 15 is output, i.e. after 15 elements, each needing "
+                "one comparison, and 16 is copied → 15 comparisons.\n\n"
+                "Total = 12 + 12 + 15 = **39**.\n\n"
+                "For reference: best case for n = 16 is (n/2) log₂ n = 32 and worst case is "
+                "n log₂ n − n + 1 = 49.\n\n"
+                "**Trap:** assuming the final merge is also a best case (8) because both halves were "
+                "sorted — interleaved values force the maximum p + q − 1."
+            ),
+            "solution_diagrams": [{"type": "matrix", "title": "Comparisons per merge level",
+                                   "row_labels": ["left half", "right half", "final"],
+                                   "col_labels": ["1+1", "2+2", "4+4", "8+8"],
+                                   "rows": [[4, 4, 4, "–"], [4, 4, 4, "–"], ["–", "–", "–", 15]]}],
+            "verify": '''
+c = [0]
+def ms(a):
+    if len(a) <= 1: return a
+    m = len(a) // 2; L = ms(a[:m]); R = ms(a[m:]); i = j = 0; o = []
+    while i < len(L) and j < len(R):
+        c[0] += 1
+        if L[i] <= R[j]: o.append(L[i]); i += 1
+        else: o.append(R[j]); j += 1
+    return o + L[i:] + R[j:]
+ms([2, 4, 6, 8, 10, 12, 14, 16, 1, 3, 5, 7, 9, 11, 13, 15])
+assert c[0] == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q15
+        {
+            "type": "MCQ", "marks": 2, "topic": "Recurrences — change of variable",
+            "text": ("Let T(n) = 2T(√n) + log₂ n for n > 2, with T(2) = 1. Which of the following is a "
+                     "tight bound for T(n)?"),
+            "options": ["Θ(log n)", "Θ(log n · log log n)", "Θ(√n)", "Θ(log² n)"],
+            "answer": "B",
+            "solution": (
+                "Substitute m = log₂ n, i.e. n = 2^{m}, so √n = 2^{m/2}. Define S(m) = T(2^{m}). Then\n"
+                "S(m) = 2S(m/2) + m.\n\n"
+                "This is the merge-sort recurrence: by the master theorem (a = 2, b = 2, f(m) = m = "
+                "Θ(m^{log₂ 2})) S(m) = Θ(m log m).\n\n"
+                "Translating back: T(n) = S(log n) = **Θ(log n · log log n)** → (B).\n\n"
+                "Recursion-tree view: the depth is log log n (taking square roots repeatedly until "
+                "the argument is constant); at depth i there are 2^{i} subproblems, each of size "
+                "n^{1/2^{i}}, so each costs (log n)/2^{i}; every level sums to log n.\n\n"
+                "Option analysis:\n\n"
+                "- (A) would hold for T(n) = T(√n) + log n (one recursive call: geometric sum).\n"
+                "- (C) confuses √n in the argument with the cost.\n"
+                "- (D) would need log n levels, but there are only log log n.\n\n"
+                "**Tip:** recurrences on √n become ordinary divide-and-conquer recurrences after the "
+                "substitution m = log n."
+            ),
+            "verify": '''
+import math
+from functools import lru_cache
+@lru_cache(None)
+def S(m): return 1 if m <= 1 else 2 * S(m // 2) + m
+r = [S(2 ** k) / (2 ** k * k) for k in (10, 20)]
+assert abs(r[0] / r[1] - 1) < 0.1
+assert S(2 ** 20) / (2 ** 20) > 15 and ANSWER == "B"
+''',
+        },
+        # ------------------------------------------------------------ Q16
+        {
+            "type": "NAT", "marks": 2, "topic": "BFS — distances in a rule-defined graph",
+            "text": ("Graph G has vertex set {0, 1, …, 11}, and vertices i and j are adjacent iff "
+                     "|i − j| ∈ {3, 5}. BFS is run from vertex 0. The sum of the BFS distances "
+                     "(number of edges) from 0 to all 12 vertices is ______."),
+            "answer": "26",
+            "solution": (
+                "Neighbours of i are i ± 3 and i ± 5 (within 0 … 11). BFS level by level:\n\n"
+                "- Level 0: {0}.\n"
+                "- Level 1: neighbours of 0 → {3, 5}.\n"
+                "- Level 2: from 3 → 6, 8; from 5 → 2, 8, 10 → {2, 6, 8, 10}.\n"
+                "- Level 3: from 2 → 7; from 6 → 1, 9, 11; from 8 → 11; from 10 → 7 → {1, 7, 9, 11}.\n"
+                "- Level 4: from 1 → 4; (4 is not adjacent to anything earlier: 4 ± 3 = 1, 7 and "
+                "4 ± 5 = 9 are all level 3) → {4}.\n\n"
+                "All 12 vertices are reached (G is connected). "
+                "Sum = 0·1 + 1·2 + 2·4 + 3·4 + 4·1 = 0 + 2 + 8 + 12 + 4 = **26**.\n\n"
+                "Observation: every edge changes the parity of the vertex by 3 or 5 (both odd), so G is "
+                "**bipartite** (even vs odd vertices) — consistent with even vertices appearing only on "
+                "even levels.\n\n"
+                "**Trap:** stopping at level 3 and missing vertex 4, or treating 0 + 5 + 3 = 8 as two "
+                "distinct routes (BFS counts each vertex once)."
+            ),
+            "solution_diagrams": [{"type": "matrix", "title": "BFS distance from 0",
+                                   "col_labels": [str(i) for i in range(12)],
+                                   "row_labels": ["dist"],
+                                   "rows": [[0, 3, 2, 1, 4, 1, 2, 3, 2, 3, 2, 3]]}],
+            "verify": '''
+from collections import deque
+G = {i: [j for j in range(12) if abs(i - j) in (3, 5)] for i in range(12)}
+d = {0: 0}; q = deque([0])
+while q:
+    u = q.popleft()
+    for v in G[u]:
+        if v not in d: d[v] = d[u] + 1; q.append(v)
+assert len(d) == 12 and sum(d.values()) == int(ANSWER)
+assert [d[i] for i in range(12)] == [0, 3, 2, 1, 4, 1, 2, 3, 2, 3, 2, 3]
+''',
+        },
+        # ------------------------------------------------------------ Q17
+        {
+            "type": "MCQ", "marks": 2, "topic": "Dijkstra — counting distance updates",
+            "text": ("Dijkstra's algorithm is run from S on the weighted directed graph below. "
+                     "Initially d[S] = 0 and all other d values are ∞; an *update* of d[T] is an "
+                     "assignment that makes d[T] **strictly smaller** (the first assignment from ∞ "
+                     "counts). How many times is d[T] updated?"),
+            "diagrams": [{"type": "graph", "directed": True,
+                          "nodes": ["S", "A", "B", "C", "T"],
+                          "edges": [["S", "A", 1], ["S", "B", 4], ["S", "T", 15], ["A", "B", 2],
+                                    ["A", "C", 6], ["B", "C", 3], ["B", "T", 10], ["C", "T", 2],
+                                    ["A", "T", 12]],
+                          "pos": {"S": [0, 3], "A": [1.5, 1.5], "B": [1.5, -0.5], "C": [4, 0.3],
+                                  "T": [6, 3]}}],
+            "options": ["2", "4", "3", "5"],
+            "answer": "C",
+            "solution": (
+                "Dijkstra relaxes the out-edges of each vertex when it is extracted; d[T] changes only "
+                "when a strictly shorter route is found.\n\n"
+                "- Extract S (0): d[A] = 1, d[B] = 4, d[T] = 15 → **update 1**.\n"
+                "- Extract A (1): d[B] = min(4, 3) = 3, d[C] = 7, d[T] = min(15, 1 + 12 = 13) → **update 2**.\n"
+                "- Extract B (3): d[C] = min(7, 6) = 6; d[T]: 3 + 10 = 13 is **not** smaller than 13 → "
+                "no update.\n"
+                "- Extract C (6): d[T] = min(13, 6 + 2 = 8) → **update 3**.\n"
+                "- Extract T (8).\n\n"
+                "d[T] is updated **3** times (15 → 13 → 8) → (C). Final shortest path S → A → B → C → T "
+                "with cost 1 + 2 + 3 + 2 = 8.\n\n"
+                "Option analysis:\n\n"
+                "- (A) 2 forgets the initial assignment from ∞.\n"
+                "- (B) 4 counts the tie 13 = 13 at B as an update.\n"
+                "- (D) 5 counts one update per incoming edge of T, plus one.\n\n"
+                "**Trap:** with `<` in the relaxation test, equal-cost alternatives never trigger an "
+                "update."
+            ),
+            "verify": '''
+import heapq
+E = [("S","A",1),("S","B",4),("S","T",15),("A","B",2),("A","C",6),("B","C",3),
+     ("B","T",10),("C","T",2),("A","T",12)]
+G = {}
+for u, v, w in E: G.setdefault(u, []).append((v, w))
+d = {v: float("inf") for v in "SABCT"}; d["S"] = 0; pq = [(0, "S")]; done = set(); up = 0
+while pq:
+    du, u = heapq.heappop(pq)
+    if u in done: continue
+    done.add(u)
+    for v, w in G.get(u, []):
+        if du + w < d[v]:
+            d[v] = du + w; heapq.heappush(pq, (d[v], v)); up += (v == "T")
+assert up == 3 and d["T"] == 8 and ANSWER == "C"
+''',
+        },
+        # ------------------------------------------------------------ Q18
+        {
+            "type": "MSQ", "marks": 2, "topic": "Hashing — deletion with tombstones",
+            "text": ("A table with 10 slots uses h(k) = k mod 10 and linear probing. The keys 31, 41, 51, "
+                     "22, 61 are inserted in that order, and then 41 is deleted by marking its slot "
+                     "DELETED (a tombstone). Searches skip over DELETED slots and stop at an EMPTY "
+                     "slot; an insertion places the key in the first EMPTY **or** DELETED slot on its "
+                     "probe sequence. Which of the following statements is/are TRUE?"),
+            "options": [
+                "A search for 61 now examines exactly 5 slots",
+                "If 41's slot had been made EMPTY instead of DELETED, a search for 51 would wrongly report "
+                "that 51 is absent",
+                "Inserting 71 now stores it in slot 2",
+                "A search for 22 now examines exactly 2 slots",
+            ],
+            "answer": ["A", "B", "C"],
+            "solution": (
+                "Insertions: 31 → 1; 41 → 1 taken → 2; 51 → 1, 2 taken → 3; 22 → 2, 3 taken → 4; "
+                "61 → 1, 2, 3, 4 taken → 5. Then slot 2 (41) becomes DELETED.\n\n"
+                "Table: 1: 31, 2: DEL, 3: 51, 4: 22, 5: 61, rest EMPTY.\n\n"
+                "- (A) Search 61: slots 1 (31), 2 (DEL, skip), 3 (51), 4 (22), 5 (61, found) → 5 slots. "
+                "**TRUE.**\n"
+                "- (B) Search 51 starts at slot 1 (31) and then reaches slot 2; if it were EMPTY, "
+                "the search would stop and report “absent” although 51 sits in slot 3. This is exactly "
+                "why tombstones are needed. **TRUE.**\n"
+                "- (C) Insert 71: slot 1 occupied, slot 2 DELETED → stored in slot 2 (reusing the "
+                "tombstone). **TRUE.**\n"
+                "- (D) Search 22: slots 2 (DEL), 3 (51), 4 (22) → 3 slots, not 2. **FALSE.**\n\n"
+                "**Trap:** in (D), forgetting that a tombstone still costs a probe. Tombstones keep "
+                "searches correct but make them longer — tables with many deletions need periodic "
+                "rehashing."
+            ),
+            "solution_diagrams": [{"type": "hashtable", "size": 10,
+                                   "slots": {1: 31, 2: "DEL", 3: 51, 4: 22, 5: 61},
+                                   "caption": "Table after deleting 41"}],
+            "verify": '''
+EMPTY, DEL = None, "DEL"
+T = [EMPTY] * 10
+def ins(k):
+    i = k % 10
+    while T[i] not in (EMPTY, DEL): i = (i + 1) % 10
+    T[i] = k
+def search(k, tab):
+    i, c = k % 10, 0
+    while True:
+        c += 1
+        if tab[i] is EMPTY: return None, c
+        if tab[i] == k: return i, c
+        i = (i + 1) % 10
+for k in [31, 41, 51, 22, 61]: ins(k)
+T[T.index(41)] = DEL
+A = search(61, T)[1] == 5
+U = T[:]; U[2] = EMPTY
+B = search(51, U)[0] is None
+D = search(22, T)[1] == 2
+ins(71); C = T[2] == 71
+assert [c for c, v in zip("ABCD", [A, B, C, D]) if v] == sorted(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q19
+        {
+            "type": "NAT", "marks": 2, "topic": "Stacks — counting output sequences",
+            "text": ("The integers 1, 2, 3, 4, 5 are pushed onto an initially empty stack in this "
+                     "order, with pops interleaved arbitrarily; each popped value is output, and all "
+                     "five values are eventually output. The number of possible output sequences "
+                     "whose **first** element is 3 is ______."),
+            "answer": "9",
+            "solution": (
+                "For 3 to be output first, the operations must start push 1, push 2, push 3, pop. At "
+                "that moment the stack holds 1, 2 (2 on top) and 4, 5 are still to be pushed.\n\n"
+                "Constraint: 2 must be output before 1. The values 4 and 5 can be pushed at any time; "
+                "count by when 2 and 1 are popped relative to 4 and 5:\n\n"
+                "- 2 1 then 4, 5: 2 1 4 5, 2 1 5 4 → 2\n"
+                "- 2 first, then 1 only after 4 and/or 5 has been output: 2 4 1 5, 2 4 5 1, 2 5 4 1 → 3\n"
+                "- 4 first: 4 2 1 5, 4 2 5 1, 4 5 2 1 → 3\n"
+                "- 5 first (4 must be on the stack below it): 5 4 2 1 → 1\n\n"
+                "Total = 2 + 3 + 3 + 1 = **9**.\n\n"
+                "Check of an excluded case: 2 5 1 4 is impossible — after 5 is popped, 4 is on top "
+                "of 1, so 1 cannot precede 4.\n\n"
+                "Cross-check: summing such counts over all possible first elements gives the total "
+                "number of stack permutations of 5 elements, the Catalan number C₅ = 42 "
+                "(first element 1: 14, 2: 14, 3: 9, 4: 4, 5: 1).\n\n"
+                "**Trap:** counting 4!/2 = 12 by only enforcing “2 before 1” — the order of 4 and 5 "
+                "relative to 1 and 2 is also constrained."
+            ),
+            "verify": '''
+import itertools
+def ok(seq):
+    st, nx = [], 1
+    for x in seq:
+        while nx <= x: st.append(nx); nx += 1
+        if st[-1] != x: return False
+        st.pop()
+    return True
+good = [p for p in itertools.permutations(range(1, 6)) if ok(p)]
+first3 = sorted(p[1:] for p in good if p[0] == 3)
+assert len(good) == 42 and len(first3) == int(ANSWER)
+assert first3 == sorted([(2,1,4,5),(2,1,5,4),(2,4,1,5),(2,4,5,1),(2,5,4,1),
+                         (4,2,1,5),(4,2,5,1),(4,5,2,1),(5,4,2,1)])
+''',
+        },
+        # ------------------------------------------------------------ Q20
+        {
+            "type": "MSQ", "marks": 2, "topic": "Linked lists — moving the tail to the front",
+            "text": ("Consider the following Python function on a singly linked list (nodes have "
+                     "fields `v` and `nxt`). Which of the following statements is/are TRUE?"),
+            "code": '''def f(h, k):
+    for _ in range(k):
+        prev, cur = None, h
+        while cur.nxt:
+            prev, cur = cur, cur.nxt
+        prev.nxt = None
+        cur.nxt = h
+        h = cur
+    return h''',
+            "diagrams": [{"type": "linkedlist", "values": [1, 2, 3, 4, 5, 6], "head": "h"}],
+            "options": [
+                "For the list shown, `f(h, 2)` returns the list 5 → 6 → 1 → 2 → 3 → 4",
+                "For the list shown, `f(h, 2)` executes the statement `prev, cur = cur, cur.nxt` "
+                "exactly 12 times",
+                "For the list shown, `f(h, 8)` returns the list 3 → 4 → 5 → 6 → 1 → 2",
+                "For a list with a single node, `f(h, 1)` raises an AttributeError",
+            ],
+            "answer": ["A", "D"],
+            "solution": (
+                "Each iteration walks to the last node (keeping its predecessor), detaches it and "
+                "makes it the new head: one **right rotation** by one position. k iterations rotate "
+                "right by k.\n\n"
+                "- (A) Two right rotations of 1…6: 6 1 2 3 4 5 → 5 6 1 2 3 4. **TRUE.**\n"
+                "- (B) In each iteration the inner loop advances from the head to the last node: "
+                "n − 1 = 5 steps. Two iterations → 10, not 12. **FALSE.**\n"
+                "- (C) 8 right rotations of a 6-node list = 8 mod 6 = 2 rotations → 5 6 1 2 3 4. "
+                "The stated list (3 4 5 6 1 2) is the result of rotating **left** by 2. **FALSE.**\n"
+                "- (D) With one node, the while-loop body never runs, so `prev` stays None and "
+                "`prev.nxt = None` raises AttributeError ('NoneType' object has no attribute "
+                "'nxt'). **TRUE.**\n\n"
+                "Cost: Θ(nk) overall. A better approach computes k mod n, finds the new tail in one "
+                "pass and re-links in O(n).\n\n"
+                "**Trap:** confusing a right rotation (tail to front) with a left rotation (head to "
+                "back) in (C)."
+            ),
+            "verify": '''
+class Nd:
+    def __init__(s, v, n=None): s.v, s.nxt = v, n
+def mk(xs):
+    h = None
+    for x in reversed(xs): h = Nd(x, h)
+    return h
+def lst(h):
+    o = []
+    while h: o.append(h.v); h = h.nxt
+    return o
+A = lst(f(mk([1, 2, 3, 4, 5, 6]), 2)) == [5, 6, 1, 2, 3, 4]
+C = lst(f(mk([1, 2, 3, 4, 5, 6]), 8)) == [3, 4, 5, 6, 1, 2]
+steps = 0
+h = mk([1, 2, 3, 4, 5, 6])
+for _ in range(2):
+    prev, cur = None, h
+    while cur.nxt: prev, cur = cur, cur.nxt; steps += 1
+    prev.nxt = None; cur.nxt = h; h = cur
+B = steps == 12
+try:
+    f(mk([9]), 1); D = False
+except AttributeError:
+    D = True
+assert [c for c, v in zip("ABCD", [A, B, C, D]) if v] == sorted(ANSWER)
+''',
+        },
     ],
 }

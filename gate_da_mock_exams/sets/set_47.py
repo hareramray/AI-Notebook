@@ -361,5 +361,467 @@ d2 = sorted(sorted(['b2','a3','c1','a1','b3','c2'], key=lambda s: s[1]), key=lam
 assert d2 == ['c2', 'c1', 'b3', 'b2', 'a3', 'a1']
 ''',
         },
+        # ------------------------------------------------------------ Q11
+        {
+            "type": "NAT", "marks": 2, "topic": "Counting topological orders",
+            "text": "The number of distinct topological orderings of the directed acyclic graph shown is ______.",
+            "diagrams": [{"type": "graph", "directed": True,
+                          "nodes": ["A", "B", "C", "D", "E", "F", "G"],
+                          "edges": [["A", "B"], ["A", "C"], ["B", "D"], ["C", "D"], ["C", "E"], ["D", "F"],
+                                    ["E", "F"], ["B", "G"]],
+                          "pos": {"A": [0, 1], "B": [1.6, 2], "C": [1.6, 0], "D": [3.2, 1], "E": [3.2, -0.6],
+                                  "F": [4.8, 0.4], "G": [3.2, 2.6]}}],
+            "answer": "21",
+            "solution": (
+                "Strategy: fix the forced parts, count the core, then insert the “loose” vertex G.\n\n"
+                "**Forced:** A is the only source → first. F must follow D and E, and D, E follow B and C "
+                "(D after B, C; E after C), so among {B, C, D, E, F}, F is last.\n\n"
+                "**Core {B, C, D, E}** with B → D, C → D, C → E:\n\n"
+                "- B first: then C must precede D and E → B C D E, B C E D (2)\n"
+                "- C first: remaining B, D, E with B before D → C B D E, C B E D, C E B D (3)\n\n"
+                "So 5 orders of B, C, D, E (each followed by F).\n\n"
+                "**Insert G** (only constraint: after B) into the 6 gaps of each 5-element sequence "
+                "X₁…X₅ — the gaps after B number 6 − pos(B):\n\n"
+                "- B C D E F: pos 1 → 5\n- B C E D F: → 5\n- C B D E F: pos 2 → 4\n- C B E D F: → 4\n"
+                "- C E B D F: pos 3 → 3\n\n"
+                "Total = 5 + 5 + 4 + 4 + 3 = **21**.\n\n"
+                "**Trap:** multiplying independent-looking counts (e.g. 5 × 6 = 30) — G's options depend on "
+                "where B sits in each order."
+            ),
+            "verify": '''
+import itertools
+E = [('A','B'),('A','C'),('B','D'),('C','D'),('C','E'),('D','F'),('E','F'),('B','G')]
+cnt = sum(1 for p in itertools.permutations('ABCDEFG')
+          if all(p.index(u) < p.index(v) for u, v in E))
+assert cnt == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q12
+        {
+            "type": "MCQ", "marks": 2, "topic": "Generators + closures + default arguments",
+            "text": "Consider the following Python program. What is printed?",
+            "code": '''def gen():
+    fs = []
+    for i in range(3):
+        fs.append(lambda x, i=i: x + i)
+        fs.append(lambda x: x * i)
+        yield len(fs)
+    yield [f(2) for f in fs]
+
+g = gen()
+next(g)
+print(next(g), list(g))''',
+            "options": ["`4 [6, [2, 4, 3, 4, 4, 4]]`", "`4 [6, [2, 0, 3, 2, 4, 4]]`",
+                        "`2 [4, 6, [2, 4, 3, 4, 4, 4]]`", "`4 [[2, 4, 3, 4, 4, 4]]`"],
+            "answer": "A",
+            "solution": (
+                "Two independent traps: (1) a generator resumes where it paused, and `list(g)` collects **all "
+                "remaining** yields; (2) `i=i` freezes the current value in a default argument, while the plain "
+                "lambda looks `i` up when called (late binding).\n\n"
+                "**Generator progress:**\n\n"
+                "- first `next(g)`: i = 0, two lambdas appended, yields 2 (discarded)\n"
+                "- second `next(g)`: i = 1, yields **4** (printed first)\n"
+                "- `list(g)`: i = 2, yields 6; loop ends; yields the list of results; then stops → "
+                "[6, [ … ]]\n\n"
+                "**The list** is computed after the loop, when i = 2:\n\n"
+                "- i=0 pair: 2 + 0 = 2, and 2 × i = 2 × 2 = 4\n"
+                "- i=1 pair: 2 + 1 = 3, and 4\n"
+                "- i=2 pair: 2 + 2 = 4, and 4\n\n"
+                "→ [2, 4, 3, 4, 4, 4]. Output: `4 [6, [2, 4, 3, 4, 4, 4]]`.\n\n"
+                "- (B) evaluates the plain lambdas with the i of their creation (no late binding).\n"
+                "- (C) prints the discarded first yield as well.\n"
+                "- (D) forgets the third `yield len(fs)`.\n\n"
+                "**Tip:** the generator's frame (and its `i`) stays alive until exhausted, which is why the "
+                "plain lambdas see i = 2."
+            ),
+            "verify": "assert OUTPUT.strip() == '4 [6, [2, 4, 3, 4, 4, 4]]' and ANSWER == 'A'",
+        },
+        # ------------------------------------------------------------ Q13
+        {
+            "type": "MSQ", "marks": 2, "topic": "Dijkstra with a negative edge",
+            "text": ("Dijkstra's algorithm is run from S on the directed graph shown, which has one negative edge "
+                     "(A → B, weight −4) and no negative cycle. Implementation: repeatedly extract the "
+                     "non-finalized vertex with the smallest d (ties alphabetically), finalize it, and relax "
+                     "**all** its outgoing edges — d of an already-finalized vertex may still decrease, but a "
+                     "finalized vertex is never extracted again. Which of the following statements is/are TRUE?"),
+            "diagrams": [{"type": "graph", "directed": True, "nodes": ["S", "A", "B", "C", "D"],
+                          "edges": [["S", "A", 5], ["S", "B", 2], ["A", "B", -4], ["B", "C", 3], ["C", "D", 2],
+                                    ["A", "D", 6]],
+                          "pos": {"S": [0, 1], "A": [2, 2.2], "B": [2, -0.2], "C": [4, -0.2], "D": [4, 2.2]}}],
+            "options": ["The final value d[B] equals the true shortest distance from S to B",
+                        "The final value d[C] is 5, whereas the true distance to C is 4",
+                        "Exactly one vertex ends with an incorrect d value",
+                        "Bellman–Ford on this graph would report a negative-weight cycle"],
+            "answer": ["A", "B"],
+            "solution": (
+                "**Dijkstra trace:**\n\n"
+                "- Extract S (0): d[A] = 5, d[B] = 2.\n"
+                "- Extract B (2): d[C] = 5.\n"
+                "- Extract A (5; tie with C, A first): d[B] = min(2, 5 − 4) = **1** (B is already finalized — its "
+                "value changes but it is never re-processed); d[D] = 11.\n"
+                "- Extract C (5): d[D] = min(11, 7) = 7.\n"
+                "- Extract D (7).\n\n"
+                "Final: S 0, A 5, B 1, C 5, D 7.\n\n"
+                "**True distances** (Bellman–Ford): S 0, A 5, B = 5 − 4 = 1, C = 1 + 3 = 4, D = 4 + 2 = 6.\n\n"
+                "- (A) **True** — d[B] = 1 is correct, but only because the late relaxation from A updated it.\n"
+                "- (B) **True** — C was relaxed from B while d[B] was still 2, and the improvement of B never "
+                "propagated: d[C] = 5 vs 4.\n"
+                "- (C) **False** — both C (5 vs 4) and D (7 vs 6) are wrong.\n"
+                "- (D) **False** — the only cycle-free structure here has no cycles at all, so there is no "
+                "negative cycle; Bellman–Ford returns the true distances.\n\n"
+                "**Trap:** believing Dijkstra fails only at the endpoint of the negative edge — the damage is "
+                "in everything *downstream* of it."
+            ),
+            "verify": '''
+G = {'S':[('A',5),('B',2)],'A':[('B',-4),('D',6)],'B':[('C',3)],'C':[('D',2)],'D':[]}
+INF = float('inf'); d = {v: INF for v in G}; d['S'] = 0; done = set()
+while len(done) < len(G):
+    u = min(sorted(v for v in G if v not in done), key=lambda v: d[v]); done.add(u)
+    for v, w in G[u]:
+        if d[u] + w < d[v]: d[v] = d[u] + w
+bf = {v: INF for v in G}; bf['S'] = 0
+for _ in range(len(G) - 1):
+    for u in G:
+        for v, w in G[u]:
+            if bf[u] + w < bf[v]: bf[v] = bf[u] + w
+neg = any(bf[u] + w < bf[v] for u in G for v, w in G[u])
+vals = [d['B'] == bf['B'], d['C'] == 5 and bf['C'] == 4,
+        sum(d[v] != bf[v] for v in G) == 1, neg]
+assert [L for L, v in zip('ABCD', vals) if v] == sorted(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q14
+        {
+            "type": "NAT", "marks": 2, "topic": "Counting BSTs by height",
+            "text": ("Consider all binary search trees containing exactly the keys 1, 2, …, 7. The height of a "
+                     "tree is the number of edges on its longest root-to-leaf path. The number of these BSTs "
+                     "whose height is **exactly 3** is ______."),
+            "answer": "68",
+            "solution": (
+                "Let N(n, h) = number of BSTs on n keys with height ≤ h (empty tree has height −1, so "
+                "N(0, h) = 1 for h ≥ −1). Choosing root i splits the keys into i − 1 and n − i:\n\n"
+                "N(n, h) = ∑_{i=1}^{n} N(i − 1, h − 1) · N(n − i, h − 1).\n\n"
+                "Answer = N(7, 3) − N(7, 2).\n\n"
+                "**Height ≤ 2** (at most 7 nodes in 3 levels), for n = 0..7:\n"
+                "N(n, 2) = 1, 1, 2, 5, 6, 6, 4, 1.\n\n"
+                "(e.g. n = 4: of the 14 BSTs, the 8 “paths” have height 3, leaving 6; n = 7: only the perfect tree.)\n\n"
+                "**Height ≤ 3**, n = 7: sum over root position, left size L = 0..6, right size 6 − L:\n\n"
+                "- L = 0, 6: 1 × 4 = 4 each\n- L = 1, 5: 1 × 6 = 6 each\n- L = 2, 4: 2 × 6 = 12 each\n"
+                "- L = 3: 5 × 5 = 25\n\n"
+                "N(7, 3) = 4 + 6 + 12 + 25 + 12 + 6 + 4 = 69.\n\n"
+                "Since N(7, 2) = 1 (the perfect tree), the count with height exactly 3 is 69 − 1 = **68**.\n\n"
+                "**Trap:** forgetting to subtract the height-2 tree, or using node-count height (where “height 3” "
+                "would mean something else)."
+            ),
+            "solution_diagrams": [{"type": "bintree", "tree": [4, [2, [1], [3]], [5, None, [6, None, [7]]]],
+                                   "caption": "One BST of height 3"}],
+            "verify": '''
+from functools import lru_cache
+@lru_cache(None)
+def shapes(lo, hi):
+    if lo > hi: return [None]
+    out = []
+    for r in range(lo, hi + 1):
+        for L in shapes(lo, r - 1):
+            for R in shapes(r + 1, hi): out.append((r, L, R))
+    return out
+def h(t): return -1 if t is None else 1 + max(h(t[1]), h(t[2]))
+T = shapes(1, 7)
+assert len(T) == 429 and sum(h(t) == 3 for t in T) == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q15
+        {
+            "type": "MCQ", "marks": 2, "topic": "Unbalanced divide-and-conquer recurrences",
+            "text": ("Consider (with T(n) = 1 for n ≤ 1)\n\n"
+                     "T₁(n) = T₁(⌊n/2⌋) + T₁(⌊n/3⌋) + n\n"
+                     "T₂(n) = T₂(⌊n/4⌋) + T₂(⌊3n/4⌋) + n\n\n"
+                     "Which one of the following is correct?"),
+            "options": ["T₁(n) = Θ(n) and T₂(n) = Θ(n log n)",
+                        "T₁(n) = Θ(n log n) and T₂(n) = Θ(n log n)",
+                        "T₁(n) = Θ(n) and T₂(n) = Θ(n)",
+                        "T₁(n) = Θ(n log n) and T₂(n) = Θ(n²)"],
+            "answer": "A",
+            "solution": (
+                "Use the recursion tree: the work at a level is n times the sum of the fractions raised to "
+                "the level number.\n\n"
+                "**T₁:** the subproblem sizes n/2 + n/3 = (5/6)n. Level i costs at most (5/6)^{i}·n, a geometric "
+                "series: total ≤ n · 1/(1 − 5/6) = 6n. With the root alone costing n, T₁(n) = **Θ(n)**.\n\n"
+                "**T₂:** n/4 + 3n/4 = n, so every full level costs exactly n. The shortest root-to-leaf path "
+                "(always taking n/4) has log₄ n levels and the longest log_{4/3} n levels — both Θ(log n). "
+                "Hence T₂(n) = **Θ(n log n)** (like a merge sort with a 1:3 split).\n\n"
+                "Numerical check: T₁(n)/n rises towards the bound 6 (5.1 at n = 10⁴, 5.7 at n = 10⁶), while T₂(n)/(n log₂ n) settles "
+                "near a constant (≈ 1.2) and T₂(n)/n keeps growing.\n\n"
+                "- (B) treats T₁ like a balanced split — but the fractions sum to less than 1.\n"
+                "- (C) treats T₂ like T₁ — but its fractions sum to exactly 1.\n"
+                "- (D) confuses an unbalanced *constant-fraction* split with quicksort's worst case "
+                "T(n) = T(n − 1) + n.\n\n"
+                "**Tip:** for T(n) = ∑ T(αᵢ n) + n: ∑ αᵢ < 1 → Θ(n); = 1 → Θ(n log n); > 1 → polynomially larger."
+            ),
+            "verify": '''
+import math, sys
+sys.setrecursionlimit(10000)
+from functools import lru_cache
+@lru_cache(None)
+def T1(n): return 1 if n <= 1 else T1(n // 2) + T1(n // 3) + n
+@lru_cache(None)
+def T2(n): return 1 if n <= 1 else T2(n // 4) + T2(3 * n // 4) + n
+a = [T1(n) / n for n in (10**4, 10**5, 10**6)]
+b = [T2(n) / (n * math.log2(n)) for n in (10**4, 10**5, 10**6)]
+c = [T2(n) / n for n in (10**4, 10**6)]
+assert max(a) < 6 and (a[2] - a[1]) < (a[1] - a[0])          # bounded, converging to 6
+assert max(b) - min(b) < 0.1 and c[1] > c[0] * 1.3
+assert ANSWER == 'A'
+''',
+        },
+        # ------------------------------------------------------------ Q16
+        {
+            "type": "NAT", "marks": 2, "topic": "Linear probing with deletion (tombstones)",
+            "text": ("A hash table of size 11 uses h(k) = k mod 11 with linear probing. Deletion replaces a key "
+                     "by a tombstone **DEL**. Insertion places the key in the first slot on its probe sequence "
+                     "that is empty or DEL. A search continues past DEL slots and stops at the key or at an "
+                     "empty slot.\n\n"
+                     "Operations: insert 22, 33, 13, 44, 24, 35; delete 33; delete 13; insert 46.\n\n"
+                     "Then two unsuccessful searches are made, for 57 and for 55. Counting every slot examined "
+                     "(including the empty slot that ends a search), the total number of slots examined by the "
+                     "two searches is ______."),
+            "answer": "12",
+            "solution": (
+                "Home slots: 22 → 0, 33 → 0, 13 → 2, 44 → 0, 24 → 2, 35 → 2, 46 → 2, 57 → 2, 55 → 0.\n\n"
+                "**Insertions:**\n\n"
+                "- 22 → 0; 33 → 0 full → 1; 13 → 2; 44 → 0,1,2 full → 3; 24 → 2,3 full → 4; "
+                "35 → 2,3,4 full → 5.\n"
+                "- Table: [22, 33, 13, 44, 24, 35, –, –, –, –, –]\n\n"
+                "**Deletions:** 33 (slot 1) and 13 (slot 2) become DEL.\n\n"
+                "**Insert 46** (home 2): slot 2 is DEL → 46 goes to slot 2. Table: "
+                "[22, DEL, 46, 44, 24, 35, –, …].\n\n"
+                "**Search 57** (home 2): slots 2 (46), 3 (44), 4 (24), 5 (35), 6 (empty) → **5** examined.\n\n"
+                "**Search 55** (home 0): 0 (22), 1 (DEL — continue), 2, 3, 4, 5, 6 (empty) → **7** examined.\n\n"
+                "Total = 5 + 7 = **12**.\n\n"
+                "**Trap:** stopping a search at a DEL slot (which would wrongly report keys such as 44 as absent), "
+                "or treating deletion as emptying the slot — that would break the probe chain of 44, 24 and 35. "
+                "Tombstones keep searches correct but make them longer, which is why tables are periodically rebuilt."
+            ),
+            "solution_diagrams": [{"type": "hashtable", "size": 11,
+                                   "slots": {0: 22, 1: "DEL", 2: 46, 3: 44, 4: 24, 5: 35},
+                                   "caption": "Table before the two searches"}],
+            "verify": '''
+DEL = 'DEL'; T = [None]*11
+def ins(k):
+    i = k % 11
+    while T[i] is not None and T[i] != DEL: i = (i + 1) % 11
+    T[i] = k
+def find(k):
+    i = k % 11; c = 0
+    while True:
+        c += 1
+        if T[i] is None or T[i] == k: return i, c
+        i = (i + 1) % 11
+for k in [22, 33, 13, 44, 24, 35]: ins(k)
+for k in [33, 13]: T[find(k)[0]] = DEL
+ins(46)
+assert T[:7] == [22, DEL, 46, 44, 24, 35, None]
+assert find(57)[1] + find(55)[1] == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q17
+        {
+            "type": "MSQ", "marks": 2, "topic": "All possible BFS orders",
+            "text": ("BFS is run from s on the undirected graph shown. The adjacency lists may be ordered "
+                     "arbitrarily, so several visiting orders are possible. Which of the following statements "
+                     "is/are TRUE?"),
+            "diagrams": [{"type": "graph", "directed": False, "nodes": ["s", "a", "b", "c", "d", "e", "f"],
+                          "edges": [["s", "a"], ["s", "b"], ["s", "c"], ["a", "d"], ["b", "d"], ["b", "e"],
+                                    ["c", "e"], ["d", "f"], ["e", "f"]],
+                          "pos": {"s": [0, 1], "a": [1.6, 2.2], "b": [1.6, 1], "c": [1.6, -0.2],
+                                  "d": [3.2, 1.6], "e": [3.2, 0.4], "f": [4.8, 1]}}],
+            "options": ["Exactly 8 distinct BFS visiting orders are possible",
+                        "f is the last vertex visited in every BFS order",
+                        "Some BFS order visits e before d",
+                        "s, c, a, b, d, e, f is a possible BFS order"],
+            "answer": ["A", "B", "C"],
+            "solution": (
+                "Levels are fixed: {s}, {a, b, c}, {d, e}, {f}. Within these, BFS order is constrained: the "
+                "level-2 vertices are visited in the order they were **discovered**, which is determined by "
+                "the level-1 order (d is discovered by a or b, e by b or c).\n\n"
+                "Enumerate the 6 orders of {a, b, c} and see who discovers d, e first:\n\n"
+                "- a b c → a finds d first → d, e (b's list order is irrelevant: d already found)\n"
+                "- a c b → a finds d → d, e\n"
+                "- b a c, b c a → b finds both; its adjacency order decides → d, e **or** e, d (2 each)\n"
+                "- c a b, c b a → c finds e first → e, d\n\n"
+                "Total orders = 1 + 1 + 2 + 2 + 1 + 1 = **8**.\n\n"
+                "- (A) **True.**\n"
+                "- (B) **True** — f is the only vertex at distance 3.\n"
+                "- (C) **True** — e.g. s, c, a, b, e, d, f.\n"
+                "- (D) **False** — if c is the first level-1 vertex, it discovers e before anyone discovers d, "
+                "so e must precede d.\n\n"
+                "**Trap:** assuming any permutation within each level is achievable (that would give "
+                "3! × 2! = 12)."
+            ),
+            "verify": '''
+import itertools
+E = [('s','a'),('s','b'),('s','c'),('a','d'),('b','d'),('b','e'),('c','e'),('d','f'),('e','f')]
+adj = {}
+for u, v in E: adj.setdefault(u, []).append(v); adj.setdefault(v, []).append(u)
+V = sorted(adj); orders = set()
+for combo in itertools.product(*[list(itertools.permutations(adj[v])) for v in V]):
+    P = dict(zip(V, combo)); seen = {'s'}; q = ['s']; o = []
+    while q:
+        u = q.pop(0); o.append(u)
+        for w in P[u]:
+            if w not in seen: seen.add(w); q.append(w)
+    orders.add(''.join(o))
+vals = [len(orders) == 8, all(o[-1] == 'f' for o in orders),
+        any(o.index('e') < o.index('d') for o in orders), 'scabdef' in orders]
+assert [L for L, v in zip('ABCD', vals) if v] == sorted(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q18
+        {
+            "type": "NAT", "marks": 2, "topic": "Memoization via a mutable default",
+            "text": "The value printed by the following Python program is ______.",
+            "code": '''def f(n, memo={}):
+    if n in memo:
+        return memo[n]
+    f.calls += 1
+    r = n if n < 2 else f(n - 1) + f(n - 2)
+    memo[n] = r
+    return r
+
+f.calls = 0
+f(10)
+a = f.calls
+f(15)
+b = f.calls
+print(a * 100 + b)''',
+            "answer": "1116",
+            "solution": (
+                "The default `memo={}` is created **once** when `def` runs, so it persists across top-level "
+                "calls — here that is exploited as a cache. `f.calls` counts only cache misses (calls that "
+                "actually compute).\n\n"
+                "**f(10):** f(10) → f(9) → … → f(1); f(0) is reached via f(2)'s second call. Every n from 0 to 10 "
+                "is computed exactly once (later requests hit the memo) → 11 misses. a = 11.\n\n"
+                "**f(15):** values 0..10 are already cached; 15, 14, 13, 12, 11 are computed → 5 more misses. "
+                "b = 16.\n\n"
+                "Printed: 11 × 100 + 16 = **1116**.\n\n"
+                "Without memoisation f(10) alone would make 177 calls (2·F(11) − 1 with F(11) = 89); memoisation "
+                "reduces this to linear.\n\n"
+                "**Trap:** expecting the memo to reset between calls (b = 16 + … would become 16 on its own, "
+                "giving 1127), or counting cache hits as calls."
+            ),
+            "verify": '''
+assert OUTPUT.strip() == ANSWER
+def g(n): return 1 if n < 2 else 1 + g(n - 1) + g(n - 2)
+assert g(10) == 177
+''',
+        },
+        # ------------------------------------------------------------ Q19
+        {
+            "type": "MCQ", "marks": 2, "topic": "Linked lists — reversal in growing groups",
+            "text": "Consider the following Python program on the list 1 → 2 → … → 10. What is printed?",
+            "code": '''class N:
+    def __init__(self, v, nxt=None):
+        self.v, self.next = v, nxt
+
+def rev(h, k):
+    cur, prev, cnt = h, None, 0
+    while cur and cnt < k:
+        cur.next, prev, cur = prev, cur, cur.next
+        cnt += 1
+    if cur:
+        h.next = rev(cur, k + 1)
+    return prev
+
+head = None
+for v in range(10, 0, -1):
+    head = N(v, head)
+head = rev(head, 2)
+out = []
+while head:
+    out.append(head.v)
+    head = head.next
+print(*out)''',
+            "diagrams": [{"type": "linkedlist", "values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "head": "head",
+                          "caption": "Input list"}],
+            "options": ["`2 1 5 4 3 9 8 7 6 10`", "`2 1 4 3 6 5 8 7 10 9`",
+                        "`2 1 5 4 3 9 8 7 6`", "`2 1 5 4 3 10 9 8 7 6`"],
+            "answer": "A",
+            "solution": (
+                "`rev(h, k)` reverses the first k nodes, then recursively processes the rest with group size "
+                "k + 1, and links the old first node `h` (now the group's tail) to the result.\n\n"
+                "The tuple assignment `cur.next, prev, cur = prev, cur, cur.next` evaluates the whole right side "
+                "first (old prev, old cur, old cur.next) and then assigns left to right — `cur.next` is set on the "
+                "*old* cur before `cur` is rebound, so it is a correct in-place reversal step.\n\n"
+                "- k = 2: group [1, 2] → 2 1; recurse from 3\n"
+                "- k = 3: group [3, 4, 5] → 5 4 3; recurse from 6\n"
+                "- k = 4: group [6, 7, 8, 9] → 9 8 7 6; recurse from 10\n"
+                "- k = 5: only [10] remains → loop stops after 1 node (cur becomes None) → 10\n\n"
+                "Joined: `2 1 5 4 3 9 8 7 6 10`.\n\n"
+                "- (B) uses a constant group size 2.\n"
+                "- (C) loses the final short group (as if `if cur` were missing the last link).\n"
+                "- (D) treats the last group as 6..10 (sizes 2, 3, 5).\n\n"
+                "**Trap:** writing the assignment as `cur, cur.next, prev = cur.next, prev, cur` would set "
+                "`.next` on the *new* cur and corrupt the list — order of targets matters."
+            ),
+            "verify": "assert OUTPUT.strip() == '2 1 5 4 3 9 8 7 6 10' and ANSWER == 'A'",
+        },
+        # ------------------------------------------------------------ Q20
+        {
+            "type": "MSQ", "marks": 2, "topic": "Heap facts and heapsort",
+            "text": "Which of the following statements about binary heaps with n distinct keys is/are TRUE?",
+            "options": ["The k-th smallest key of a min-heap can be found in O(k log k) time without modifying the heap",
+                        "Two binary heaps of n keys each can be merged into one binary heap in O(n) time",
+                        "For n ≥ 7, the third-largest key of a max-heap can occupy exactly 6 different array positions",
+                        "Heapsort is a stable sorting algorithm"],
+            "answer": ["A", "B", "C"],
+            "solution": (
+                "- (A) **True.** Keep an auxiliary min-heap of *candidates*, starting with the root. Pop the "
+                "smallest candidate and push its (at most two) children; the k-th pop is the k-th smallest. "
+                "The auxiliary heap never exceeds k + 1 entries, so the cost is O(k log k), independent of n.\n"
+                "- (B) **True.** Concatenate the two arrays (O(n)) and run bottom-up build-heap on the 2n keys, "
+                "which is O(n).\n"
+                "- (C) **True.** The third-largest has exactly two larger keys, so it has at most two ancestors: "
+                "depth 1 or 2 → array positions 2..7 (1-indexed), six positions. Each is achievable: at depth 1 "
+                "with the second-largest as its sibling, at depth 2 with the second-largest as its parent.\n"
+                "- (D) **False.** E.g. records (1,x), (1,y): build-heap leaves them, then the first extraction "
+                "swaps the root (1,x) to the end, giving the order y, x. Long-range swaps destroy stability.\n\n"
+                "**Trap:** in (C), confusing *positions* (6) with *depths* (2); in (A), thinking the heap order "
+                "forces the k-th smallest to be at depth ≤ log k (it can be at depth k − 1)."
+            ),
+            "verify": '''
+import itertools, heapq
+# (C): enumerate all max-heaps on 1..7 and 1..8, positions of the 3rd largest
+for n in (7, 8):
+    pos = set()
+    for p in itertools.permutations(range(1, n + 1)):
+        if all(p[(i-1)//2] > p[i] for i in range(1, n)): pos.add(p.index(n - 2))
+    assert pos == {1, 2, 3, 4, 5, 6}
+# (A): candidate-heap method agrees with sorting
+H = [1, 3, 2, 7, 4, 5, 6, 9, 8, 10]
+def kth(H, k):
+    c = [(H[0], 0)]
+    for _ in range(k):
+        v, i = heapq.heappop(c)
+        for j in (2*i + 1, 2*i + 2):
+            if j < len(H): heapq.heappush(c, (H[j], j))
+    return v
+assert all(kth(H, k) == sorted(H)[k-1] for k in range(1, 11))
+# (D): heapsort on records is unstable
+def heapsort(a):
+    a = a[:]; n = len(a)
+    def down(i, n):
+        while True:
+            l, r, m = 2*i+1, 2*i+2, i
+            if l < n and a[l][0] > a[m][0]: m = l
+            if r < n and a[r][0] > a[m][0]: m = r
+            if m == i: return
+            a[i], a[m] = a[m], a[i]; i = m
+    for i in range(n//2 - 1, -1, -1): down(i, n)
+    for e in range(n - 1, 0, -1): a[0], a[e] = a[e], a[0]; down(0, e)
+    return a
+assert heapsort([(1, 'x'), (1, 'y')]) == [(1, 'y'), (1, 'x')]
+assert sorted(ANSWER) == ['A', 'B', 'C']
+''',
+        },
     ],
 }
