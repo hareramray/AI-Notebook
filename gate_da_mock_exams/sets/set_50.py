@@ -486,8 +486,9 @@ assert win_max(a, 3) == brute and sum(brute) == int(ANSWER)
                      "In the **two stacks in series** model the allowed moves are: push the next input onto S1; "
                      "move the top of S1 onto S2; pop the top of S2 to the output. Which of the following "
                      "statements is/are TRUE?"),
-            "diagrams": [{"type": "stack", "values": [1, 2, 3], "label": "S1"},
-                         {"type": "stack", "values": [], "label": "S2"}],
+            "diagrams": [{"type": "stack", "values": [1, 3], "label": "S1",
+                          "caption": "Input 1, 2, 3, 4 → S1 → S2 → output (an example intermediate state)"},
+                         {"type": "stack", "values": [2], "label": "S2"}],
             "options": [
                 "Every permutation of 1, 2, 3, 4 can be produced with two stacks in series",
                 "Exactly 14 permutations of 1, 2, 3, 4 can be produced with a single stack",

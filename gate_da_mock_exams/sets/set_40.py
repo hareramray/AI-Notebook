@@ -423,7 +423,11 @@ print(sum(f(x) for x in [0, 1, 2, 5]))''',
                 "Sum = −1 + 10 + 99 + 2 = **110**.\n\n"
                 "**Trap:** assuming the `try` block’s `return` wins (giving 5 for f(2) and a sum of 16), or "
                 "assuming the exception propagates for x = 0. A `return` inside `finally` also silently "
-                "swallows any in-flight exception, which is why linters warn about it."
+                "swallows any in-flight exception, which is why linters warn about it.\n\n"
+                "**Order of events for f(2):** the expression `10 // 2` is evaluated and the value 5 is "
+                "stashed as the pending return value; control then enters `finally`, where `return 99` "
+                "discards the stashed 5. For x = 1 and x = 5 the `finally` block falls through, so the "
+                "stashed value is returned unchanged."
             ),
             "verify": "assert OUTPUT.strip() == ANSWER == '110'",
         },

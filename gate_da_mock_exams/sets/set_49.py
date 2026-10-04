@@ -384,3 +384,258 @@ print(c)''',
             ),
             "verify": "assert int(OUTPUT) == int(ANSWER) == sum(20 // i for i in range(1, 21))",
         },
+        # ------------------------------------------------------------ Q11
+        {
+            "type": "MCQ", "marks": 2, "topic": "Python — sorted(): keys, case and stability",
+            "text": "Consider the following Python program. What is printed?",
+            "code": '''data = ["kiwi", "Fig", "apple", "date", "Banana", "fig"]
+r1 = sorted(data, key=len)
+r2 = sorted(data, key=str.lower)
+r3 = sorted(sorted(data), key=len, reverse=True)
+print(r1[:3], r2[:2], r3[2:5])''',
+            "options": ["`['Fig', 'fig', 'kiwi'] ['apple', 'Banana'] ['date', 'kiwi', 'Fig']`",
+                        "`['Fig', 'fig', 'kiwi'] ['apple', 'Banana'] ['kiwi', 'date', 'fig']`",
+                        "`['Fig', 'fig', 'date'] ['apple', 'Banana'] ['date', 'kiwi', 'Fig']`",
+                        "`['Fig', 'fig', 'kiwi'] ['Banana', 'Fig'] ['date', 'kiwi', 'Fig']`"],
+            "answer": "A",
+            "solution": (
+                "Three facts decide everything: (1) `sorted` is **stable** — records with equal keys keep "
+                "their relative input order; (2) default string order compares code points, so every "
+                "uppercase letter precedes every lowercase letter; (3) `reverse=True` reverses the order "
+                "of *keys* but still keeps equal-key records stable (it does **not** simply reverse the "
+                "output list).\n\n"
+                "- r1 (by length): lengths kiwi 4, Fig 3, apple 5, date 4, Banana 6, fig 3. Length 3 in "
+                "input order: Fig, fig; then length 4: kiwi, date → r1[:3] = ['Fig', 'fig', 'kiwi'].\n"
+                "- r2 (case-insensitive): apple, banana, date, fig, fig, kiwi → r2[:2] = ['apple', 'Banana'].\n"
+                "- r3: `sorted(data)` = ['Banana', 'Fig', 'apple', 'date', 'fig', 'kiwi'] (uppercase first). "
+                "Then by length descending, ties kept in this order: Banana(6), apple(5), date(4), kiwi(4), "
+                "Fig(3), fig(3) → r3[2:5] = ['date', 'kiwi', 'Fig'].\n\n"
+                "Output → option (A).\n\n"
+                "- (B) assumes `reverse=True` reverses tied elements too (as `sorted(...)[::-1]` would).\n"
+                "- (C) sorts the length-4 words alphabetically in r1 — but `key=len` ignores the letters.\n"
+                "- (D) uses case-sensitive order for r2.\n\n"
+                "**Tip:** multi-key sorting by successive stable sorts (secondary key first, primary key "
+                "last) relies exactly on this stability."
+            ),
+            "verify": '''
+assert OUTPUT.strip() == "['Fig', 'fig', 'kiwi'] ['apple', 'Banana'] ['date', 'kiwi', 'Fig']"
+assert sorted(sorted(data), key=len)[::-1][2:5] == ['kiwi', 'date', 'fig'] and ANSWER == 'A'
+''',
+        },
+        # ------------------------------------------------------------ Q12
+        {
+            "type": "NAT", "marks": 2, "topic": "Python — memoisation through a mutable default",
+            "text": ("Consider the following Python program. It prints four numbers; the last two are c1 and "
+                     "c2. The value of c1 + c2 is ______."),
+            "code": '''calls = 0
+def T(n, memo={}):
+    global calls
+    calls += 1
+    if n in memo:
+        return memo[n]
+    val = 1 if n < 3 else T(n - 1) + T(n - 2) + T(n - 3)
+    memo[n] = val
+    return val
+
+a = T(8)
+c1 = calls
+b = T(10)
+c2 = calls - c1
+print(a, b, c1, c2)''',
+            "answer": "26",
+            "solution": (
+                "The default `memo={}` is created **once** and shared by all calls — including the second "
+                "top-level call `T(10)`. Every call (even a memo hit) increments `calls`.\n\n"
+                "**c1 — calls made by T(8)** (memo initially empty):\n\n"
+                "- The first-child chain T(8) → T(7) → T(6) → T(5) → T(4) → T(3) → T(2): 7 calls; "
+                "T(3) then calls T(1) and T(0): 2 more (all three bases get memoised) → 9.\n"
+                "- Returning upward, each of T(4), T(5), T(6), T(7), T(8) makes two more calls (n−2, n−3) "
+                "which are memo hits → 5 × 2 = 10.\n"
+                "- c1 = 9 + 10 = **19**. (Value a = T(8) = 57: 1, 1, 1, 3, 5, 9, 17, 31, 57.)\n\n"
+                "**c2 — calls made by T(10)** (memo holds 0 … 8):\n\n"
+                "- T(10) (1) → T(9) (1, new) → T(8), T(7), T(6) all hits (3) → T(9) = 105.\n"
+                "- Back in T(10): T(8), T(7) hits (2) → b = 193.\n"
+                "- c2 = 1 + 1 + 3 + 2 = **7**.\n\n"
+                "c1 + c2 = 19 + 7 = **26**.\n\n"
+                "**Traps:** assuming the memo is reset between top-level calls (c2 would be 25), or counting "
+                "only cache *misses* (c1 = 9, c2 = 2)."
+            ),
+            "verify": "assert OUTPUT.split() == ['57', '193', '19', '7'] and int(ANSWER) == c1 + c2",
+        },
+        # ------------------------------------------------------------ Q13
+        {
+            "type": "MSQ", "marks": 2, "topic": "BST — deletion with two children",
+            "text": ("The BST below is built by inserting 40, 20, 60, 10, 30, 50, 70, 25, 35, 45, 55, 33. Then "
+                     "**40** is deleted and afterwards **30** is deleted. A node with two children is deleted "
+                     "by copying its **in-order successor**'s key into it and deleting the successor node. "
+                     "Height = number of edges on the longest root-to-leaf path. Which of the following "
+                     "statements is/are TRUE about the final tree?"),
+            "diagrams": [{"type": "bintree",
+                          "tree": [40, [20, [10], [30, [25], [35, [33], None]]],
+                                   [60, [50, [45], [55]], [70]]],
+                          "caption": "Initial BST"}],
+            "options": [
+                "Its pre-order traversal is 45, 20, 10, 33, 25, 35, 60, 50, 55, 70",
+                "Its height is 4",
+                "If the in-order **predecessor** had been used for deleting 40 instead, the root after that "
+                "deletion would be 35",
+                "It has exactly 4 leaves",
+            ],
+            "answer": ["A", "C"],
+            "solution": (
+                "**Delete 40** (two children): successor = minimum of the right subtree = 45 (leaf, left "
+                "child of 50). Copy 45 into the root and remove the leaf 45 → 50 keeps only its right child "
+                "55.\n\n"
+                "**Delete 30** (two children 25, 35): successor = minimum of 30's right subtree = 33 (left "
+                "child of 35, a leaf). Copy 33 into the node and remove leaf 33 → 35 becomes a leaf.\n\n"
+                "Final tree: 45 → left 20 (10, 33 (25, 35)), right 60 (50 (–, 55), 70).\n\n"
+                "- (A) **True.** Pre-order: 45, 20, 10, 33, 25, 35, 60, 50, 55, 70.\n"
+                "- (B) **False.** The longest paths are 45→20→33→25/35 and 45→60→50→55: 3 edges. (The "
+                "original height 4 came from 40→20→30→35→33, and 33 has been moved up.)\n"
+                "- (C) **True.** The predecessor of 40 is the maximum of the left subtree: 20 → 30 → 35 "
+                "(35 has no right child) → 35, so 35 would become the root (its left child 33 would move up).\n"
+                "- (D) **False.** Leaves: 10, 25, 35, 55, 70 → 5.\n\n"
+                "**Trap:** taking the successor of 40 to be 50 (the right child) — the successor is the "
+                "*leftmost* node of the right subtree."
+            ),
+            "solution_diagrams": [{"type": "bintree",
+                                   "tree": [45, [20, [10], [33, [25], [35]]], [60, [50, None, [55]], [70]]],
+                                   "highlight": [45, 33], "caption": "After deleting 40 and then 30"}],
+            "verify": '''
+import copy
+def ins(t, k):
+    if t is None: return [k, None, None]
+    if k < t[0]: t[1] = ins(t[1], k)
+    else: t[2] = ins(t[2], k)
+    return t
+def ext(t, f):
+    while t[f]: t = t[f]
+    return t[0]
+def dele(t, k, succ=True):
+    if t is None: return None
+    if k < t[0]: t[1] = dele(t[1], k, succ)
+    elif k > t[0]: t[2] = dele(t[2], k, succ)
+    else:
+        if t[1] is None: return t[2]
+        if t[2] is None: return t[1]
+        if succ: s = ext(t[2], 1); t[0] = s; t[2] = dele(t[2], s, succ)
+        else: s = ext(t[1], 2); t[0] = s; t[1] = dele(t[1], s, succ)
+    return t
+def pre(t): return [] if t is None else [t[0]] + pre(t[1]) + pre(t[2])
+def ht(t): return -1 if t is None else 1 + max(ht(t[1]), ht(t[2]))
+def lv(t): return 0 if t is None else (1 if not t[1] and not t[2] else lv(t[1]) + lv(t[2]))
+T = None
+for k in [40, 20, 60, 10, 30, 50, 70, 25, 35, 45, 55, 33]: T = ins(T, k)
+F = dele(dele(copy.deepcopy(T), 40), 30)
+res = {'A': pre(F) == [45, 20, 10, 33, 25, 35, 60, 50, 55, 70], 'B': ht(F) == 4,
+       'C': dele(copy.deepcopy(T), 40, False)[0] == 35, 'D': lv(F) == 4}
+assert sorted(k for k in res if res[k]) == sorted(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q14
+        {
+            "type": "NAT", "marks": 2, "topic": "Hashing — deletion with tombstones",
+            "text": ("A hash table has 11 slots, h(k) = k mod 11, and linear probing. Deletion replaces a key by "
+                     "a DELETED marker (tombstone). **Insertion** places the key in the first slot of its probe "
+                     "sequence that is EMPTY or DELETED. **Search** probes until it finds the key or an EMPTY "
+                     "slot (DELETED slots are probed and skipped). The operations are:\n\n"
+                     "insert 22, 33, 44, 13, 24; delete 33; delete 13; insert 55; insert 46; "
+                     "search 24; search 35.\n\n"
+                     "Counting every slot examined as one probe, the total number of probes made by the two "
+                     "searches is ______."),
+            "answer": "7",
+            "solution": (
+                "**Inserts:** 22 → slot 0; 33 → 0 taken → 1; 44 → 0, 1 → 2; 13 (home 2) → 2 → 3; "
+                "24 (home 2) → 2, 3 → 4.\n\n"
+                "**Deletes:** 33 at slot 1 → DEL; 13 at slot 3 → DEL. Table: 0:22, 1:DEL, 2:44, 3:DEL, "
+                "4:24.\n\n"
+                "**Insert 55** (home 0): slot 0 occupied, slot 1 DEL → reuse slot 1.\n"
+                "**Insert 46** (home 2): slot 2 occupied, slot 3 DEL → reuse slot 3.\n"
+                "Table: 0:22, 1:55, 2:44, 3:46, 4:24, others EMPTY.\n\n"
+                "**Search 24** (home 2): slots 2 (44), 3 (46), 4 (24) → found, **3** probes.\n"
+                "**Search 35** (home 2, absent): slots 2, 3, 4, 5 (EMPTY) → **4** probes.\n\n"
+                "Total = 3 + 4 = **7**.\n\n"
+                "Why tombstones matter: had the deletions simply emptied slots 1 and 3, a search for 24 "
+                "*before* the re-insertions would have stopped at the empty slot 3 and wrongly reported "
+                "24 as absent.\n\n"
+                "**Trap:** forgetting that 55 and 46 recycle the tombstones (then 46 would land in slot 5 "
+                "and the search for 35 would cost 5 probes)."
+            ),
+            "solution_diagrams": [{"type": "hashtable", "size": 11,
+                                   "slots": {0: 22, 1: "DEL", 2: 44, 3: "DEL", 4: 24},
+                                   "caption": "After the two deletions"},
+                                  {"type": "hashtable", "size": 11,
+                                   "slots": {0: 22, 1: 55, 2: 44, 3: 46, 4: 24},
+                                   "caption": "Final table (tombstones reused)"}],
+            "verify": '''
+EMPTY, DEL = None, "DEL"
+T = [EMPTY] * 11
+def insert(k):
+    i = k % 11
+    while T[i] not in (EMPTY, DEL): i = (i + 1) % 11
+    T[i] = k
+def search(k):
+    i = k % 11; p = 0
+    while True:
+        p += 1
+        if T[i] == k: return p
+        if T[i] is EMPTY: return p
+        i = (i + 1) % 11
+def delete(k):
+    i = k % 11
+    while T[i] != k: i = (i + 1) % 11
+    T[i] = DEL
+for k in [22, 33, 44, 13, 24]: insert(k)
+delete(33); delete(13); insert(55); insert(46)
+assert T[:6] == [22, 55, 44, 46, 24, None]
+assert search(24) + search(35) == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q15
+        {
+            "type": "MCQ", "marks": 2, "topic": "Quicksort — Hoare partition",
+            "text": ("The Hoare partition below is called as `hoare(A, 0, 7)` on "
+                     "A = [26, 41, 13, 26, 9, 37, 18, 52]. What does it return, and what is A afterwards?"),
+            "code": '''def hoare(A, lo, hi):
+    p = A[lo]
+    i, j = lo - 1, hi + 1
+    while True:
+        i += 1
+        while A[i] < p:
+            i += 1
+        j -= 1
+        while A[j] > p:
+            j -= 1
+        if i >= j:
+            return j
+        A[i], A[j] = A[j], A[i]''',
+            "options": ["Returns 4; A = [18, 9, 13, 26, 26, 37, 41, 52]",
+                        "Returns 2; A = [18, 9, 13, 26, 41, 37, 26, 52]",
+                        "Returns 3; A = [18, 9, 13, 26, 41, 37, 26, 52]",
+                        "Returns 3; A = [18, 9, 13, 26, 37, 41, 26, 52]"],
+            "answer": "C",
+            "solution": (
+                "Hoare's scheme moves i right past elements < p and j left past elements > p, then swaps; "
+                "elements **equal** to the pivot stop both scans. It returns j such that "
+                "A[lo..j] ≤ p ≤ A[j+1..hi] — the pivot is **not** necessarily in its final position.\n\n"
+                "p = 26.\n\n"
+                "- i → 0 (A[0] = 26 is not < 26). j: 52 > 26 → skip, stops at 6 (18). i < j → swap A[0], A[6] "
+                "→ [18, 41, 13, 26, 9, 37, 26, 52].\n"
+                "- i → 1 (41 stops). j: 37 > 26 → skip, stops at 4 (9). Swap → "
+                "[18, 9, 13, 26, 41, 37, 26, 52].\n"
+                "- i → 2 (13 < 26), 3 (26 stops). j → 3 (26 is not > 26). i ≥ j → **return 3**.\n\n"
+                "Result: returns 3, A = [18, 9, 13, 26, 41, 37, 26, 52] → option (C). Quicksort then "
+                "recurses on A[0..3] and A[4..7] (note the pivot value 26 appears on *both* sides).\n\n"
+                "- (A) is what a Lomuto-style partition that places the pivot would suggest — Hoare does not.\n"
+                "- (B) returns i − 1 instead of j.\n"
+                "- (D) performs an extra swap of 41 and 37, which never happens.\n\n"
+                "**Trap:** with Hoare partition the recursive calls must be on [lo, j] and [j + 1, hi] "
+                "(not j − 1), otherwise elements can be lost or the recursion may not shrink."
+            ),
+            "verify": '''
+A = [26, 41, 13, 26, 9, 37, 18, 52]
+r = hoare(A, 0, 7)
+assert r == 3 and A == [18, 9, 13, 26, 41, 37, 26, 52]
+assert max(A[:r + 1]) <= 26 <= min(A[r + 1:]) and ANSWER == 'C'
+''',
+        },
