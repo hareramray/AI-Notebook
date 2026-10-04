@@ -420,5 +420,488 @@ truth = {'A': okA, 'B': okB, 'C': okC, 'D': okD}
 assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)
 ''',
         },
+        # ------------------------------------------------------------ Q11
+        {
+            "type": "MCQ", "marks": 2, "topic": "Python — closures, class attributes, try/finally",
+            "text": "Consider the following Python program. What is printed?",
+            "code": '''class Counter:
+    total = 0
+    def __init__(self):
+        self.fns = []
+        for i in range(3):
+            def f(x, i=i):
+                Counter.total += x * i
+                return Counter.total
+            self.fns.append(f)
+    def run(self, vals):
+        try:
+            for f, v in zip(self.fns, vals):
+                if v < 0:
+                    raise ValueError(v)
+                f(v)
+            return Counter.total
+        except ValueError as e:
+            return -e.args[0]
+        finally:
+            Counter.total += 100
+
+c = Counter()
+print(c.run([1, 2, 3]), c.run([4, -5, 6]), Counter.total)''',
+            "options": ["`8 5 208`", "`108 5 208`", "`108 208 208`", "`8 -5 208`"],
+            "answer": "A",
+            "solution": (
+                "Three mechanisms interact:\n"
+                "- `i=i` freezes each closure's multiplier at 0, 1, 2 (no late-binding problem).\n"
+                "- `Counter.total` is a **class** attribute shared by all calls.\n"
+                "- In `return expr` inside `try`, `expr` is evaluated **before** `finally` runs; "
+                "`finally` cannot change an already-computed return value (it does not itself "
+                "return).\n\n"
+                "First call `run([1, 2, 3])`:\n"
+                "- f₀(1): total += 0 → 0;  f₁(2): += 2 → 2;  f₂(3): += 6 → 8.\n"
+                "- `return Counter.total` computes **8**; then `finally` makes total 108.\n\n"
+                "Second call `run([4, −5, 6])`:\n"
+                "- f₀(4): += 0 → 108.\n"
+                "- v = −5 → `ValueError(-5)`; handler returns −(−5) = **5**; `finally` → total 208.\n\n"
+                "The arguments of `print` are evaluated left to right, so `Counter.total` is read "
+                "last → **208**.\n\n"
+                "Output `8 5 208` → option **(A)**.\n\n"
+                "- (B) assumes `finally` runs before the return value is computed.\n"
+                "- (C) additionally treats the except-branch return like the try-branch.\n"
+                "- (D) forgets the negation in `-e.args[0]`.\n\n"
+                "**Trap:** a `return` *inside* `finally` would override; a plain statement there only "
+                "has side effects."
+            ),
+            "verify": "assert OUTPUT.strip() == '8 5 208' and ANSWER == 'A'",
+        },
+        # ------------------------------------------------------------ Q12
+        {
+            "type": "NAT", "marks": 2, "topic": "Recursion — memoisation via a mutable default",
+            "text": "Consider the following Python program. The value printed is ______.",
+            "code": '''calls = 0
+
+def f(n, memo={}):
+    global calls
+    calls += 1
+    if n in memo:
+        return memo[n]
+    r = 1 if n < 3 else f(n - 1) + f(n - 3)
+    memo[n] = r
+    return r
+
+f(10)
+f(12)
+print(calls)''',
+            "answer": "22",
+            "solution": (
+                "The default dict `memo={}` is created once and **shared by every call**, so it acts "
+                "as a persistent cache — even across the two top-level calls. Every call (hit or "
+                "miss) increments `calls`.\n\n"
+                "First call f(10):\n"
+                "- Each n is computed (a miss) at most once. f(10) → f(9) → … → f(3) → f(2) (base) "
+                "then f(0) (base); returning up, f(4) needs f(1) (base, new), and f(n−3) for n ≥ 5 is "
+                "always already cached.\n"
+                "- Computed values: n = 0 … 10 → 11 misses. Each computed n ≥ 3 (8 values: 3 … 10) "
+                "makes exactly 2 calls → 16 calls, plus the top-level call → **17**.\n\n"
+                "Second call f(12):\n"
+                "- f(12) miss → calls f(11) (miss) and f(9) (hit); f(11) calls f(10) (hit) and f(8) "
+                "(hit).\n"
+                "- Calls: f(12), f(11), f(10), f(8), f(9) → **5**.\n\n"
+                "Total = 17 + 5 = **22**.\n\n"
+                "**Trap:** assuming the memo is empty again for f(12) (which would give 17 + 21 = 38), "
+                "or counting only cache misses (13)."
+            ),
+            "verify": '''
+assert OUTPUT.strip() == ANSWER
+cnt = [0]
+def g(n, memo):
+    cnt[0] += 1
+    if n in memo: return memo[n]
+    r = 1 if n < 3 else g(n-1, memo) + g(n-3, memo)
+    memo[n] = r; return r
+m = {}
+g(10, m); g(12, m)
+assert cnt[0] == 22
+''',
+        },
+        # ------------------------------------------------------------ Q13
+        {
+            "type": "MSQ", "marks": 2, "topic": "BST vs binary heap built from the same keys",
+            "text": ("The keys 15, 9, 22, 4, 12, 19, 30, 11, 13, 2 are inserted, in that order, (i) into "
+                     "an empty BST T (shown) and (ii) into an empty binary **min**-heap H stored as an "
+                     "array (0-based), using the standard sift-up insertion. Depth of the root is 0. "
+                     "Which of the following statements is/are TRUE?"),
+            "diagrams": [{"type": "bintree",
+                          "tree": [15, [9, [4, [2], None], [12, [11], [13]]], [22, [19], [30]]],
+                          "caption": "Figure: BST T"}],
+            "options": ["The height of T is 3",
+                        "In H, the root is 2 and its two children are 4 and 19",
+                        "Exactly two keys have the same depth in T as in H",
+                        "The post-order traversal of T ends with 22, 15, and the last element of the "
+                        "array H is 13"],
+            "answer": ["A", "B", "C"],
+            "solution": (
+                "Build H by sift-up insertion:\n"
+                "- 15 → [15];  9 → swap → [9, 15];  22 → [9, 15, 22].\n"
+                "- 4 (index 3): swap with 15, then with 9 → [4, 9, 22, 15].\n"
+                "- 12 (index 4): parent 9 < 12 → [4, 9, 22, 15, 12].\n"
+                "- 19 (index 5): swap with 22 → [4, 9, 19, 15, 12, 22];  30 → appended.\n"
+                "- 11 (index 7): swap with 15; parent 9 < 11 → stop → [4, 9, 19, 11, 12, 22, 30, 15].\n"
+                "- 13 (index 8): parent 11 < 13 → stays.\n"
+                "- 2 (index 9): swap with 12, then 9, then 4 → H = [2, 4, 19, 11, 9, 22, 30, 15, 13, 12].\n\n"
+                "- (A) Longest root-to-leaf path in T: 15→9→4→2 or 15→9→12→11 → 3 edges. **True.**\n"
+                "- (B) H[0] = 2, H[1] = 4, H[2] = 19. **True.**\n"
+                "- (C) Depths (T, H): 15 (0, 3), 9 (1, 2), 22 (1, 2), 4 (2, 1), 12 (2, 3), "
+                "19 (2, 1), 30 (2, 2) ✓, 11 (3, 2), 13 (3, 3) ✓, 2 (3, 0). Exactly 30 and 13 match. "
+                "**True.**\n"
+                "- (D) Post-order of T = 2, 4, 11, 13, 12, 9, 19, 30, 22, 15 — ends with 22, 15 ✓, but "
+                "the last array element of H is **12**, not 13. **False.**\n\n"
+                "**Trap:** in H the last inserted key 2 travels all the way to the root, dragging 12 "
+                "(not 13) into the last slot."
+            ),
+            "solution_diagrams": [{"type": "heap", "values": [2, 4, 19, 11, 9, 22, 30, 15, 13, 12],
+                                   "caption": "Min-heap H after all insertions"}],
+            "verify": '''
+import heapq, math
+keys = [15,9,22,4,12,19,30,11,13,2]
+def ins(t, k):
+    if t is None: return [k, None, None]
+    if k < t[0]: t[1] = ins(t[1], k)
+    else: t[2] = ins(t[2], k)
+    return t
+T = None
+for k in keys: T = ins(T, k)
+def ht(t): return -1 if t is None else 1 + max(ht(t[1]), ht(t[2]))
+def depth(t, k, d=0):
+    return d if t[0] == k else depth(t[1] if k < t[0] else t[2], k, d+1)
+def post(t): return [] if t is None else post(t[1]) + post(t[2]) + [t[0]]
+H = []
+for k in keys:
+    H.append(k); i = len(H) - 1
+    while i > 0 and H[(i-1)//2] > H[i]:
+        H[i], H[(i-1)//2] = H[(i-1)//2], H[i]; i = (i-1)//2
+hd = {k: int(math.log2(H.index(k) + 1)) for k in keys}
+same = [k for k in keys if depth(T, k) == hd[k]]
+truth = {'A': ht(T) == 3, 'B': H[:3] == [2, 4, 19], 'C': len(same) == 2,
+         'D': post(T)[-2:] == [22, 15] and H[-1] == 13}
+assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q14
+        {
+            "type": "NAT", "marks": 2, "topic": "Heaps — counting distinct heaps",
+            "text": ("The number of distinct binary **max**-heaps (as arrays of length 9, i.e. complete "
+                     "binary trees filled level by level from the left) that can be formed with the 9 "
+                     "distinct keys 1, 2, …, 9 is ______."),
+            "answer": "896",
+            "solution": (
+                "The maximum (9) must be at the root. The remaining 8 keys are split between the left "
+                "and right subtrees, whose **shapes are fixed** by completeness; any choice of which "
+                "keys go left works, and each side is then any heap of its own shape:\n"
+                "H(n) = C(n − 1, L) · H(L) · H(R), where L, R are the subtree sizes.\n\n"
+                "Shapes: a complete tree with 9 nodes has levels of 1, 2, 4 and 2 nodes. The two "
+                "last-level nodes are both under the left child, so L = 1 + 2 + 2 = 5 (indices 1, 3, "
+                "4, 7, 8) and R = 3 (indices 2, 5, 6).\n\n"
+                "- H(1) = 1, H(2) = 1 (root + one child), H(3) = C(2,1)·1·1 = 2.\n"
+                "- H(5): L = 3, R = 1 → C(4,3)·H(3)·H(1) = 4·2 = 8.\n"
+                "- H(9) = C(8,5)·H(5)·H(3) = 56 · 8 · 2 = **896**.\n\n"
+                "Sanity check: 9! = 362 880 permutations, of which only 896 satisfy the heap "
+                "property (the brute-force count agrees).\n\n"
+                "**Trap:** using a balanced split L = R = 4 (would give C(8,4)·3·3 = 630), or "
+                "forgetting the binomial factor for choosing which keys go left."
+            ),
+            "solution_diagrams": [{"type": "heap", "values": ["9", "L", "R", "L", "L", "R", "R", "L", "L"],
+                                   "caption": "Shape: 5 positions in the left subtree (L), 3 in the right (R)"}],
+            "verify": '''
+from itertools import permutations
+c = 0
+for p in permutations(range(9)):
+    if all(p[(i-1)//2] > p[i] for i in range(1, 9)): c += 1
+assert c == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q15
+        {
+            "type": "MCQ", "marks": 2, "topic": "Merge sort — bottom-up vs top-down",
+            "text": ("**Bottom-up** (iterative) merge sort merges runs of width 1, 2, 4, … from left to "
+                     "right; at each width, a run with no partner on its right is left unchanged. A "
+                     "merge compares the two front elements until one run is exhausted. The number of "
+                     "element comparisons it makes on [5, 2, 8, 6, 1, 9, 3] is:"),
+            "options": ["13", "14", "12", "11"],
+            "answer": "A",
+            "solution": (
+                "Bottom-up and top-down merge sort split an odd-length array differently, so their "
+                "comparison counts can differ.\n\n"
+                "Width 1 (pairs): (5|2) → 1, (8|6) → 1, (1|9) → 1, [3] has no partner → **3** "
+                "comparisons; array [2, 5, 6, 8, 1, 9, 3].\n\n"
+                "Width 2: [2, 5] + [6, 8]: 2<6, 5<6, left exhausted → **2**. [1, 9] + [3]: 1<3, "
+                "9>3, right exhausted → **2**. Array [2, 5, 6, 8, 1, 3, 9].\n\n"
+                "Width 4: [2, 5, 6, 8] + [1, 3, 9]: 1, 2, 3, 5, 6, 8 are output by 6 comparisons, then "
+                "9 is copied → **6**.\n\n"
+                "Total = 3 + 4 + 6 = **13** → option **(A)**.\n\n"
+                "- (B) 14 is what **top-down** merge sort (split ⌊n/2⌋ = 3 | 4) makes: "
+                "[5 | 2, 8] → 1 + 2, [6, 1 | 9, 3] → 1 + 1 + 3, final 3 + 4 run merge → 6; total 14.\n"
+                "- (C), (D) miscount the unequal merges.\n\n"
+                "**Trap:** assuming both versions perform identical merges — they only coincide when "
+                "n is a power of two."
+            ),
+            "solution_diagrams": [{"type": "matrix", "title": "Bottom-up passes",
+                                   "col_labels": ["width", "array after pass", "comparisons"],
+                                   "row_labels": ["pass 1", "pass 2", "pass 3"],
+                                   "rows": [[1, "2 5 6 8 1 9 3", 3], [2, "2 5 6 8 1 3 9", 4],
+                                            [4, "1 2 3 5 6 8 9", 6]]}],
+            "verify": '''
+def bu(a):
+    a = a[:]; n = len(a); w = 1; c = 0
+    while w < n:
+        for lo in range(0, n, 2*w):
+            L = a[lo:lo+w]; R = a[lo+w:lo+2*w]; out = []; i = j = 0
+            while i < len(L) and j < len(R):
+                c += 1
+                if L[i] <= R[j]: out.append(L[i]); i += 1
+                else: out.append(R[j]); j += 1
+            a[lo:lo+2*w] = out + L[i:] + R[j:]
+        w *= 2
+    return a, c
+def td(a, c):
+    if len(a) <= 1: return a
+    m = len(a)//2; L = td(a[:m], c); R = td(a[m:], c); out = []; i = j = 0
+    while i < len(L) and j < len(R):
+        c[0] += 1
+        if L[i] <= R[j]: out.append(L[i]); i += 1
+        else: out.append(R[j]); j += 1
+    return out + L[i:] + R[j:]
+x = [5,2,8,6,1,9,3]
+s, c = bu(x); c2 = [0]; td(x, c2)
+assert s == sorted(x) and c == 13 and c2[0] == 14 and ANSWER == 'A'
+''',
+        },
+        # ------------------------------------------------------------ Q16
+        {
+            "type": "NAT", "marks": 2, "topic": "Shortest paths — edges on some shortest path",
+            "text": ("In the weighted undirected graph shown, the number of edges that lie on **at "
+                     "least one** shortest path from S to T is ______."),
+            "diagrams": [{"type": "graph", "directed": False,
+                          "nodes": ["S", "A", "B", "C", "D", "E", "T"],
+                          "edges": [["S", "A", 3], ["S", "B", 2], ["S", "C", 6], ["A", "B", 1],
+                                    ["A", "D", 3], ["B", "D", 5], ["B", "E", 3],
+                                    ["D", "T", 2], ["E", "T", 3], ["D", "E", 1], ["C", "T", 3],
+                                    ["A", "C", 2]],
+                          "pos": {"S": [0, 1.5], "A": [1.8, 2.8], "B": [1.8, 0.2], "C": [1.8, 4.8],
+                                  "D": [3.8, 2.4], "E": [3.8, 0.2], "T": [5.6, 1.5]}}],
+            "answer": "10",
+            "solution": (
+                "Run Dijkstra from S **and** from T. An edge (u, v, w) lies on some shortest S–T path "
+                "iff d_{S}(u) + w + d_{T}(v) = d_{S}(T) (in either orientation).\n\n"
+                "Distances from S: S 0, A 3, B 2, C 5, D 6, E 5, T **8**.\n"
+                "Distances to T:   S 8, A 5, B 6, C 3, D 2, E 3, T 0.\n\n"
+                "Check each edge (best orientation):\n"
+                "- S–A: 0 + 3 + 5 = 8 ✓   - S–B: 0 + 2 + 6 = 8 ✓   - S–C: 0 + 6 + 3 = 9 ✗\n"
+                "- A–B: d_{S}(B) + 1 + d_{T}(A) = 2 + 1 + 5 = 8 ✓ (path S–B–A–D–T)\n"
+                "- A–D: 3 + 3 + 2 = 8 ✓   - B–D: 2 + 5 + 2 = 9 ✗   - B–E: 2 + 3 + 3 = 8 ✓\n"
+                "- D–T: 6 + 2 = 8 ✓   - E–T: 5 + 3 = 8 ✓\n"
+                "- D–E: d_{S}(E) + 1 + d_{T}(D) = 5 + 1 + 2 = 8 ✓ (path S–B–E–D–T)\n"
+                "- C–T: 5 + 3 = 8 ✓   - A–C: 3 + 2 + 3 = 8 ✓ (path S–A–C–T)\n\n"
+                "Edges on some shortest path: 12 − 2 = **10** (all except S–C and B–D).\n\n"
+                "**Trap:** only marking the edges of the single path Dijkstra happens to record in its "
+                "predecessor tree, or testing only one orientation of each undirected edge (A–B and "
+                "D–E are used 'backwards' relative to the letter order)."
+            ),
+            "verify": '''
+import heapq
+E = [('S','A',3),('S','B',2),('S','C',6),('A','B',1),('A','D',3),('B','D',5),('B','E',3),
+     ('D','T',2),('E','T',3),('D','E',1),('C','T',3),('A','C',2)]
+G = {}
+for u, v, w in E:
+    G.setdefault(u, []).append((v, w)); G.setdefault(v, []).append((u, w))
+def dij(s):
+    d = {v: float('inf') for v in G}; d[s] = 0; pq = [(0, s)]
+    while pq:
+        du, u = heapq.heappop(pq)
+        if du > d[u]: continue
+        for v, w in G[u]:
+            if du + w < d[v]: d[v] = du + w; heapq.heappush(pq, (d[v], v))
+    return d
+ds, dt = dij('S'), dij('T'); D = ds['T']
+on = [e for e in E if ds[e[0]] + e[2] + dt[e[1]] == D or ds[e[1]] + e[2] + dt[e[0]] == D]
+assert D == 8 and len(on) == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q17
+        {
+            "type": "MSQ", "marks": 2, "topic": "Hashing — collision probabilities",
+            "text": ("Three keys are inserted into a hash table with 5 slots using separate chaining. "
+                     "Each key independently hashes to each slot with probability 1/5. Which of the "
+                     "following statements is/are TRUE?"),
+            "options": ["The probability that no two keys share a slot is 12/25",
+                        "The probability that all three keys land in the same slot is 1/25",
+                        "The expected number of non-empty slots is 2.44",
+                        "The expected length of the longest chain is 1.6"],
+            "answer": ["A", "B", "C"],
+            "solution": (
+                "There are 5³ = 125 equally likely outcomes.\n\n"
+                "- (A) All distinct: 5 · 4 · 3 = 60 outcomes → 60/125 = **12/25** = 0.48. **True.**\n"
+                "- (B) All in one slot: 5 outcomes → 5/125 = **1/25**. **True.**\n"
+                "- (C) Linearity of expectation: a slot stays empty with probability (4/5)³ = 64/125, "
+                "so E[non-empty] = 5 · (1 − 64/125) = 5 · 61/125 = **2.44**. **True.**\n"
+                "- (D) Longest chain L: P(L = 1) = 60/125, P(L = 3) = 5/125, so "
+                "P(L = 2) = 60/125. E[L] = (60·1 + 60·2 + 5·3)/125 = 195/125 = **1.56**, not 1.6. "
+                "**False.**\n\n"
+                "Even with load factor α = 0.6, a collision happens with probability 0.52 — the "
+                "birthday effect.\n\n"
+                "**Trap:** in (D), guessing 1 + α = 1.6 — that is the expected cost of a successful "
+                "search pattern, not the expected *maximum* chain length."
+            ),
+            "verify": '''
+from fractions import Fraction as Fr
+from itertools import product
+outs = list(product(range(5), repeat=3))
+N = len(outs)
+pA = Fr(sum(1 for o in outs if len(set(o)) == 3), N)
+pB = Fr(sum(1 for o in outs if len(set(o)) == 1), N)
+eC = Fr(sum(len(set(o)) for o in outs), N)
+eD = Fr(sum(max(o.count(s) for s in range(5)) for o in outs), N)
+truth = {'A': pA == Fr(12, 25), 'B': pB == Fr(1, 25), 'C': eC == Fr(244, 100),
+         'D': eD == Fr(16, 10)}
+assert eD == Fr(156, 100)
+assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q18
+        {
+            "type": "NAT", "marks": 2, "topic": "Stacks — prefix evaluation with floor division",
+            "text": ("The function below evaluates a prefix (Polish) expression by scanning tokens from "
+                     "right to left. The value printed is ______."),
+            "code": '''def ev(tokens):
+    st = []
+    for t in reversed(tokens):
+        if t in '+-*/':
+            a = st.pop()
+            b = st.pop()
+            st.append({'+': a + b, '-': a - b,
+                       '*': a * b, '/': a // b}[t])
+        else:
+            st.append(int(t))
+    return st[-1]
+
+e = "* - / 7 -2 * 3 - 4 6 / - 5 * 2 6 + 1 3"
+print(ev(e.split()))''',
+            "answer": "-4",
+            "solution": (
+                "Scanning a prefix expression from the right, the **first** value popped is the "
+                "**left** operand. Note `'-2' in '+-*/'` is False (the string \"-2\" is not a "
+                "substring of \"+-*/\"), so `-2` is an operand. `/` is Python's floor division.\n\n"
+                "Structure: `* X Y` with X = `- / 7 -2 * 3 - 4 6` and Y = `/ - 5 * 2 6 + 1 3`.\n\n"
+                "- X: `/ 7 -2` = 7 // −2 = floor(−3.5) = **−4**; `* 3 - 4 6` = 3 × (4 − 6) = −6; "
+                "X = −4 − (−6) = **2**.\n"
+                "- Y: `- 5 * 2 6` = 5 − 12 = −7; `+ 1 3` = 4; Y = −7 // 4 = floor(−1.75) = **−2**.\n"
+                "- Result: X × Y = 2 × (−2) = **−4**.\n\n"
+                "**Trap:** with truncating division (C/Java) X = −3 + 6 = 3 and Y = −1, giving −3; "
+                "popping operands in the postfix order (right operand first) would compute "
+                "−2 // 7 etc. and give a completely different value."
+            ),
+            "solution_diagrams": [{"type": "tree", "root": "*",
+                                   "children": {"*": ["-", "/"], "-": ["/₁", "×"], "/₁": ["7", "-2"],
+                                                "×": ["3", "−"], "−": ["4", "6"],
+                                                "/": ["-₂", "+"], "-₂": ["5", "×₂"], "×₂": ["2", "6₂"],
+                                                "+": ["1", "3₂"]},
+                                   "labels": {"/₁": "/", "×": "*", "−": "-", "-₂": "-", "×₂": "*",
+                                              "6₂": "6", "3₂": "3"},
+                                   "caption": "Expression tree of e"}],
+            "verify": "assert OUTPUT.strip() == ANSWER",
+        },
+        # ------------------------------------------------------------ Q19
+        {
+            "type": "MCQ", "marks": 2, "topic": "DFS in Python — mutable default visited set",
+            "text": ("The directed graph shown is stored as `g` (neighbours listed alphabetically). What "
+                     "does the program print?"),
+            "code": '''def dfs(g, u, seen=set(), order=None):
+    if order is None:
+        order = []
+    seen.add(u)
+    order.append(u)
+    for v in g[u]:
+        if v not in seen:
+            dfs(g, v, seen, order)
+    return order
+
+g = {'A': 'BC', 'B': 'D', 'C': 'E', 'D': 'F',
+     'E': '', 'F': '', 'G': 'AH', 'H': 'E'}
+print(dfs(g, 'A'), dfs(g, 'G'))''',
+            "diagrams": [{"type": "graph", "directed": True,
+                          "nodes": ["A", "B", "C", "D", "E", "F", "G", "H"],
+                          "edges": [["A", "B"], ["A", "C"], ["B", "D"], ["C", "E"], ["D", "F"],
+                                    ["G", "A"], ["G", "H"], ["H", "E"]],
+                          "pos": {"A": [1.5, 2], "B": [0.5, 1], "C": [2.5, 1], "D": [0.5, 0],
+                                  "E": [2.5, 0], "F": [0.5, -1], "G": [3.5, 3], "H": [4, 1]}}],
+            "options": ["`['A', 'B', 'D', 'F', 'C', 'E'] ['G', 'H']`",
+                        "`['A', 'B', 'D', 'F', 'C', 'E'] ['G', 'A', 'B', 'D', 'F', 'C', 'E', 'H']`",
+                        "`['A', 'B', 'D', 'F', 'C', 'E'] ['G']`",
+                        "`['A', 'B', 'C', 'D', 'E', 'F'] ['G', 'H']`"],
+            "answer": "A",
+            "solution": (
+                "`order` is correctly reset with the `None` idiom, but `seen=set()` is a mutable "
+                "default evaluated **once** — the second top-level call starts with everything the "
+                "first call visited already marked.\n\n"
+                "First call dfs(g, 'A') — recursive DFS, neighbours in listed order:\n"
+                "- A → B → D → F (dead end) → back to A → C → E.\n"
+                "- order = [A, B, D, F, C, E]; seen = {A, B, C, D, E, F}.\n\n"
+                "Second call dfs(g, 'G') with the same `seen`:\n"
+                "- G added. Neighbour A is already in seen → skipped. H is new → visit H; its "
+                "neighbour E is in seen → skipped.\n"
+                "- order = [G, H].\n\n"
+                "Output → option **(A)**.\n\n"
+                "- (B) is the correct DFS from G with a fresh visited set — the intended behaviour.\n"
+                "- (C) assumes G's neighbours are all seen — H was not reachable from A.\n"
+                "- (D) is a BFS order for the first call.\n\n"
+                "**Trap:** the bug is silent for the first call; only repeated calls reveal it. "
+                "Always use `seen=None` and create the set inside."
+            ),
+            "verify": "assert OUTPUT.strip() == \"['A', 'B', 'D', 'F', 'C', 'E'] ['G', 'H']\" and ANSWER == 'A'",
+        },
+        # ------------------------------------------------------------ Q20
+        {
+            "type": "MSQ", "marks": 2, "topic": "Counting BSTs by height",
+            "text": ("Consider all binary search trees containing exactly the keys 1, 2, 3, 4, 5. Height "
+                     "is the number of edges on the longest root-to-leaf path. Which of the following "
+                     "statements is/are TRUE?"),
+            "options": ["There are exactly 32 such BSTs",
+                        "Exactly 16 of them have height 4",
+                        "Exactly 6 of them have the minimum possible height, 2",
+                        "Exactly 5 of them have 3 at the root"],
+            "answer": ["B", "C"],
+            "solution": (
+                "The number of BSTs on n keys is the Catalan number Cₙ: C₀..C₅ = 1, 1, 2, 5, 14, 42. "
+                "With root r there are C_{r−1} · C_{5−r} trees.\n\n"
+                "- (A) Total = C₅ = 42 (= 14 + 5 + 4 + 5 + 14 by root). **False.**\n"
+                "- (B) Height 4 with 5 nodes means a path: the root is 1 or 5 (otherwise both sides are "
+                "non-empty and the height ≤ 3), and the same holds at every level → each of the 4 "
+                "non-leaf steps chooses min or max of the remaining keys → 2⁴ = 16. **True.**\n"
+                "- (C) Height 2 holds at most 7 nodes; with 5 keys the root's two subtrees must both "
+                "have height ≤ 1, i.e. sizes ≤ 3 and summing to 4: (1, 3), (2, 2), (3, 1). A 3-node "
+                "subtree of height 1 must be perfect (1 way); a 2-node subtree has 2 shapes. Count = "
+                "1·1 + 2·2 + 1·1 = 6. **True.**\n"
+                "- (D) Root 3: left {1, 2} → C₂ = 2, right {4, 5} → 2 → 4 trees. **False.**\n\n"
+                "Height distribution: h=2: 6, h=3: 20, h=4: 16 (sum 42).\n\n"
+                "**Trap:** in (A), confusing 2^{n} (or 2^{n−1} chains) with the Catalan count."
+            ),
+            "solution_diagrams": [{"type": "bintree", "tree": [3, [2, [1], None], [4, None, [5]]],
+                                   "caption": "One of the 6 BSTs of height 2"},
+                                  {"type": "bintree", "tree": [1, None, [5, [2, None, [4, [3], None]], None]],
+                                   "caption": "One of the 16 BSTs of height 4 (a zig-zag path)"}],
+            "verify": '''
+from functools import lru_cache
+@lru_cache(None)
+def le(n, h):
+    if n == 0: return 1
+    if h < 0: return 0
+    return sum(le(k, h-1) * le(n-1-k, h-1) for k in range(n))
+exact = lambda n, h: le(n, h) - le(n, h-1)
+root3 = le(2, 9) * le(2, 9)
+truth = {'A': le(5, 9) == 32, 'B': exact(5, 4) == 16, 'C': exact(5, 2) == 6,
+         'D': root3 == 5}
+assert le(5, 9) == 42 and exact(5, 1) == 0
+assert sorted(k for k, v in truth.items() if v) == sorted(ANSWER)
+''',
+        },
     ],
 }

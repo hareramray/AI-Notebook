@@ -703,7 +703,11 @@ assert rep == int(ANSWER) and h[0] == 12
                 "**False.**\n\n"
                 "**Trap:** in (D) forgetting G — an internal vertex of a pendant path is always a cut vertex. "
                 "Also note: an endpoint of a bridge is a cut vertex unless it has degree 1 (H is not a cut "
-                "vertex)."
+                "vertex).\n\n"
+                "**Method tip:** for small graphs, first mark every edge that lies on a cycle (here the six "
+                "triangle edges); the remaining edges are exactly the bridges. Then a vertex is a cut vertex "
+                "iff it is an endpoint of a bridge with degree ≥ 2, or it joins two cycles that share only "
+                "that vertex."
             ),
             "verify": '''
 E = [('A','B'),('A','C'),('B','C'),('C','D'),('D','E'),('D','F'),('E','F'),('F','G'),('G','H')]
@@ -753,6 +757,11 @@ assert sorted(ANSWER) == [x for x, ok in zip("ABCD", truth) if ok]
                 "8 × 0.448795 ≈ **3.59**.\n\n"
                 "So on average fewer than half of the 8 slots are used even though there are 6 keys — "
                 "collisions are common long before the table is 'full' (birthday paradox).\n\n"
+                "**Why not count directly?** The number of empty slots is a dependent sum (if one slot is empty, "
+                "the others are slightly more likely to be hit), but linearity of expectation holds "
+                "regardless of dependence, so the indicator method is exact.\n\n"
+                "**Related quantity:** the expected number of *occupied* slots is 8 − 3.59 ≈ 4.41, and the "
+                "expected number of colliding key pairs is C(6, 2)/8 = 1.875.\n\n"
                 "**Trap:** answering 8 − 6 = 2 (that assumes no collisions at all), or using (1/8)^{6}."
             ),
             "verify": '''
