@@ -249,7 +249,7 @@ def fig_t_q26():
     m = t >= 1.833
     ax.fill_between(t[m], stats.t.pdf(t[m], 9), color=MAROON, alpha=0.4)
     ax.axvline(Q26_t, color=GOLD, lw=2.2)
-    ax.text(Q26_t - 1.6, 0.33, f"t = {Q26_t:.2f}", fontsize=9)
+    ax.text(Q26_t + 0.1, 0.33, f"t = {Q26_t:.2f}", fontsize=9)
     ax.text(2.0, 0.08, "reject: t ≥ 1.833", color=MAROON, fontsize=8.5)
     ax.set_yticks([]); ax.set_xlabel("t (9 df)")
     return fig
@@ -262,7 +262,7 @@ def fig_chi_q27():
     m = x >= 11.07
     ax.fill_between(x[m], stats.chi2.pdf(x[m], 5), color=MAROON, alpha=0.4)
     ax.axvline(Q27, color=GOLD, lw=2.2)
-    ax.text(Q27 + 0.3, 0.13, "χ² = 4.5", fontsize=9)
+    ax.text(Q27 + 0.4, 0.15, "χ² = 4.5", fontsize=9)
     ax.text(12, 0.03, "reject: χ² ≥ 11.07", color=MAROON, fontsize=8.5)
     ax.set_yticks([]); ax.set_xlabel("χ² (5 df)")
     return fig
@@ -274,7 +274,7 @@ def fig_t_vs_z_q28():
     ax.plot(x, stats.norm.pdf(x), color=BLUE, label="N(0,1)")
     ax.plot(x, stats.t.pdf(x, 2), color=MAROON, label="t, 2 df")
     ax.plot(x, stats.t.pdf(x, 8), color=GOLD, label="t, 8 df")
-    ax.legend(fontsize=8, frameon=False); ax.set_yticks([])
+    ax.legend(fontsize=8, frameon=False, loc="upper left"); ax.set_yticks([])
     ax.set_title("Lower peak, heavier tails; t → N(0,1) as df grows", fontsize=9.5)
     return fig
 
@@ -735,8 +735,8 @@ SET = {
         # ------------------------------------------------------------ Q22
         dict(
             qtype="MSQ", marks=2, topic="Reading a discrete CDF", difficulty="Medium",
-            text=["The CDF of a discrete random variable X (number of rainy days in a week at a station, "
-                  "restricted to the values shown) is plotted below:",
+            text=["The CDF of a discrete random variable X (the number of warning sirens sounded at a dam during a "
+                  "storm) is plotted below:",
                   ("fig", fig_cdf_q22),
                   "F(x) = 0 for x &lt; 1, 0.2 for 1 ≤ x &lt; 2, 0.5 for 2 ≤ x &lt; 4, 0.9 for 4 ≤ x &lt; 5 and 1 for x ≥ 5. "
                   "Which of the following is/are TRUE?"],

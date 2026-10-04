@@ -325,9 +325,8 @@ Q.append(dict(
 
 Q.append(dict(
     qtype="NAT", marks=1, topic="z confidence interval for μ", difficulty="Easy",
-    text="The diastolic blood pressure of adults in a region is normally distributed with known standard "
-         "deviation σ = 6 mmHg. A random sample of 25 adults has mean 52.4 mmHg (after a standardising "
-         "offset). The <b>upper limit</b> of the 95% confidence interval for the population mean is ______ "
+    text="The time a hospital pharmacy takes to process a prescription is normally distributed with known "
+         "standard deviation σ = 6 minutes. A random sample of 25 prescriptions has mean 52.4 minutes. The <b>upper limit</b> of the 95% confidence interval for the population mean is ______ "
          "(round off to 2 decimal places). [Use z<sub>0.025</sub> = 1.96.]",
     answer=f"{Q2_up:.2f}", range=(54.74, 54.76),
     solution=[
@@ -482,13 +481,13 @@ Q.append(dict(
     qtype="MCQ", marks=1, topic="z-test statistic", difficulty="Easy",
     text="The breaking strength of a cable has known σ = 15 N. To test H<sub>0</sub>: μ = 200 N, a sample "
          "of 36 cables gives x̄ = 204.5 N. The value of the z-test statistic is",
-    options=["0.30", "1.80", "10.80", "1.50"],
+    options=["0.30", "1.80", "0.75", "0.125"],
     answer="B",
     solution=[
         "<b>Concept:</b> z = (x̄ − μ<sub>0</sub>)/(σ/√n).",
         "$$z=\\dfrac{204.5-200}{15/\\sqrt{36}}=\\dfrac{4.5}{2.5}=1.80",
-        "(A) forgets √n (4.5/15). (C) multiplies by √n twice-wrongly (4.5 × 6/2.5). "
-        "(D) uses √n in the wrong place (4.5/3).",
+        "(A) divides by σ instead of σ/√n (4.5/15). (C) divides by √n only (4.5/6). "
+        "(D) divides by n (4.5/36).",
         ("note", "Always standardise with the standard error σ/√n, never with σ itself.", "Trap"),
     ],
 ))
@@ -609,7 +608,7 @@ Q.append(dict(
                      ["After"] + [str(v) for v in Q16_after]]),
           "For testing whether the drug reduces mean blood pressure, the value of the paired t statistic "
           "(based on d = Before − After) is ______ (round off to 2 decimal places)."],
-    answer=f"{Q16_t:.2f}", range=(4.12, 4.16),
+    answer=f"{Q16_t:.2f}", range=(4.18, 4.22),
     solution=[
         "<b>Concept:</b> paired t = d̄ / (s<sub>d</sub>/√n) with n − 1 df, where d<sub>i</sub> are the "
         "within-patient differences.",
@@ -622,7 +621,7 @@ Q.append(dict(
         f"$$t=\\dfrac{{{Q16_dbar:.3f}}}{{{Q16_s/math.sqrt(8):.4f}}}={Q16_t:.3f}",
         "With 7 df, t<sub>0.05,7</sub> = 1.895 and t<sub>0.01,7</sub> = 2.998, so the reduction is significant "
         "even at the 1% level.",
-        ("note", "A two-sample t-test on these columns would give t ≈ 1.29 — the pairing removes the large "
+        ("note", "A two-sample t-test on these columns would give t ≈ 1.50 — the pairing removes the large "
                  "patient-to-patient variation and reveals the effect.", "Key idea"),
     ],
 ))
@@ -808,7 +807,7 @@ Q.append(dict(
          "one-sided z-test at α = 0.05, a researcher wants power 0.90 when the true mean is μ<sub>0</sub> + 4. "
          "[z<sub>0.05</sub> = 1.645, z<sub>0.10</sub> = 1.2816, z<sub>0.20</sub> = 0.8416, z<sub>0.025</sub> = 1.96]. "
          "The minimum sample size is",
-    options=[str(Q24_80), str(Q24), str(Q24_two), "34"],
+    options=[str(Q24_80), str(Q24), str(Q24_two), "17"],
     answer="B",
     solution=[
         "<b>Concept:</b> power 1 − β requires √n δ/σ ≥ z<sub>α</sub> + z<sub>β</sub>, so "
@@ -822,7 +821,7 @@ Q.append(dict(
                    [str(Q24_80), "power 0.80 (z<sub>0.20</sub> = 0.8416)"],
                    [str(Q24), "correct"],
                    [str(Q24_two), "two-sided α (1.96 instead of 1.645)"],
-                   ["34", "uses 1.645 + 0.8416 with δ/σ wrong (distractor)"]]),
+                   ["17", "ignores the power requirement (z<sub>β</sub> = 0, i.e. power only 0.5)"]]),
         ("note", "Halving δ quadruples n; raising power from 0.80 to 0.90 costs about 40% more data.",
          "Key idea"),
     ],
@@ -931,8 +930,8 @@ Q.append(dict(
         "$$\\dfrac{10\\,S^2}{9}\\sim\\chi^2_{10}\\ \\Rightarrow\\ \\mathrm{Var}\\left(\\dfrac{10\\,S^2}{9}\\right)=20",
         "$$\\dfrac{100}{81}\\,\\mathrm{Var}(S^2)=20\\ \\Rightarrow\\ \\mathrm{Var}(S^2)=\\dfrac{20\\times 81}{100}=16.2",
         "General formula: Var(S²) = 2σ⁴/(n − 1) = 2(81)/10 = 16.2.",
-        "(B) uses n instead of n − 1 (162/11). (C) forgets to square σ² (2 × 9/10 · …). (D) uses σ⁴/… "
-        "with 2σ⁴/9 (df − 1).",
+        "(B) uses n instead of n − 1 (162/11). (C) divides by (n − 1)² = 100 (2 × 81/100). "
+        "(D) divides by n − 2 = 9 (2 × 81/9).",
         ("note", "Also E(S²) = σ², so S² is unbiased; its precision improves like 1/(n − 1).", "Key idea"),
     ],
 ))

@@ -173,9 +173,9 @@ def fig_q13():
     ax.text(0.34, 0.80, "spam", fontsize=9, ha="left", va="bottom")
     ax.text(0.34, 0.24, "ham", fontsize=9, ha="left", va="bottom")
     ax.text(0.50, 0.88, "0.90", color=MAROON, fontsize=9)
-    ax.text(0.50, 0.66, "0.10", color=MAROON, fontsize=9)
-    ax.text(0.50, 0.32, "0.05", color=MAROON, fontsize=9)
-    ax.text(0.50, 0.11, "0.95", color=MAROON, fontsize=9)
+    ax.text(0.50, 0.60, "0.10", color=MAROON, fontsize=9)
+    ax.text(0.50, 0.33, "0.05", color=MAROON, fontsize=9)
+    ax.text(0.50, 0.05, "0.95", color=MAROON, fontsize=9)
     labels = {"S+": "flagged: 0.20×0.90 = 0.180", "S-": "passed: 0.020",
               "H+": "flagged: 0.80×0.05 = 0.040", "H-": "passed: 0.760"}
     for lk, (x, y) in leaves.items():
@@ -224,7 +224,7 @@ def fig_q20():
     m = x > 3.841
     ax.fill_between(x[m], pdf[m], color=MAROON, alpha=0.45, label="rejection region, α = 0.05")
     ax.axvline(Q20_CHI, color=GOLD, lw=2, label=f"observed χ² = {Q20_CHI:.2f}")
-    ax.set_ylim(0, 1.0)
+    ax.set_ylim(0, 0.35)
     ax.legend(frameon=False, fontsize=8)
     ax.set_yticks([])
     ax.set_xlabel("χ² with 1 df (critical value 3.841)")
@@ -232,7 +232,7 @@ def fig_q20():
 
 
 def fig_q21():
-    fig, ax = plt.subplots(figsize=(3.6, 3.2))
+    fig, ax = plt.subplots(figsize=(3.0, 2.8))
     ax.add_patch(Polygon([[0, 0], [1, 0], [1, 1]], closed=True, color=BLUE, alpha=0.18,
                          label="support 0 < y < x < 1"))
     ax.add_patch(Polygon([[0, 0], [1, 0], [0.5, 0.5]], closed=True, color=MAROON, alpha=0.45,
@@ -258,7 +258,8 @@ def fig_q24():
     im = ax.imshow(R, cmap="RdBu_r", vmin=-1, vmax=1)
     for i in range(3):
         for j in range(3):
-            ax.text(j, i, f"{R[i, j]:.2f}", ha="center", va="center", fontsize=10)
+            ax.text(j, i, f"{R[i, j]:.2f}", ha="center", va="center", fontsize=10,
+                    color="white" if abs(R[i, j]) > 0.6 else "black")
     lab = ["$X_1$", "$X_2$", "$X_3$"]
     ax.set_xticks(range(3), lab)
     ax.set_yticks(range(3), lab)
@@ -777,7 +778,7 @@ SET = {
         ),
         dict(
             qtype="MSQ", marks=2, topic="Covariance matrix and correlation", difficulty="Medium",
-            text=["Three standardised-pipeline features X<sub>1</sub>, X<sub>2</sub>, X<sub>3</sub> have the "
+            text=["Three input features X<sub>1</sub>, X<sub>2</sub>, X<sub>3</sub> have the "
                   "covariance matrix",
                   ("table", [["Σ", "X<sub>1</sub>", "X<sub>2</sub>", "X<sub>3</sub>"], ["X<sub>1</sub>", "4", "2", "0"], ["X<sub>2</sub>", "2", "9", "−1.5"],
                              ["X<sub>3</sub>", "0", "−1.5", "1"]]),
