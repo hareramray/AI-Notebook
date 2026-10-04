@@ -121,7 +121,7 @@ def fig_region_q18():
     ax.plot([0, 1], [0, 1], color=BLUE)
     ax.plot([0, 0.5], [0.5, 0.5], color=MAROON, lw=3)
     ax.plot([0, 0.25], [0.5, 0.5], color=GOLD, lw=5)
-    ax.text(0.02, 0.40, "slice Y = 0.5,\n0 < x < 0.5", fontsize=8.5, color=MAROON)
+    ax.text(0.03, 0.30, "slice Y = 0.5,\n0 < x < 0.5", fontsize=8.5, color=MAROON)
     ax.text(0.15, 0.8, "f = 6x", fontsize=10)
     ax.text(0.78, 0.66, "y = x", color=BLUE, fontsize=9, rotation=33)
     ax.set_xlim(0, 1.05); ax.set_ylim(0, 1.05); ax.set_aspect("equal")

@@ -654,8 +654,8 @@ SET = {
             qtype="MCQ", marks=2, topic="Covariance of indicator sums", difficulty="Hard",
             text="Ten distinguishable balls are thrown independently and uniformly into 5 boxes. Let X be the "
                  "number of empty boxes. Var(X) is closest to",
-            options=[f"{_q19:.3f}", f"{_q19_E:.3f}", f"{_q19_naive:.3f}", "0.250"],
-            answer="A",
+            options=["0.250", f"{_q19_E:.3f}", f"{_q19_naive:.3f}", f"{_q19:.3f}"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> write X = ∑I<sub>j</sub> with I<sub>j</sub> = 1 if box j is empty; then "
                 "Var(X) = ∑Var(I<sub>j</sub>) + ∑<sub>j≠k</sub>Cov(I<sub>j</sub>, I<sub>k</sub>).",
@@ -707,11 +707,11 @@ SET = {
                   ("table", [["Server", "1", "2", "3", "4", "5", "6"], ["d", "3", "5", "−1", "4", "6", "2"]]),
                   "Test H<sub>0</sub>: μ<sub>d</sub> = 0 against H<sub>1</sub>: μ<sub>d</sub> ≠ 0 at α = 0.05 "
                   "(t<sub>0.025,5</sub> = 2.571). Which is correct?"],
-            options=[f"t ≈ {_t21:.2f}; reject H<sub>0</sub>",
-                     "t ≈ 3.42; reject H<sub>0</sub>",
+            options=["t ≈ 3.42; reject H<sub>0</sub>",
                      "t ≈ 1.28; do not reject H<sub>0</sub>",
+                     f"t ≈ {_t21:.2f}; reject H<sub>0</sub>",
                      "t ≈ 2.85; reject H<sub>0</sub>"],
-            answer="A",
+            answer="C",
             solution=[
                 "<b>Concept:</b> paired data reduce to a one-sample t-test on the differences: "
                 "t = d̄/(s<sub>d</sub>/√n) with n − 1 df.",
@@ -721,7 +721,7 @@ SET = {
                 r"$$t=\dfrac{3.1667}{" + f"{_s21 / math.sqrt(6):.4f}" + r"}=" + f"{_t21:.3f}",
                 "|t| = 3.12 &gt; 2.571 ⇒ reject H<sub>0</sub>: the caching layer changes latency.",
                 ("fig", fig_q21),
-                "(B) uses divisor n in s (3.42); (C) forgets the √n (d̄/s); (D) divides by √(n − 1) instead of √n.",
+                "(A) uses divisor n in s (3.42); (B) forgets the √n (d̄/s); (D) divides by √(n − 1) instead of √n.",
                 ("note", "Treating the before/after columns as two independent samples throws away the pairing "
                          "and usually inflates the standard error.", "Trap"),
             ],
@@ -825,11 +825,11 @@ SET = {
             qtype="MCQ", marks=2, topic="Mean, median and mode of a continuous distribution", difficulty="Hard",
             text="X has pdf f(x) = x e<super>−x</super> for x &gt; 0. Which of the following correctly describes "
                  "its mode, median and mean?",
-            options=[f"mode = 1 &lt; median ≈ {_q27_med:.2f} &lt; mean = 2",
-                     "mode = 1 &lt; mean = 2 &lt; median ≈ 2.20",
+            options=["mode = 1 &lt; mean = 2 &lt; median ≈ 2.20",
+                     f"mode = 1 &lt; median ≈ {_q27_med:.2f} &lt; mean = 2",
                      "median ≈ 1.39 &lt; mode = 1.5 &lt; mean = 2",
                      "mode = median = mean = 2"],
-            answer="A",
+            answer="B",
             solution=[
                 "<b>Concept:</b> mode maximises f; median solves F(m) = 1/2; mean = ∫x f(x) dx.",
                 "Mode: f′(x) = e<super>−x</super>(1 − x) = 0 ⇒ x = 1.",
@@ -839,7 +839,7 @@ SET = {
                 r"$$F(m)=\dfrac{1}{2}\ \Rightarrow\ (1+m)e^{-m}=\dfrac{1}{2}\ \Rightarrow\ m\approx " + f"{_q27_med:.3f}",
                 "Check: (1 + 1.678)e<super>−1.678</super> = 2.678 × 0.1867 ≈ 0.500.",
                 ("fig", fig_q27),
-                "Right-skewed ⇒ mode &lt; median &lt; mean, as in (A).",
+                "Right-skewed ⇒ mode &lt; median &lt; mean, as in (B).",
                 ("note", "Empirical rule for moderately skewed distributions: mean − mode ≈ 3(mean − median): "
                          "here 1 vs 3(0.32) = 0.97.", "Key idea"),
             ],
@@ -888,15 +888,15 @@ SET = {
             text="Five cards are dealt from a well-shuffled standard deck of 52. The probability of getting "
                  "exactly 'two pairs' (two cards of one rank, two cards of another rank, and a fifth card of a "
                  "third rank) is closest to",
-            options=[f"{_q30:.4f}", f"{2 * _q30:.4f}", f"{_q30 / 2:.4f}", "0.0211"],
-            answer="A",
+            options=[f"{2 * _q30:.4f}", f"{_q30 / 2:.4f}", "0.0211", f"{_q30:.4f}"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> count by choosing ranks first (unordered when the roles are identical), then suits.",
                 "Choose the 2 pair-ranks: C(13, 2) — unordered, because both pairs play the same role.",
                 "Suits for each pair: C(4, 2) each. Fifth card: any of 11 remaining ranks × 4 suits = 44.",
                 r"$$N=\binom{13}{2}\binom{4}{2}^2(44)=78\times 36\times 44=" + f"{_q30_fav}",
                 r"$$P=\dfrac{" + f"{_q30_fav}" + r"}{\binom{52}{5}}=\dfrac{" + f"{_q30_fav}" + r"}{2598960}\approx " + f"{_q30:.4f}",
-                "(B) chooses the pair ranks as 13 × 12 (ordered), double counting; 0.0211 is three-of-a-kind.",
+                "(A) chooses the pair ranks as 13 × 12 (ordered), double counting; (C) 0.0211 is three-of-a-kind.",
                 ("note", "Ask: are the chosen ranks interchangeable? Two pairs — yes (combination). Full house "
                          "(triple + pair) — no (13 × 12).", "Trap"),
             ],
