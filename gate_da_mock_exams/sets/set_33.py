@@ -1,80 +1,88 @@
 # Set 33 — Full-Syllabus Mock — Paper 3
 SET = {
-    "number": 33,
-    "title": "Full-Syllabus Mock — Paper 3",
-    "difficulty": "GATE-level",
-    "focus": "balanced paper across the whole Section 4 syllabus",
-    "questions": [
-        # ------------------------------------------------------------ Q1
+    'number': 33,
+    'title': 'Full-Syllabus Mock — Paper 3',
+    'difficulty': 'GATE-level',
+    'focus': 'balanced paper across the whole Section 4 syllabus',
+    'questions': [
         {
-            "type": "MCQ", "marks": 1, "topic": "Python — closures and late binding",
-            "text": "Consider the following Python program. What is printed?",
-            "code": '''fs = []
+            'type': 'MCQ',
+            'marks': 1,
+            'topic': 'Python — closures and late binding',
+            'text': 'Consider the following Python program. What is printed?',
+            'code': '''fs = []
 for i in range(3):
     fs.append(lambda x, i=i: x + i)
     fs.append(lambda x: x * i)
 print([f(10) for f in fs])''',
-            "options": ["`[10, 20, 11, 20, 12, 20]`", "`[10, 0, 11, 10, 12, 20]`",
-                        "`[12, 20, 12, 20, 12, 20]`", "`[10, 20, 11, 10, 12, 0]`"],
-            "answer": "A",
-            "solution": (
-                "A lambda body looks up free variables **when it is called** (late binding), but a default "
-                "argument is evaluated **when the lambda is created**.\n\n"
-                "- `lambda x, i=i: x + i` freezes the current i (0, 1, 2) → 10, 11, 12.\n"
-                "- `lambda x: x * i` reads the global i at call time; after the loop i = 2 → every one "
-                "gives 10 × 2 = 20.\n\n"
-                "Interleaved: **[10, 20, 11, 20, 12, 20]**.\n\n"
-                "- (B) assumes the multiplying lambdas captured i = 0, 1, 2 at creation time.\n"
-                "- (C) assumes the default-argument lambdas are also late-bound.\n"
-                "- (D) mixes the two models in reverse order.\n\n"
-                "**Trap:** closures capture *variables*, not values. **Fix:** use a default argument or "
-                "`functools.partial` to freeze a value."
-            ),
-            "verify": "assert OUTPUT.strip() == '[10, 20, 11, 20, 12, 20]' and ANSWER == 'A'",
+            'options': [
+                '`[10, 0, 11, 10, 12, 20]`',
+                '`[10, 20, 11, 20, 12, 20]`',
+                '`[12, 20, 12, 20, 12, 20]`',
+                '`[10, 20, 11, 10, 12, 0]`',
+            ],
+            'answer': 'B',
+            'solution': '''A lambda body looks up free variables **when it is called** (late binding), but a default argument is evaluated **when the lambda is created**.
+
+- `lambda x, i=i: x + i` freezes the current i (0, 1, 2) → 10, 11, 12.
+- `lambda x: x * i` reads the global i at call time; after the loop i = 2 → every one gives 10 × 2 = 20.
+
+Interleaved: **[10, 20, 11, 20, 12, 20]**.
+
+- (A) assumes the multiplying lambdas captured i = 0, 1, 2 at creation time.
+- (C) assumes the default-argument lambdas are also late-bound.
+- (D) mixes the two models in reverse order.
+
+**Trap:** closures capture *variables*, not values. **Fix:** use a default argument or `functools.partial` to freeze a value.''',
+            'verify': "ANSWER = {'A': 'B', 'B': 'A'}.get(ANSWER, ANSWER)\nassert OUTPUT.strip() == '[10, 20, 11, 20, 12, 20]' and ANSWER == 'A'",
         },
-        # ------------------------------------------------------------ Q2
         {
-            "type": "NAT", "marks": 1, "topic": "Python — floor division and modulo with negatives",
-            "text": "The value printed by the Python statement `print(-17 // 5 + -17 % 5 * 2 + 17 % -5)` is ______.",
-            "answer": "-1",
-            "solution": (
-                "Python's `//` rounds toward −∞ and `%` satisfies a == (a // b)·b + a % b, so the remainder "
-                "takes the **sign of the divisor**. Unary minus binds tighter than `//`, `%`, `*`; and `%`, "
-                "`*`, `//` share one precedence level (left to right).\n\n"
-                "- `-17 // 5` = ⌊−3.4⌋ = **−4**\n"
-                "- `-17 % 5` = −17 − (−4)(5) = **3**; then `3 * 2` = 6\n"
-                "- `17 % -5`: 17 // −5 = ⌊−3.4⌋ = −4, remainder 17 − (−4)(−5) = **−3**\n\n"
-                "Sum: −4 + 6 − 3 = **−1**.\n\n"
-                "**Trap:** C/Java truncate toward zero, which would give −3 + (−2)·2 + 2 = −5. "
-                "In Python, `a % b` always has the sign of b."
-            ),
-            "verify": "assert -17 // 5 + -17 % 5 * 2 + 17 % -5 == int(ANSWER)",
+            'type': 'NAT',
+            'marks': 1,
+            'topic': 'Python — floor division and modulo with negatives',
+            'text': 'The value printed by the Python statement `print(-17 // 5 + -17 % 5 * 2 + 17 % -5)` is ______.',
+            'answer': '-1',
+            'solution': '''Python's `//` rounds toward −∞ and `%` satisfies a == (a // b)·b + a % b, so the remainder takes the **sign of the divisor**. Unary minus binds tighter than `//`, `%`, `*`; and `%`, `*`, `//` share one precedence level (left to right).
+
+- `-17 // 5` = ⌊−3.4⌋ = **−4**
+- `-17 % 5` = −17 − (−4)(5) = **3**; then `3 * 2` = 6
+- `17 % -5`: 17 // −5 = ⌊−3.4⌋ = −4, remainder 17 − (−4)(−5) = **−3**
+
+Sum: −4 + 6 − 3 = **−1**.
+
+**Trap:** C/Java truncate toward zero, which would give −3 + (−2)·2 + 2 = −5. In Python, `a % b` always has the sign of b.''',
+            'verify': 'assert -17 // 5 + -17 % 5 * 2 + 17 % -5 == int(ANSWER)',
         },
-        # ------------------------------------------------------------ Q3
         {
-            "type": "MCQ", "marks": 1, "topic": "Stacks — infix to postfix",
-            "text": ("Using the usual precedences (`^` highest and **right**-associative; `*`, `/` next, "
-                     "left-associative; `+`, `-` lowest, left-associative), the postfix form of\n\n"
-                     "`a + b * ( c - d ) / e ^ f ^ g`\n\nis"),
-            "options": ["`a b c d - * e f g ^ ^ / +`", "`a b c d - * e f ^ g ^ / +`",
-                        "`a b c d - e f g ^ ^ / * +`", "`a b c d - * / e f g ^ ^ +`"],
-            "answer": "A",
-            "solution": (
-                "Fully parenthesise first: `^` is right-associative, so e ^ f ^ g = e ^ (f ^ g); `*` and `/` "
-                "are left-associative, so b * (c − d) / X = (b * (c − d)) / X.\n\n"
-                "Expression: a + ((b * (c − d)) / (e ^ (f ^ g))).\n\n"
-                "- b * (c − d) → `b c d - *`\n"
-                "- e ^ (f ^ g) → `e f g ^ ^`\n"
-                "- division → `b c d - * e f g ^ ^ /`\n"
-                "- plus a → **`a b c d - * e f g ^ ^ / +`**\n"
-                "- (B) `e f ^ g ^` treats `^` as left-associative ((e ^ f) ^ g).\n"
-                "- (C) groups b * ((c − d) / …), i.e. treats `*` and `/` as right-associative.\n"
-                "- (D) places `/` before its right operand is complete — not a valid postfix of this "
-                "expression.\n\n"
-                "**Tip:** in the shunting-yard algorithm, an incoming `^` does **not** pop a `^` on the "
-                "stack (right associativity), while an incoming `/` does pop a `*` (equal precedence, left)."
-            ),
-            "verify": '''
+            'type': 'MCQ',
+            'marks': 1,
+            'topic': 'Stacks — infix to postfix',
+            'text': '''Using the usual precedences (`^` highest and **right**-associative; `*`, `/` next, left-associative; `+`, `-` lowest, left-associative), the postfix form of
+
+`a + b * ( c - d ) / e ^ f ^ g`
+
+is''',
+            'options': [
+                '`a b c d - * e f g ^ ^ / +`',
+                '`a b c d - * e f ^ g ^ / +`',
+                '`a b c d - e f g ^ ^ / * +`',
+                '`a b c d - * / e f g ^ ^ +`',
+            ],
+            'answer': 'A',
+            'solution': '''Fully parenthesise first: `^` is right-associative, so e ^ f ^ g = e ^ (f ^ g); `*` and `/` are left-associative, so b * (c − d) / X = (b * (c − d)) / X.
+
+Expression: a + ((b * (c − d)) / (e ^ (f ^ g))).
+
+- b * (c − d) → `b c d - *`
+- e ^ (f ^ g) → `e f g ^ ^`
+- division → `b c d - * e f g ^ ^ /`
+- plus a → **`a b c d - * e f g ^ ^ / +`**
+- (B) `e f ^ g ^` treats `^` as left-associative ((e ^ f) ^ g).
+- (C) groups b * ((c − d) / …), i.e. treats `*` and `/` as right-associative.
+- (D) places `/` before its right operand is complete — not a valid postfix of this expression.
+
+**Tip:** in the shunting-yard algorithm, an incoming `^` does **not** pop a `^` on the stack (right associativity), while an incoming `/` does pop a `*` (equal precedence, left).''',
+            'verify': '''
 def topost(s):
     prec = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3}; out = []; st = []
     for t in s.split():
@@ -92,11 +100,12 @@ def topost(s):
 assert topost("a + b * ( c - d ) / e ^ f ^ g") == "a b c d - * e f g ^ ^ / +" and ANSWER == "A"
 ''',
         },
-        # ------------------------------------------------------------ Q4
         {
-            "type": "NAT", "marks": 1, "topic": "Python — queue and stack interplay",
-            "text": "Consider the following Python program. The value printed is ______.",
-            "code": '''from collections import deque
+            'type': 'NAT',
+            'marks': 1,
+            'topic': 'Python — queue and stack interplay',
+            'text': 'Consider the following Python program. The value printed is ______.',
+            'code': '''from collections import deque
 q = deque([1, 2, 3, 4, 5, 6])
 st = []
 for _ in range(3):
@@ -106,48 +115,49 @@ while st:
 for _ in range(3):
     q.append(q.popleft())
 print(int(''.join(map(str, q))))''',
-            "answer": "321456",
-            "solution": (
-                "A classic 'reverse the first k elements of a queue' routine (k = 3).\n\n"
-                "- Dequeue 1, 2, 3 and push them: queue [4, 5, 6], stack [1, 2, 3] (top 3).\n"
-                "- Pop the stack into the queue (LIFO reverses): queue [4, 5, 6, 3, 2, 1].\n"
-                "- Rotate n − k = 3 times (dequeue + enqueue): [3, 2, 1, 4, 5, 6].\n\n"
-                "Joined as digits: **321456**.\n\n"
-                "**Trap:** forgetting that the final rotation brings the reversed block to the **front** "
-                "(answer 456321), or reversing twice (123456). **Tip:** the routine costs Θ(n) with one "
-                "auxiliary stack of size k."
-            ),
-            "verify": "assert OUTPUT.strip() == ANSWER",
+            'answer': '321456',
+            'solution': '''A classic 'reverse the first k elements of a queue' routine (k = 3).
+
+- Dequeue 1, 2, 3 and push them: queue [4, 5, 6], stack [1, 2, 3] (top 3).
+- Pop the stack into the queue (LIFO reverses): queue [4, 5, 6, 3, 2, 1].
+- Rotate n − k = 3 times (dequeue + enqueue): [3, 2, 1, 4, 5, 6].
+
+Joined as digits: **321456**.
+
+**Trap:** forgetting that the final rotation brings the reversed block to the **front** (answer 456321), or reversing twice (123456). **Tip:** the routine costs Θ(n) with one auxiliary stack of size k.''',
+            'verify': 'assert OUTPUT.strip() == ANSWER',
         },
-        # ------------------------------------------------------------ Q5
         {
-            "type": "MCQ", "marks": 1, "topic": "Doubly linked list — deletion",
-            "text": ("In the doubly linked list below every node has fields `prev`, `val`, `next`. The pointer p "
-                     "refers to the node with value 30 (neither first nor last). Which code fragment correctly "
-                     "unlinks p, so that the list reads 10, 20, 40, 50 in both directions?"),
-            "diagrams": [{"type": "linkedlist", "values": [10, 20, 30, 40, 50], "doubly": True,
-                          "head": "head", "tail": "tail"}],
-            "options": [
-                "`p.prev.next = p.next; p.next.prev = p.prev`",
-                "`p.prev.next = p.next; p.next.prev = p.prev.next`",
-                "`p.next.prev = p.prev; p.prev = p.next`",
-                "`p.prev.next = p.next.next; p.next.prev = p.prev`",
+            'type': 'MCQ',
+            'marks': 1,
+            'topic': 'Doubly linked list — deletion',
+            'text': 'In the doubly linked list below every node has fields `prev`, `val`, `next`. The pointer p refers to the node with value 30 (neither first nor last). Which code fragment correctly unlinks p, so that the list reads 10, 20, 40, 50 in both directions?',
+            'diagrams': [
+                {
+                    'type': 'linkedlist',
+                    'values': [10, 20, 30, 40, 50],
+                    'doubly': True,
+                    'head': 'head',
+                    'tail': 'tail',
+                },
             ],
-            "answer": "A",
-            "solution": (
-                "To unlink p, its predecessor must point forward to p's successor and its successor must "
-                "point back to p's predecessor. The two assignments are independent, so either order works.\n\n"
-                "- (A) 20.next = 40 and 40.prev = 20. **Correct.**\n"
-                "- (B) after the first statement p.prev.next **is** 40, so the second sets 40.prev = 40 — a "
-                "self-loop; backward traversal breaks.\n"
-                "- (C) 40.prev = 20 is right, but `p.prev = p.next` only changes p's own field; 20.next "
-                "still points to 30, so the forward list is unchanged.\n"
-                "- (D) 20.next = 50 skips 40 in the forward direction.\n\n"
-                "**Trap:** (B) — after modifying a link, an expression that goes *through* that link "
-                "no longer means what it did. **Tip:** deletion is Θ(1) in a doubly linked list given p; a "
-                "singly linked list needs the predecessor."
-            ),
-            "verify": '''
+            'options': [
+                '`p.next.prev = p.prev; p.prev = p.next`',
+                '`p.prev.next = p.next; p.next.prev = p.prev.next`',
+                '`p.prev.next = p.next; p.next.prev = p.prev`',
+                '`p.prev.next = p.next.next; p.next.prev = p.prev`',
+            ],
+            'answer': 'C',
+            'solution': '''To unlink p, its predecessor must point forward to p's successor and its successor must point back to p's predecessor. The two assignments are independent, so either order works.
+
+- (A) 40.prev = 20 is right, but `p.prev = p.next` only changes p's own field; 20.next still points to 30, so the forward list is unchanged.
+- (B) after the first statement p.prev.next **is** 40, so the second sets 40.prev = 40 — a self-loop; backward traversal breaks.
+- (C) 20.next = 40 and 40.prev = 20. **Correct.**
+- (D) 20.next = 50 skips 40 in the forward direction.
+
+**Trap:** (B) — after modifying a link, an expression that goes *through* that link no longer means what it did. **Tip:** deletion is Θ(1) in a doubly linked list given p; a singly linked list needs the predecessor.''',
+            'verify': '''ANSWER = {'A': 'C', 'C': 'A'}.get(ANSWER, ANSWER)
+
 class Nd:
     def __init__(s, v): s.val, s.prev, s.next = v, None, None
 def build():
@@ -173,22 +183,23 @@ for c in codes:
 assert [x for x, o in zip("ABCD", ok) if o] == [ANSWER]
 ''',
         },
-        # ------------------------------------------------------------ Q6
         {
-            "type": "NAT", "marks": 1, "topic": "Binary trees — node counting",
-            "text": ("A binary tree has exactly 20 leaves and exactly 9 nodes that have exactly one child. "
-                     "The total number of nodes in the tree is ______."),
-            "answer": "48",
-            "solution": (
-                "Let n₀, n₁, n₂ be the numbers of nodes with 0, 1, 2 children. Counting edges two ways:\n\n"
-                "- edges = n − 1 = n₀ + n₁ + n₂ − 1 (every node except the root has a parent edge)\n"
-                "- edges = n₁ + 2n₂ (child pointers)\n\n"
-                "Equating gives **n₂ = n₀ − 1** — independent of n₁.\n\n"
-                "So n₂ = 19 and n = 20 + 9 + 19 = **48**.\n\n"
-                "**Trap:** thinking the one-child nodes change the n₂ = n₀ − 1 relation, or adding 1 for the "
-                "root separately. **Tip:** a *full* binary tree (n₁ = 0) with L leaves has exactly 2L − 1 nodes."
-            ),
-            "verify": '''
+            'type': 'NAT',
+            'marks': 1,
+            'topic': 'Binary trees — node counting',
+            'text': 'A binary tree has exactly 20 leaves and exactly 9 nodes that have exactly one child. The total number of nodes in the tree is ______.',
+            'answer': '48',
+            'solution': '''Let n₀, n₁, n₂ be the numbers of nodes with 0, 1, 2 children. Counting edges two ways:
+
+- edges = n − 1 = n₀ + n₁ + n₂ − 1 (every node except the root has a parent edge)
+- edges = n₁ + 2n₂ (child pointers)
+
+Equating gives **n₂ = n₀ − 1** — independent of n₁.
+
+So n₂ = 19 and n = 20 + 9 + 19 = **48**.
+
+**Trap:** thinking the one-child nodes change the n₂ = n₀ − 1 relation, or adding 1 for the root separately. **Tip:** a *full* binary tree (n₁ = 0) with L leaves has exactly 2L − 1 nodes.''',
+            'verify': '''
 import random
 random.seed(11)
 def grow():
@@ -206,45 +217,53 @@ for _ in range(50):
 assert 20 + 9 + (20 - 1) == int(ANSWER)
 ''',
         },
-        # ------------------------------------------------------------ Q7
         {
-            "type": "MCQ", "marks": 1, "topic": "Hashing — choice of table size",
-            "text": ("The 20 keys 4, 8, 12, …, 80 (all multiples of 4) are inserted into a hash table of size "
-                     "m = 12 with h(k) = k mod 12 and separate chaining. The number of non-empty slots and the "
-                     "length of the longest chain are, respectively,"),
-            "options": ["3 and 7", "12 and 2", "3 and 6", "4 and 5"],
-            "answer": "A",
-            "solution": (
-                "4k mod 12 = 4·(k mod 3), so only slots **0, 4, 8** can ever be used — gcd(4, 12) = 4 means "
-                "the stride shares a factor with m and only m / gcd = 3 slots are reachable.\n\n"
-                "For k = 1 … 20:\n\n"
-                "- k ≡ 1 (mod 3): k = 1, 4, …, 19 → 7 keys → slot 4\n"
-                "- k ≡ 2 (mod 3): k = 2, 5, …, 20 → 7 keys → slot 8\n"
-                "- k ≡ 0 (mod 3): k = 3, 6, …, 18 → 6 keys → slot 0\n\n"
-                "Non-empty slots = **3**, longest chain = **7**.\n\n"
-                "- (B) is what a well-spread hash would give.\n"
-                "- (C) gets the slot count right but miscounts the chains.\n"
-                "- (D) assumes m / gcd = 4 reachable slots.\n\n"
-                "**Tip:** choose m prime (e.g. 13) so that arithmetic patterns in the keys do not collapse "
-                "onto a few slots; with m = 13 these keys would occupy all 13 slots."
-            ),
-            "solution_diagrams": [{"type": "hashtable", "size": 12,
-                                   "slots": {0: [12, 24, 36, 48, 60, 72], 4: [4, 16, 28, 40, 52, 64, 76],
-                                             8: [8, 20, 32, 44, 56, 68, 80]},
-                                   "caption": "Only three chains are used"}],
-            "verify": '''
+            'type': 'MCQ',
+            'marks': 1,
+            'topic': 'Hashing — choice of table size',
+            'text': 'The 20 keys 4, 8, 12, …, 80 (all multiples of 4) are inserted into a hash table of size m = 12 with h(k) = k mod 12 and separate chaining. The number of non-empty slots and the length of the longest chain are, respectively,',
+            'options': ['3 and 7', '12 and 2', '3 and 6', '4 and 5'],
+            'answer': 'A',
+            'solution': '''4k mod 12 = 4·(k mod 3), so only slots **0, 4, 8** can ever be used — gcd(4, 12) = 4 means the stride shares a factor with m and only m / gcd = 3 slots are reachable.
+
+For k = 1 … 20:
+
+- k ≡ 1 (mod 3): k = 1, 4, …, 19 → 7 keys → slot 4
+- k ≡ 2 (mod 3): k = 2, 5, …, 20 → 7 keys → slot 8
+- k ≡ 0 (mod 3): k = 3, 6, …, 18 → 6 keys → slot 0
+
+Non-empty slots = **3**, longest chain = **7**.
+
+- (B) is what a well-spread hash would give.
+- (C) gets the slot count right but miscounts the chains.
+- (D) assumes m / gcd = 4 reachable slots.
+
+**Tip:** choose m prime (e.g. 13) so that arithmetic patterns in the keys do not collapse onto a few slots; with m = 13 these keys would occupy all 13 slots.''',
+            'solution_diagrams': [
+                {
+                    'type': 'hashtable',
+                    'size': 12,
+                    'slots': {
+                        0: [12, 24, 36, 48, 60, 72],
+                        4: [4, 16, 28, 40, 52, 64, 76],
+                        8: [8, 20, 32, 44, 56, 68, 80],
+                    },
+                    'caption': 'Only three chains are used',
+                },
+            ],
+            'verify': '''
 from collections import Counter
 c = Counter(k % 12 for k in range(4, 81, 4))
 assert (len(c), max(c.values())) == (3, 7) and ANSWER == "A"
 assert len({k % 13 for k in range(4, 81, 4)}) == 13
 ''',
         },
-        # ------------------------------------------------------------ Q8
         {
-            "type": "MSQ", "marks": 1, "topic": "Binary search — termination bug",
-            "text": ("Consider the following function on the sorted list `a = [2, 4, 6, 8, 10]`. "
-                     "For which of the following calls does the `while` loop run **forever**?"),
-            "code": '''def bs(a, x):
+            'type': 'MSQ',
+            'marks': 1,
+            'topic': 'Binary search — termination bug',
+            'text': 'Consider the following function on the sorted list `a = [2, 4, 6, 8, 10]`. For which of the following calls does the `while` loop run **forever**?',
+            'code': '''def bs(a, x):
     lo, hi = 0, len(a) - 1
     while lo < hi:
         mid = (lo + hi) // 2
@@ -253,23 +272,18 @@ assert len({k % 13 for k in range(4, 81, 4)}) == 13
         else:
             hi = mid
     return lo''',
-            "run_code": False,
-            "options": ["`bs(a, 2)`", "`bs(a, 6)`", "`bs(a, 10)`", "`bs(a, 7)`"],
-            "answer": ["B", "C", "D"],
-            "solution": (
-                "The bug: `lo = mid` instead of `lo = mid + 1`. When hi = lo + 1, mid = lo (floor), and if "
-                "a[lo] < x the assignment `lo = mid` changes nothing → infinite loop.\n\n"
-                "- (A) x = 2: mid 2 → hi 2; mid 1 (4 ≥ 2) → hi 1; mid 0 (2 ≥ 2) → hi 0 → stop. Terminates.\n"
-                "- (B) x = 6: mid 2 (6 ≥ 6) → hi 2; mid 1 (4 < 6) → lo 1; now lo 1, hi 2 → mid 1 again "
-                "→ lo 1 forever. **Loops.**\n"
-                "- (C) x = 10: mid 2 → lo 2; mid 3 (8 < 10) → lo 3; lo 3, hi 4 → mid 3 forever. **Loops.**\n"
-                "- (D) x = 7: mid 2 (6 < 7) → lo 2; mid 3 (8 ≥ 7) → hi 3; lo 2, hi 3 → mid 2 → lo 2 forever. "
-                "**Loops.**\n\n"
-                "**Rule:** with mid = ⌊(lo + hi)/2⌋ the lower bound must move to mid + 1; with "
-                "mid = ⌈(lo + hi)/2⌉ the upper bound must move to mid − 1. Otherwise a 2-element range "
-                "can stall."
-            ),
-            "verify": '''
+            'run_code': False,
+            'options': ['`bs(a, 2)`', '`bs(a, 6)`', '`bs(a, 10)`', '`bs(a, 7)`'],
+            'answer': ['B', 'C', 'D'],
+            'solution': '''The bug: `lo = mid` instead of `lo = mid + 1`. When hi = lo + 1, mid = lo (floor), and if a[lo] < x the assignment `lo = mid` changes nothing → infinite loop.
+
+- (A) x = 2: mid 2 → hi 2; mid 1 (4 ≥ 2) → hi 1; mid 0 (2 ≥ 2) → hi 0 → stop. Terminates.
+- (B) x = 6: mid 2 (6 ≥ 6) → hi 2; mid 1 (4 < 6) → lo 1; now lo 1, hi 2 → mid 1 again → lo 1 forever. **Loops.**
+- (C) x = 10: mid 2 → lo 2; mid 3 (8 < 10) → lo 3; lo 3, hi 4 → mid 3 forever. **Loops.**
+- (D) x = 7: mid 2 (6 < 7) → lo 2; mid 3 (8 ≥ 7) → hi 3; lo 2, hi 3 → mid 2 → lo 2 forever. **Loops.**
+
+**Rule:** with mid = ⌊(lo + hi)/2⌋ the lower bound must move to mid + 1; with mid = ⌈(lo + hi)/2⌉ the upper bound must move to mid − 1. Otherwise a 2-element range can stall.''',
+            'verify': '''
 def bs(a, x, cap=100):
     lo, hi = 0, len(a) - 1; it = 0
     while lo < hi:
@@ -284,36 +298,36 @@ loops = [bs(a, x) is None for x in (2, 6, 10, 7)]
 assert sorted(ANSWER) == [c for c, t in zip("ABCD", loops) if t]
 ''',
         },
-        # ------------------------------------------------------------ Q9
         {
-            "type": "MSQ", "marks": 1, "topic": "Sorting — stability",
-            "text": ("The records (3,a), (1,b), (3,c), (2,d), (1,e) are sorted by their **numeric key only** "
-                     "(letters are just labels). Selection sort is the standard version (find the minimum of "
-                     "A[i..n−1] with strict `<`, then swap it with A[i]); insertion sort shifts while the key "
-                     "is strictly greater. Which of the following statements is/are TRUE?"),
-            "options": [
-                "Selection sort outputs (3,c) before (3,a)",
-                "Insertion sort outputs (3,a) before (3,c)",
-                "Selection sort outputs (1,b) before (1,e)",
-                "Selection sort is stable on this input",
+            'type': 'MSQ',
+            'marks': 1,
+            'topic': 'Sorting — stability',
+            'text': 'The records (3,a), (1,b), (3,c), (2,d), (1,e) are sorted by their **numeric key only** (letters are just labels). Selection sort is the standard version (find the minimum of A[i..n−1] with strict `<`, then swap it with A[i]); insertion sort shifts while the key is strictly greater. Which of the following statements is/are TRUE?',
+            'options': [
+                'Selection sort outputs (3,c) before (3,a)',
+                'Insertion sort outputs (3,a) before (3,c)',
+                'Selection sort outputs (1,b) before (1,e)',
+                'Selection sort is stable on this input',
             ],
-            "answer": ["A", "B", "C"],
-            "solution": (
-                "A sort is *stable* if equal keys keep their input order. Insertion sort (strict >) is "
-                "stable; selection sort's long-distance swap can jump an element over an equal one.\n\n"
-                "Selection sort trace:\n\n"
-                "- i=0: min key 1 is (1,b) at index 1 → swap with (3,a): (1,b) (3,a) (3,c) (2,d) (1,e)\n"
-                "- i=1: min of the rest is (1,e) at index 4 → swap with (3,a): (1,b) (1,e) (3,c) (2,d) (3,a)\n"
-                "- i=2: min (2,d) → swap with (3,c): (1,b) (1,e) (2,d) (3,c) (3,a)\n"
-                "- i=3: (3,c) vs (3,a): no strictly smaller → stays\n\n"
-                "Result: (1,b) (1,e) (2,d) **(3,c) (3,a)**.\n\n"
-                "- (A) **True** — (3,a) was carried to the end by the swap at i=1.\n"
-                "- (B) insertion sort gives (1,b) (1,e) (2,d) (3,a) (3,c). **True.**\n"
-                "- (C) **True** — the 1-keys happen to keep their order.\n"
-                "- (D) the 3-keys are reordered. **False.**\n\n"
-                "**Trap:** concluding stability from one pair that happens to stay in order (C)."
-            ),
-            "verify": '''
+            'answer': ['A', 'B', 'C'],
+            'solution': '''A sort is *stable* if equal keys keep their input order. Insertion sort (strict >) is stable; selection sort's long-distance swap can jump an element over an equal one.
+
+Selection sort trace:
+
+- i=0: min key 1 is (1,b) at index 1 → swap with (3,a): (1,b) (3,a) (3,c) (2,d) (1,e)
+- i=1: min of the rest is (1,e) at index 4 → swap with (3,a): (1,b) (1,e) (3,c) (2,d) (3,a)
+- i=2: min (2,d) → swap with (3,c): (1,b) (1,e) (2,d) (3,c) (3,a)
+- i=3: (3,c) vs (3,a): no strictly smaller → stays
+
+Result: (1,b) (1,e) (2,d) **(3,c) (3,a)**.
+
+- (A) **True** — (3,a) was carried to the end by the swap at i=1.
+- (B) insertion sort gives (1,b) (1,e) (2,d) (3,a) (3,c). **True.**
+- (C) **True** — the 1-keys happen to keep their order.
+- (D) the 3-keys are reordered. **False.**
+
+**Trap:** concluding stability from one pair that happens to stay in order (C).''',
+            'verify': '''
 R = [(3, 'a'), (1, 'b'), (3, 'c'), (2, 'd'), (1, 'e')]
 A = R[:]
 for i in range(len(A) - 1):
@@ -331,27 +345,27 @@ truth = [A.index((3, 'c')) < A.index((3, 'a')), B.index((3, 'a')) < B.index((3, 
 assert sorted(ANSWER) == [c for c, t in zip("ABCD", truth) if t]
 ''',
         },
-        # ------------------------------------------------------------ Q10
         {
-            "type": "MCQ", "marks": 1, "topic": "Graph traversal — tree and non-tree edges",
-            "text": ("An undirected simple graph G has 12 vertices, 20 edges and exactly 3 connected components. "
-                     "A complete DFS (restarting from an unvisited vertex until every vertex is visited) is run "
-                     "on G. The number of edges of G that are **not** tree edges of the resulting DFS forest is"),
-            "options": ["11", "9", "8", "12"],
-            "answer": "A",
-            "solution": (
-                "A DFS (or BFS) forest contains one spanning tree per connected component. A spanning tree on "
-                "c vertices has c − 1 edges, so the forest has Σ(cᵢ − 1) = n − k edges.\n\n"
-                "- Tree edges = 12 − 3 = 9\n"
-                "- Non-tree edges = 20 − 9 = **11**\n\n"
-                "(In an undirected DFS every non-tree edge is a back edge.)\n\n"
-                "- (B) 9 is the number of tree edges.\n"
-                "- (C) 8 uses n − 1 = 11 tree edges *and* subtracts one more.\n"
-                "- (D) 12 = 20 − 8 follows from wrongly taking n − k − 1 = 8 tree edges.\n\n"
-                "**Tip:** the answer does not depend on the traversal order or on BFS vs DFS — only on n, "
-                "|E| and the number of components."
-            ),
-            "verify": '''
+            'type': 'MCQ',
+            'marks': 1,
+            'topic': 'Graph traversal — tree and non-tree edges',
+            'text': 'An undirected simple graph G has 12 vertices, 20 edges and exactly 3 connected components. A complete DFS (restarting from an unvisited vertex until every vertex is visited) is run on G. The number of edges of G that are **not** tree edges of the resulting DFS forest is',
+            'options': ['12', '9', '8', '11'],
+            'answer': 'D',
+            'solution': '''A DFS (or BFS) forest contains one spanning tree per connected component. A spanning tree on c vertices has c − 1 edges, so the forest has Σ(cᵢ − 1) = n − k edges.
+
+- Tree edges = 12 − 3 = 9
+- Non-tree edges = 20 − 9 = **11**
+
+(In an undirected DFS every non-tree edge is a back edge.)
+
+- (A) 12 = 20 − 8 follows from wrongly taking n − k − 1 = 8 tree edges.
+- (B) 9 is the number of tree edges.
+- (C) 8 uses n − 1 = 11 tree edges *and* subtracts one more.
+
+**Tip:** the answer does not depend on the traversal order or on BFS vs DFS — only on n, |E| and the number of components.''',
+            'verify': '''ANSWER = {'A': 'D', 'D': 'A'}.get(ANSWER, ANSWER)
+
 import random, itertools
 random.seed(4)
 sizes = [6, 3, 3]; V = []; start = 0; E = set()
@@ -375,11 +389,12 @@ for v in range(12):
 assert len(E) - tree == 11 and ANSWER == "A"
 ''',
         },
-        # ------------------------------------------------------------ Q11
         {
-            "type": "NAT", "marks": 2, "topic": "Python — counting recursive calls",
-            "text": "Consider the following Python program. The value printed is ______.",
-            "code": '''calls = 0
+            'type': 'NAT',
+            'marks': 2,
+            'topic': 'Python — counting recursive calls',
+            'text': 'Consider the following Python program. The value printed is ______.',
+            'code': '''calls = 0
 
 def f(n):
     global calls
@@ -390,63 +405,85 @@ def f(n):
 
 f(9)
 print(calls)''',
-            "answer": "37",
-            "solution": (
-                "Let C(n) be the number of calls made by f(n), including itself. Then C(n) = 1 for n ≤ 2 and "
-                "C(n) = 1 + C(n − 1) + C(n − 3) for n ≥ 3 (f(0) is reached from f(3), so n never goes "
-                "negative).\n\n"
-                "- C(0) = C(1) = C(2) = 1\n"
-                "- C(3) = 1 + C(2) + C(0) = 3\n"
-                "- C(4) = 1 + 3 + 1 = 5\n"
-                "- C(5) = 1 + 5 + 1 = 7\n"
-                "- C(6) = 1 + 7 + 3 = 11\n"
-                "- C(7) = 1 + 11 + 5 = 17\n"
-                "- C(8) = 1 + 17 + 7 = 25\n"
-                "- C(9) = 1 + 25 + 11 = **37**\n\n"
-                "(The returned value f(9) = 22 is not printed.)\n\n"
-                "**Trap:** writing C(n) = C(n − 1) + C(n − 3) without the +1 for the current call, or "
-                "confusing the call count with the return value. `global calls` is required — without it "
-                "`calls += 1` raises UnboundLocalError."
-            ),
-            "verify": '''
+            'answer': '37',
+            'solution': '''Let C(n) be the number of calls made by f(n), including itself. Then C(n) = 1 for n ≤ 2 and C(n) = 1 + C(n − 1) + C(n − 3) for n ≥ 3 (f(0) is reached from f(3), so n never goes negative).
+
+- C(0) = C(1) = C(2) = 1
+- C(3) = 1 + C(2) + C(0) = 3
+- C(4) = 1 + 3 + 1 = 5
+- C(5) = 1 + 5 + 1 = 7
+- C(6) = 1 + 7 + 3 = 11
+- C(7) = 1 + 11 + 5 = 17
+- C(8) = 1 + 17 + 7 = 25
+- C(9) = 1 + 25 + 11 = **37**
+
+(The returned value f(9) = 22 is not printed.)
+
+**Trap:** writing C(n) = C(n − 1) + C(n − 3) without the +1 for the current call, or confusing the call count with the return value. `global calls` is required — without it `calls += 1` raises UnboundLocalError.''',
+            'verify': '''
 C = {0: 1, 1: 1, 2: 1}
 for n in range(3, 10): C[n] = 1 + C[n - 1] + C[n - 3]
 assert OUTPUT.strip() == ANSWER == str(C[9])
 ''',
         },
-        # ------------------------------------------------------------ Q12
         {
-            "type": "MSQ", "marks": 2, "topic": "BST — reconstruction from pre-order",
-            "text": ("The pre-order traversal of a binary search tree with distinct keys is\n\n"
-                     "30, 20, 10, 25, 22, 28, 40, 35, 50, 45\n\n"
-                     "Which of the following statements is/are TRUE?"),
-            "options": [
-                "The post-order traversal ends with 45, 50, 40, 30",
-                "The tree has exactly 4 leaves",
-                "The level-order traversal is 30, 20, 40, 10, 25, 35, 50, 22, 28, 45",
-                "The in-order successor of 28 is 35",
+            'type': 'MSQ',
+            'marks': 2,
+            'topic': 'BST — reconstruction from pre-order',
+            'text': '''The pre-order traversal of a binary search tree with distinct keys is
+
+30, 20, 10, 25, 22, 28, 40, 35, 50, 45
+
+Which of the following statements is/are TRUE?''',
+            'options': [
+                'The post-order traversal ends with 45, 50, 40, 30',
+                'The tree has exactly 4 leaves',
+                'The level-order traversal is 30, 20, 40, 10, 25, 35, 50, 22, 28, 45',
+                'The in-order successor of 28 is 35',
             ],
-            "answer": ["A", "C"],
-            "solution": (
-                "In a BST the pre-order sequence determines the tree: the first key is the root; the following "
-                "keys smaller than it form the left subtree's pre-order, the larger ones the right subtree's. "
-                "(Equivalently, insert the keys in pre-order sequence into an empty BST.)\n\n"
-                "- Root 30; left part 20, 10, 25, 22, 28; right part 40, 35, 50, 45.\n"
-                "- Left: 20 with left 10 and right 25 (whose children are 22 and 28).\n"
-                "- Right: 40 with left 35 and right 50 (whose left child is 45).\n\n"
-                "Post-order: 10, 22, 28, 25, 20, 35, 45, 50, 40, 30.\n\n"
-                "- (A) **True.**\n"
-                "- (B) leaves: 10, 22, 28, 35, 45 → **5**. **False.**\n"
-                "- (C) levels: [30] [20, 40] [10, 25, 35, 50] [22, 28, 45]. **True.**\n"
-                "- (D) 28 has no right child, so its successor is the nearest ancestor for which 28 lies in "
-                "the left subtree: **30**, not 35. **False.**\n\n"
-                "**Tip:** the in-order sequence of a BST is just the sorted keys — 28's successor is the next "
-                "larger key, 30."
-            ),
-            "solution_diagrams": [{"type": "bintree",
-                                   "tree": [30, [20, [10], [25, [22], [28]]], [40, [35], [50, [45], None]]],
-                                   "caption": "Reconstructed BST"}],
-            "verify": '''
+            'answer': ['A', 'C'],
+            'solution': '''In a BST the pre-order sequence determines the tree: the first key is the root; the following keys smaller than it form the left subtree's pre-order, the larger ones the right subtree's. (Equivalently, insert the keys in pre-order sequence into an empty BST.)
+
+- Root 30; left part 20, 10, 25, 22, 28; right part 40, 35, 50, 45.
+- Left: 20 with left 10 and right 25 (whose children are 22 and 28).
+- Right: 40 with left 35 and right 50 (whose left child is 45).
+
+Post-order: 10, 22, 28, 25, 20, 35, 45, 50, 40, 30.
+
+- (A) **True.**
+- (B) leaves: 10, 22, 28, 35, 45 → **5**. **False.**
+- (C) levels: [30] [20, 40] [10, 25, 35, 50] [22, 28, 45]. **True.**
+- (D) 28 has no right child, so its successor is the nearest ancestor for which 28 lies in the left subtree: **30**, not 35. **False.**
+
+**Tip:** the in-order sequence of a BST is just the sorted keys — 28's successor is the next larger key, 30.''',
+            'solution_diagrams': [
+                {
+                    'type': 'bintree',
+                    'tree': [
+                        30,
+                        [
+                            20,
+                            [10],
+                            [
+                                25,
+                                [22],
+                                [28],
+                            ],
+                        ],
+                        [
+                            40,
+                            [35],
+                            [
+                                50,
+                                [45],
+                                None,
+                            ],
+                        ],
+                    ],
+                    'caption': 'Reconstructed BST',
+                },
+            ],
+            'verify': '''
 def ins(t, k):
     if t is None: return [k, None, None]
     if k < t[0]: t[1] = ins(t[1], k)
@@ -468,34 +505,38 @@ truth = [post(t)[-4:] == [45, 50, 40, 30], lv(t) == 4,
 assert sorted(ANSWER) == [c for c, x in zip("ABCD", truth) if x]
 ''',
         },
-        # ------------------------------------------------------------ Q13
         {
-            "type": "NAT", "marks": 2, "topic": "Heaps — bottom-up build-heap",
-            "text": ("The array [3, 9, 2, 14, 7, 1, 11, 20, 5, 16] (0-based) is converted into a **max**-heap with "
-                     "the bottom-up build-heap algorithm: for i = ⌊n/2⌋ − 1 down to 0, sift A[i] down, each step "
-                     "swapping it with its larger child while that child is larger. The total number of swaps "
-                     "performed is ______."),
-            "diagrams": [{"type": "heap", "values": [3, 9, 2, 14, 7, 1, 11, 20, 5, 16],
-                          "caption": "Input array viewed as a complete binary tree"}],
-            "answer": "8",
-            "solution": (
-                "Build-heap processes internal nodes from the last one (index 4) back to the root; each sift-"
-                "down may cascade several levels.\n\n"
-                "- i=4 (7): child 16 → swap (1) → [3, 9, 2, 14, 16, 1, 11, 20, 5, 7]\n"
-                "- i=3 (14): children 20, 5 → swap with 20 (2) → [3, 9, 2, 20, 16, 1, 11, 14, 5, 7]\n"
-                "- i=2 (2): children 1, 11 → swap with 11 (3) → [3, 9, 11, 20, 16, 1, 2, 14, 5, 7]\n"
-                "- i=1 (9): children 20, 16 → swap with 20 (4); now at index 3, children 14, 5 → swap with 14 "
-                "(5) → [3, 20, 11, 14, 16, 1, 2, 9, 5, 7]\n"
-                "- i=0 (3): swap with 20 (6); at index 1 children 14, 16 → swap with 16 (7); at index 4 child 7 "
-                "→ swap (8) → [20, 16, 11, 14, 7, 1, 2, 9, 5, 3]\n\n"
-                "Total = **8** swaps.\n\n"
-                "**Trap:** stopping each sift-down after one level (that gives 5), or using repeated "
-                "insertion (sift-up) instead, which performs a different set of swaps. **Tip:** build-heap "
-                "is Θ(n) overall because most nodes are near the bottom."
-            ),
-            "solution_diagrams": [{"type": "heap", "values": [20, 16, 11, 14, 7, 1, 2, 9, 5, 3],
-                                   "caption": "Resulting max-heap"}],
-            "verify": '''
+            'type': 'NAT',
+            'marks': 2,
+            'topic': 'Heaps — bottom-up build-heap',
+            'text': 'The array [3, 9, 2, 14, 7, 1, 11, 20, 5, 16] (0-based) is converted into a **max**-heap with the bottom-up build-heap algorithm: for i = ⌊n/2⌋ − 1 down to 0, sift A[i] down, each step swapping it with its larger child while that child is larger. The total number of swaps performed is ______.',
+            'diagrams': [
+                {
+                    'type': 'heap',
+                    'values': [3, 9, 2, 14, 7, 1, 11, 20, 5, 16],
+                    'caption': 'Input array viewed as a complete binary tree',
+                },
+            ],
+            'answer': '8',
+            'solution': '''Build-heap processes internal nodes from the last one (index 4) back to the root; each sift-down may cascade several levels.
+
+- i=4 (7): child 16 → swap (1) → [3, 9, 2, 14, 16, 1, 11, 20, 5, 7]
+- i=3 (14): children 20, 5 → swap with 20 (2) → [3, 9, 2, 20, 16, 1, 11, 14, 5, 7]
+- i=2 (2): children 1, 11 → swap with 11 (3) → [3, 9, 11, 20, 16, 1, 2, 14, 5, 7]
+- i=1 (9): children 20, 16 → swap with 20 (4); now at index 3, children 14, 5 → swap with 14 (5) → [3, 20, 11, 14, 16, 1, 2, 9, 5, 7]
+- i=0 (3): swap with 20 (6); at index 1 children 14, 16 → swap with 16 (7); at index 4 child 7 → swap (8) → [20, 16, 11, 14, 7, 1, 2, 9, 5, 3]
+
+Total = **8** swaps.
+
+**Trap:** stopping each sift-down after one level (that gives 5), or using repeated insertion (sift-up) instead, which performs a different set of swaps. **Tip:** build-heap is Θ(n) overall because most nodes are near the bottom.''',
+            'solution_diagrams': [
+                {
+                    'type': 'heap',
+                    'values': [20, 16, 11, 14, 7, 1, 2, 9, 5, 3],
+                    'caption': 'Resulting max-heap',
+                },
+            ],
+            'verify': '''
 a = [3, 9, 2, 14, 7, 1, 11, 20, 5, 16]; n = len(a); sw = 0
 for i in range(n // 2 - 1, -1, -1):
     j = i
@@ -508,12 +549,12 @@ for i in range(n // 2 - 1, -1, -1):
 assert sw == int(ANSWER) and a == [20, 16, 11, 14, 7, 1, 2, 9, 5, 3]
 ''',
         },
-        # ------------------------------------------------------------ Q14
         {
-            "type": "MCQ", "marks": 2, "topic": "Quicksort — Hoare partition",
-            "text": ("The Hoare partition scheme below (pivot = A[lo]) is called as `hoare(A, 0, 7)` on "
-                     "A = [6, 3, 9, 6, 1, 8, 2, 7]. What are the contents of A and the returned value afterwards?"),
-            "code": '''def hoare(A, lo, hi):
+            'type': 'MCQ',
+            'marks': 2,
+            'topic': 'Quicksort — Hoare partition',
+            'text': 'The Hoare partition scheme below (pivot = A[lo]) is called as `hoare(A, 0, 7)` on A = [6, 3, 9, 6, 1, 8, 2, 7]. What are the contents of A and the returned value afterwards?',
+            'code': '''def hoare(A, lo, hi):
     p = A[lo]
     i, j = lo - 1, hi + 1
     while True:
@@ -526,77 +567,106 @@ assert sw == int(ANSWER) and a == [20, 16, 11, 14, 7, 1, 2, 9, 5, 3]
         if i >= j:
             return j
         A[i], A[j] = A[j], A[i]''',
-            "options": [
-                "A = [2, 3, 1, 6, 9, 8, 6, 7], returns 3",
-                "A = [2, 3, 1, 6, 9, 8, 6, 7], returns 4",
-                "A = [1, 3, 2, 6, 9, 8, 6, 7], returns 3",
-                "A = [2, 3, 1, 6, 6, 8, 9, 7], returns 3",
+            'options': [
+                'A = [1, 3, 2, 6, 9, 8, 6, 7], returns 3',
+                'A = [2, 3, 1, 6, 9, 8, 6, 7], returns 4',
+                'A = [2, 3, 1, 6, 9, 8, 6, 7], returns 3',
+                'A = [2, 3, 1, 6, 6, 8, 9, 7], returns 3',
             ],
-            "answer": "A",
-            "solution": (
-                "Hoare's scheme moves i right past elements < p and j left past elements > p, then swaps. "
-                "It returns j such that every element of A[lo..j] ≤ p ≤ every element of A[j+1..hi]; the pivot "
-                "is **not** necessarily at position j.\n\n"
-                "p = 6.\n\n"
-                "- Round 1: i stops at 0 (6 is not < 6); j: 7 (7 > 6) → 6 (2) stops. Swap → "
-                "[2, 3, 9, 6, 1, 8, 6, 7]\n"
-                "- Round 2: i: 1 (3 < 6) → 2 (9) stops; j: 5 (8 > 6) → 4 (1) stops. Swap → "
-                "[2, 3, 1, 6, 9, 8, 6, 7]\n"
-                "- Round 3: i: 3 (6) stops; j: 3 (6) stops. i ≥ j → **return 3**.\n\n"
-                "Left part A[0..3] = 2, 3, 1, 6 (all ≤ 6); right part A[4..7] = 9, 8, 6, 7 (all ≥ 6).\n\n"
-                "- (B) is right about A but returns i + 1-style index 4 (that is Lomuto thinking).\n"
-                "- (C) gets the first swap wrong (1 is not reached by j in round 1).\n"
-                "- (D) moves the second 6 next to the first, as if the pivot were placed in final position.\n\n"
-                "**Trap:** with Hoare partition, recursion must be on [lo, j] and [j+1, hi] — **not** "
-                "[lo, j−1] — because the pivot may sit anywhere in the left part."
-            ),
-            "solution_diagrams": [{"type": "array", "values": [2, 3, 1, 6, 9, 8, 6, 7],
-                                   "pointers": {"j": 3}, "label": "A",
-                                   "caption": "After partition: A[0..3] ≤ 6 ≤ A[4..7]"}],
-            "verify": '''
+            'answer': 'C',
+            'solution': '''Hoare's scheme moves i right past elements < p and j left past elements > p, then swaps. It returns j such that every element of A[lo..j] ≤ p ≤ every element of A[j+1..hi]; the pivot is **not** necessarily at position j.
+
+p = 6.
+
+- Round 1: i stops at 0 (6 is not < 6); j: 7 (7 > 6) → 6 (2) stops. Swap → [2, 3, 9, 6, 1, 8, 6, 7]
+- Round 2: i: 1 (3 < 6) → 2 (9) stops; j: 5 (8 > 6) → 4 (1) stops. Swap → [2, 3, 1, 6, 9, 8, 6, 7]
+- Round 3: i: 3 (6) stops; j: 3 (6) stops. i ≥ j → **return 3**.
+
+Left part A[0..3] = 2, 3, 1, 6 (all ≤ 6); right part A[4..7] = 9, 8, 6, 7 (all ≥ 6).
+
+- (A) gets the first swap wrong (1 is not reached by j in round 1).
+- (B) is right about A but returns i + 1-style index 4 (that is Lomuto thinking).
+- (D) moves the second 6 next to the first, as if the pivot were placed in final position.
+
+**Trap:** with Hoare partition, recursion must be on [lo, j] and [j+1, hi] — **not** [lo, j−1] — because the pivot may sit anywhere in the left part.''',
+            'solution_diagrams': [
+                {
+                    'type': 'array',
+                    'values': [2, 3, 1, 6, 9, 8, 6, 7],
+                    'pointers': {
+                        'j': 3,
+                    },
+                    'label': 'A',
+                    'caption': 'After partition: A[0..3] ≤ 6 ≤ A[4..7]',
+                },
+            ],
+            'verify': '''ANSWER = {'A': 'C', 'C': 'A'}.get(ANSWER, ANSWER)
+
 A = [6, 3, 9, 6, 1, 8, 2, 7]; r = hoare(A, 0, 7)
 assert (A, r) == ([2, 3, 1, 6, 9, 8, 6, 7], 3) and ANSWER == "A"
 ''',
         },
-        # ------------------------------------------------------------ Q15
         {
-            "type": "NAT", "marks": 2, "topic": "DAGs — counting topological orders",
-            "text": "The number of distinct topological orderings of the directed acyclic graph below is ______.",
-            "diagrams": [{"type": "graph", "directed": True,
-                          "nodes": ["A", "B", "C", "D", "E", "F"],
-                          "edges": [["A", "C"], ["B", "C"], ["B", "D"], ["C", "E"], ["D", "E"], ["D", "F"]],
-                          "pos": {"A": [0, 2], "B": [0, 0], "C": [2, 2], "D": [2, 0], "E": [4, 2],
-                                  "F": [4, 0]}}],
-            "answer": "14",
-            "solution": (
-                "A topological order lists each vertex after all its predecessors. Count by branching on "
-                "which source is output next (only vertices with no remaining in-edges may be chosen).\n\n"
-                "Constraints: A→C, B→C, B→D, C→E, D→E, D→F. Initial sources: A, B.\n\n"
-                "**Case 1 — A first.** Now only B is a source → B second. Remaining C, D, E, F with "
-                "C→E, D→E, D→F:\n\n"
-                "- C next: then D, then E and F in either order → 2\n"
-                "- D next: remaining C, E, F with only C→E → 3 orders (F can be in any of 3 slots)\n"
-                "- Case 1 total = 5\n\n"
-                "**Case 2 — B first.** Sources now A, D:\n\n"
-                "- A next: remaining C, D, E, F with C→E, D→E, D→F → 5 (same as above)\n"
-                "- D next: remaining A, C, E, F with A→C→E and F free → F can go in any of 4 slots → 4\n"
-                "- Case 2 total = 9\n\n"
-                "Total = 5 + 9 = **14**.\n\n"
-                "**Trap:** multiplying independent-looking choices (e.g. 2 × 2 × …) — the choices interact, "
-                "so systematic case analysis (or DP over subsets) is needed."
-            ),
-            "verify": '''
+            'type': 'NAT',
+            'marks': 2,
+            'topic': 'DAGs — counting topological orders',
+            'text': 'The number of distinct topological orderings of the directed acyclic graph below is ______.',
+            'diagrams': [
+                {
+                    'type': 'graph',
+                    'directed': True,
+                    'nodes': ['A', 'B', 'C', 'D', 'E', 'F'],
+                    'edges': [
+                        ['A', 'C'],
+                        ['B', 'C'],
+                        ['B', 'D'],
+                        ['C', 'E'],
+                        ['D', 'E'],
+                        ['D', 'F'],
+                    ],
+                    'pos': {
+                        'A': [0, 2],
+                        'B': [0, 0],
+                        'C': [2, 2],
+                        'D': [2, 0],
+                        'E': [4, 2],
+                        'F': [4, 0],
+                    },
+                },
+            ],
+            'answer': '14',
+            'solution': '''A topological order lists each vertex after all its predecessors. Count by branching on which source is output next (only vertices with no remaining in-edges may be chosen).
+
+Constraints: A→C, B→C, B→D, C→E, D→E, D→F. Initial sources: A, B.
+
+**Case 1 — A first.** Now only B is a source → B second. Remaining C, D, E, F with C→E, D→E, D→F:
+
+- C next: then D, then E and F in either order → 2
+- D next: remaining C, E, F with only C→E → 3 orders (F can be in any of 3 slots)
+- Case 1 total = 5
+
+**Case 2 — B first.** Sources now A, D:
+
+- A next: remaining C, D, E, F with C→E, D→E, D→F → 5 (same as above)
+- D next: remaining A, C, E, F with A→C→E and F free → F can go in any of 4 slots → 4
+- Case 2 total = 9
+
+Total = 5 + 9 = **14**.
+
+**Trap:** multiplying independent-looking choices (e.g. 2 × 2 × …) — the choices interact, so systematic case analysis (or DP over subsets) is needed.''',
+            'verify': '''
 import itertools
 E = [("A", "C"), ("B", "C"), ("B", "D"), ("C", "E"), ("D", "E"), ("D", "F")]
 cnt = sum(all(p.index(a) < p.index(b) for a, b in E) for p in itertools.permutations("ABCDEF"))
 assert cnt == int(ANSWER)
 ''',
         },
-        # ------------------------------------------------------------ Q16
         {
-            "type": "MCQ", "marks": 2, "topic": "Complexity of a loop nest",
-            "text": "What is the time complexity of `work(n)` as a function of n (count the `c += 1` steps)?",
-            "code": '''def work(n):
+            'type': 'MCQ',
+            'marks': 2,
+            'topic': 'Complexity of a loop nest',
+            'text': 'What is the time complexity of `work(n)` as a function of n (count the `c += 1` steps)?',
+            'code': '''def work(n):
     c = 0
     i = 1
     while i <= n:
@@ -606,51 +676,46 @@ assert cnt == int(ANSWER)
             j += i
         i *= 2
     return c''',
-            "options": ["Θ(n)", "Θ(n log n)", "Θ(n²)", "Θ(log² n)"],
-            "answer": "A",
-            "solution": (
-                "The outer loop takes i = 1, 2, 4, …, 2^{k} ≤ n (about log₂ n + 1 iterations). For a given i "
-                "the inner loop steps j by i from 1 to n, so it runs ⌈n / i⌉ times.\n\n"
-                "Total ≈ n/1 + n/2 + n/4 + … ≤ 2n — a **geometric** series, so work(n) = **Θ(n)**.\n\n"
-                "Concretely, work(2^{10}) = 2047 and work(2^{14}) = 32767, i.e. 2n − 1 for powers of two.\n\n"
-                "- (B) Θ(n log n) is what you get if i ran over **all** integers 1 … n (harmonic series "
-                "n·H_{n}) — but here i doubles.\n"
-                "- (C) Θ(n²) would need the inner loop to do n steps for each of n outer values.\n"
-                "- (D) Θ(log² n) ignores that the inner loop does n/i steps, not log n.\n\n"
-                "**Trap:** seeing two nested loops plus a log-style outer loop and multiplying "
-                "n × log n without checking how the inner bound depends on i."
-            ),
-            "verify": '''
+            'options': ['Θ(n log n)', 'Θ(n)', 'Θ(n²)', 'Θ(log² n)'],
+            'answer': 'B',
+            'solution': '''The outer loop takes i = 1, 2, 4, …, 2^{k} ≤ n (about log₂ n + 1 iterations). For a given i the inner loop steps j by i from 1 to n, so it runs ⌈n / i⌉ times.
+
+Total ≈ n/1 + n/2 + n/4 + … ≤ 2n — a **geometric** series, so work(n) = **Θ(n)**.
+
+Concretely, work(2^{10}) = 2047 and work(2^{14}) = 32767, i.e. 2n − 1 for powers of two.
+
+- (A) Θ(n log n) is what you get if i ran over **all** integers 1 … n (harmonic series n·H_{n}) — but here i doubles.
+- (C) Θ(n²) would need the inner loop to do n steps for each of n outer values.
+- (D) Θ(log² n) ignores that the inner loop does n/i steps, not log n.
+
+**Trap:** seeing two nested loops plus a log-style outer loop and multiplying n × log n without checking how the inner bound depends on i.''',
+            'verify': '''ANSWER = {'A': 'B', 'B': 'A'}.get(ANSWER, ANSWER)
+
 assert work(2 ** 10) == 2 * 2 ** 10 - 1 and work(2 ** 14) == 2 * 2 ** 14 - 1
 r = [work(n) / n for n in (1000, 10000, 100000)]
 assert max(r) < 2.1 and min(r) > 1.5 and ANSWER == "A"
 ''',
         },
-        # ------------------------------------------------------------ Q17
         {
-            "type": "NAT", "marks": 2, "topic": "Merge sort — counting inversions",
-            "text": ("Inversions of A = [5, 9, 2, 7, 1, 8, 3, 6] are counted with the divide-and-conquer merge-sort "
-                     "method: inversions inside the left half + inside the right half + *split* inversions "
-                     "(pairs with one element in each half) counted during the final merge. The number of "
-                     "split inversions counted during the **final** merge (left half [5, 9, 2, 7], right half "
-                     "[1, 8, 3, 6]) is ______."),
-            "answer": "10",
-            "solution": (
-                "A split inversion is a pair (x, y) with x in the left half, y in the right half and x > y. "
-                "During the merge of the **sorted** halves L = [2, 5, 7, 9] and R = [1, 3, 6, 8], each time an "
-                "element of R is output, it forms an inversion with every element still remaining in L.\n\n"
-                "- output 1 (from R): L remaining = 4 → +4\n"
-                "- output 2 (L), then 3 (R): L remaining {5, 7, 9} → +3\n"
-                "- output 5 (L), then 6 (R): L remaining {7, 9} → +2\n"
-                "- output 7 (L), then 8 (R): L remaining {9} → +1\n"
-                "- output 9\n\n"
-                "Split inversions = 4 + 3 + 2 + 1 = **10**.\n\n"
-                "Check directly: 5 > 1, 3; 9 > 1, 8, 3, 6; 2 > 1; 7 > 1, 3, 6 → 2 + 4 + 1 + 3 = 10. "
-                "(Total inversions = 3 in the left half + 2 in the right half + 10 = 15.)\n\n"
-                "**Trap:** adding 1 per R-element output instead of 'number of remaining L elements'. "
-                "**Tip:** the whole count runs in Θ(n log n)."
-            ),
-            "verify": '''
+            'type': 'NAT',
+            'marks': 2,
+            'topic': 'Merge sort — counting inversions',
+            'text': 'Inversions of A = [5, 9, 2, 7, 1, 8, 3, 6] are counted with the divide-and-conquer merge-sort method: inversions inside the left half + inside the right half + *split* inversions (pairs with one element in each half) counted during the final merge. The number of split inversions counted during the **final** merge (left half [5, 9, 2, 7], right half [1, 8, 3, 6]) is ______.',
+            'answer': '10',
+            'solution': '''A split inversion is a pair (x, y) with x in the left half, y in the right half and x > y. During the merge of the **sorted** halves L = [2, 5, 7, 9] and R = [1, 3, 6, 8], each time an element of R is output, it forms an inversion with every element still remaining in L.
+
+- output 1 (from R): L remaining = 4 → +4
+- output 2 (L), then 3 (R): L remaining {5, 7, 9} → +3
+- output 5 (L), then 6 (R): L remaining {7, 9} → +2
+- output 7 (L), then 8 (R): L remaining {9} → +1
+- output 9
+
+Split inversions = 4 + 3 + 2 + 1 = **10**.
+
+Check directly: 5 > 1, 3; 9 > 1, 8, 3, 6; 2 > 1; 7 > 1, 3, 6 → 2 + 4 + 1 + 3 = 10. (Total inversions = 3 in the left half + 2 in the right half + 10 = 15.)
+
+**Trap:** adding 1 per R-element output instead of 'number of remaining L elements'. **Tip:** the whole count runs in Θ(n log n).''',
+            'verify': '''
 A = [5, 9, 2, 7, 1, 8, 3, 6]
 L, R = A[:4], A[4:]
 split = sum(x > y for x in L for y in R)
@@ -658,50 +723,94 @@ inv = lambda a: sum(a[i] > a[j] for i in range(len(a)) for j in range(i + 1, len
 assert split == int(ANSWER) and inv(A) == inv(L) + inv(R) + split == 15
 ''',
         },
-        # ------------------------------------------------------------ Q18
         {
-            "type": "MSQ", "marks": 2, "topic": "DFS and BFS trees of an undirected graph",
-            "text": ("DFS and BFS are each run from vertex A on the undirected graph below, visiting neighbours "
-                     "in alphabetical order. Which of the following statements is/are TRUE?"),
-            "diagrams": [{"type": "graph", "directed": False,
-                          "nodes": ["A", "B", "C", "D", "E", "F", "G"],
-                          "edges": [["A", "B"], ["A", "C"], ["B", "D"], ["C", "D"], ["D", "E"], ["E", "F"],
-                                    ["E", "G"], ["F", "G"], ["C", "F"]],
-                          "pos": {"A": [0, 1.5], "B": [1.5, 3], "C": [1.5, 0], "D": [3, 1.5], "E": [4.5, 2.5],
-                                  "F": [4.5, 0], "G": [6, 1.25]}}],
-            "options": [
-                "Every vertex of the DFS tree has at most one child (the DFS tree is a path)",
-                "The DFS produces exactly 3 back edges",
-                "In the BFS tree the largest distance (level) of any vertex from A is 3",
-                "In the DFS, G is discovered before E",
+            'type': 'MSQ',
+            'marks': 2,
+            'topic': 'DFS and BFS trees of an undirected graph',
+            'text': 'DFS and BFS are each run from vertex A on the undirected graph below, visiting neighbours in alphabetical order. Which of the following statements is/are TRUE?',
+            'diagrams': [
+                {
+                    'type': 'graph',
+                    'directed': False,
+                    'nodes': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+                    'edges': [
+                        ['A', 'B'],
+                        ['A', 'C'],
+                        ['B', 'D'],
+                        ['C', 'D'],
+                        ['D', 'E'],
+                        ['E', 'F'],
+                        ['E', 'G'],
+                        ['F', 'G'],
+                        ['C', 'F'],
+                    ],
+                    'pos': {
+                        'A': [0, 1.5],
+                        'B': [1.5, 3],
+                        'C': [1.5, 0],
+                        'D': [3, 1.5],
+                        'E': [4.5, 2.5],
+                        'F': [4.5, 0],
+                        'G': [6, 1.25],
+                    },
+                },
             ],
-            "answer": ["A", "B", "C"],
-            "solution": (
-                "**DFS (recursive, alphabetical):** A → B (A's first neighbour) → D (B's next unvisited) → "
-                "C (D's neighbours B, C, E: B visited, so C) → F (C's neighbours A, D visited, F new) → E "
-                "(F's neighbours C, E, G → E first) → G (E's neighbours D, F visited, G new). "
-                "Then everything backtracks.\n\n"
-                "Tree edges: AB, BD, DC, CF, FE, EG — the tree is the path A-B-D-C-F-E-G. "
-                "The other 9 − 6 = 3 edges (AC, DE, FG) are back edges.\n\n"
-                "**BFS from A:** level 1 {B, C}; level 2 {D (via B), F (via C)}; level 3 {E (via D), "
-                "G (via F)}.\n\n"
-                "- (A) **True.**\n"
-                "- (B) **True** — in an undirected DFS every non-tree edge is a back edge; 9 − (7 − 1) = 3.\n"
-                "- (C) **True** — E and G are at distance 3.\n"
-                "- (D) E is discovered from F before G. **False.**\n\n"
-                "**Contrast:** the DFS tree has depth 6 while the BFS tree has depth 3 — BFS trees are "
-                "shortest-path trees; DFS trees can be as deep as n − 1."
-            ),
-            "solution_diagrams": [{"type": "graph", "directed": False,
-                                   "nodes": ["A", "B", "C", "D", "E", "F", "G"],
-                                   "edges": [["A", "B"], ["A", "C"], ["B", "D"], ["C", "D"], ["D", "E"],
-                                             ["E", "F"], ["E", "G"], ["F", "G"], ["C", "F"]],
-                                   "pos": {"A": [0, 1.5], "B": [1.5, 3], "C": [1.5, 0], "D": [3, 1.5],
-                                           "E": [4.5, 2.5], "F": [4.5, 0], "G": [6, 1.25]},
-                                   "highlight_edges": [["A", "B"], ["B", "D"], ["D", "C"], ["C", "F"],
-                                                       ["F", "E"], ["E", "G"]],
-                                   "caption": "DFS tree (highlighted) is a Hamiltonian path"}],
-            "verify": '''
+            'options': [
+                'Every vertex of the DFS tree has at most one child (the DFS tree is a path)',
+                'The DFS produces exactly 3 back edges',
+                'In the BFS tree the largest distance (level) of any vertex from A is 3',
+                'In the DFS, G is discovered before E',
+            ],
+            'answer': ['A', 'B', 'C'],
+            'solution': '''**DFS (recursive, alphabetical):** A → B (A's first neighbour) → D (B's next unvisited) → C (D's neighbours B, C, E: B visited, so C) → F (C's neighbours A, D visited, F new) → E (F's neighbours C, E, G → E first) → G (E's neighbours D, F visited, G new). Then everything backtracks.
+
+Tree edges: AB, BD, DC, CF, FE, EG — the tree is the path A-B-D-C-F-E-G. The other 9 − 6 = 3 edges (AC, DE, FG) are back edges.
+
+**BFS from A:** level 1 {B, C}; level 2 {D (via B), F (via C)}; level 3 {E (via D), G (via F)}.
+
+- (A) **True.**
+- (B) **True** — in an undirected DFS every non-tree edge is a back edge; 9 − (7 − 1) = 3.
+- (C) **True** — E and G are at distance 3.
+- (D) E is discovered from F before G. **False.**
+
+**Contrast:** the DFS tree has depth 6 while the BFS tree has depth 3 — BFS trees are shortest-path trees; DFS trees can be as deep as n − 1.''',
+            'solution_diagrams': [
+                {
+                    'type': 'graph',
+                    'directed': False,
+                    'nodes': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+                    'edges': [
+                        ['A', 'B'],
+                        ['A', 'C'],
+                        ['B', 'D'],
+                        ['C', 'D'],
+                        ['D', 'E'],
+                        ['E', 'F'],
+                        ['E', 'G'],
+                        ['F', 'G'],
+                        ['C', 'F'],
+                    ],
+                    'pos': {
+                        'A': [0, 1.5],
+                        'B': [1.5, 3],
+                        'C': [1.5, 0],
+                        'D': [3, 1.5],
+                        'E': [4.5, 2.5],
+                        'F': [4.5, 0],
+                        'G': [6, 1.25],
+                    },
+                    'highlight_edges': [
+                        ['A', 'B'],
+                        ['B', 'D'],
+                        ['D', 'C'],
+                        ['C', 'F'],
+                        ['F', 'E'],
+                        ['E', 'G'],
+                    ],
+                    'caption': 'DFS tree (highlighted) is a Hamiltonian path',
+                },
+            ],
+            'verify': '''
 E = [("A","B"),("A","C"),("B","D"),("C","D"),("D","E"),("E","F"),("E","G"),("F","G"),("C","F")]
 adj = {}
 for a, b in E:
@@ -726,37 +835,49 @@ truth = [max(kids.values()) == 1, len(E) - len(tree) == 3, max(dist.values()) ==
 assert sorted(ANSWER) == [c for c, t in zip("ABCD", truth) if t]
 ''',
         },
-        # ------------------------------------------------------------ Q19
         {
-            "type": "MSQ", "marks": 2, "topic": "Linear probing — clustering effects",
-            "text": ("Keys 25, 47, 14, 36, 58, 70, 3 are inserted in that order into an initially empty hash table "
-                     "of size 11 with h(k) = k mod 11 and linear probing (step +1). Probes are counted as slots "
-                     "inspected, including the final one. Which of the following statements is/are TRUE?"),
-            "options": [
-                "Key 70 is stored in slot 8",
-                "The average number of probes over the seven successful searches is 27/7",
-                "An unsuccessful search for a key whose home slot is 3 makes 8 probes",
-                "The table contains a run of 8 consecutive occupied slots",
+            'type': 'MSQ',
+            'marks': 2,
+            'topic': 'Linear probing — clustering effects',
+            'text': 'Keys 25, 47, 14, 36, 58, 70, 3 are inserted in that order into an initially empty hash table of size 11 with h(k) = k mod 11 and linear probing (step +1). Probes are counted as slots inspected, including the final one. Which of the following statements is/are TRUE?',
+            'options': [
+                'Key 70 is stored in slot 8',
+                'The average number of probes over the seven successful searches is 27/7',
+                'An unsuccessful search for a key whose home slot is 3 makes 8 probes',
+                'The table contains a run of 8 consecutive occupied slots',
             ],
-            "answer": ["A", "B", "C"],
-            "solution": (
-                "Homes: 25→3, 47→3, 14→3, 36→3, 58→3, 70→4, 3→3 — six keys share home 3!\n\n"
-                "- 25 → 3 (1 probe); 47 → 4 (2); 14 → 5 (3); 36 → 6 (4); 58 → 7 (5)\n"
-                "- 70: home 4 is inside the cluster → 4, 5, 6, 7 full → **8** (5 probes)\n"
-                "- 3: 3 … 8 full → 9 (7 probes)\n\n"
-                "Final: slots 3–9 occupied (a run of 7), slots 0, 1, 2, 10 empty.\n\n"
-                "- (A) **True.**\n"
-                "- (B) a successful search for a key repeats its insertion probes: "
-                "1 + 2 + 3 + 4 + 5 + 5 + 7 = 27 → 27/7 ≈ 3.86. **True.**\n"
-                "- (C) from slot 3: slots 3 … 9 full (7 probes), slot 10 empty (8th probe). **True.**\n"
-                "- (D) the run is slots 3–9, length **7**. **False.**\n\n"
-                "**Insight:** key 70 had a *different* home slot yet paid 5 probes — primary clustering "
-                "penalises every key whose home falls inside a cluster, not just keys with the same home."
-            ),
-            "solution_diagrams": [{"type": "hashtable", "size": 11,
-                                   "slots": {3: 25, 4: 47, 5: 14, 6: 36, 7: 58, 8: 70, 9: 3},
-                                   "caption": "Final table: one cluster, slots 3–9"}],
-            "verify": '''
+            'answer': ['A', 'B', 'C'],
+            'solution': '''Homes: 25→3, 47→3, 14→3, 36→3, 58→3, 70→4, 3→3 — six keys share home 3!
+
+- 25 → 3 (1 probe); 47 → 4 (2); 14 → 5 (3); 36 → 6 (4); 58 → 7 (5)
+- 70: home 4 is inside the cluster → 4, 5, 6, 7 full → **8** (5 probes)
+- 3: 3 … 8 full → 9 (7 probes)
+
+Final: slots 3–9 occupied (a run of 7), slots 0, 1, 2, 10 empty.
+
+- (A) **True.**
+- (B) a successful search for a key repeats its insertion probes: 1 + 2 + 3 + 4 + 5 + 5 + 7 = 27 → 27/7 ≈ 3.86. **True.**
+- (C) from slot 3: slots 3 … 9 full (7 probes), slot 10 empty (8th probe). **True.**
+- (D) the run is slots 3–9, length **7**. **False.**
+
+**Insight:** key 70 had a *different* home slot yet paid 5 probes — primary clustering penalises every key whose home falls inside a cluster, not just keys with the same home.''',
+            'solution_diagrams': [
+                {
+                    'type': 'hashtable',
+                    'size': 11,
+                    'slots': {
+                        3: 25,
+                        4: 47,
+                        5: 14,
+                        6: 36,
+                        7: 58,
+                        8: 70,
+                        9: 3,
+                    },
+                    'caption': 'Final table: one cluster, slots 3–9',
+                },
+            ],
+            'verify': '''
 T = [None] * 11; pr = {}
 for k in [25, 47, 14, 36, 58, 70, 3]:
     i, c = k % 11, 1
@@ -772,33 +893,38 @@ truth = [T[8] == 70, Fraction(sum(pr.values()), 7) == Fraction(27, 7), c == 8, b
 assert sorted(ANSWER) == [x for x, t in zip("ABCD", truth) if t]
 ''',
         },
-        # ------------------------------------------------------------ Q20
         {
-            "type": "MCQ", "marks": 2, "topic": "Python — generator and iterator exhaustion",
-            "text": "Consider the following Python program. What is printed?",
-            "code": '''g = (x * x for x in range(5))
+            'type': 'MCQ',
+            'marks': 2,
+            'topic': 'Python — generator and iterator exhaustion',
+            'text': 'Consider the following Python program. What is printed?',
+            'code': '''g = (x * x for x in range(5))
 a = sum(g)
 b = sum(g)
 it = iter([1, 2, 3, 4])
 pairs = list(zip(it, it))
 print(a, b, pairs)''',
-            "options": ["`30 0 [(1, 2), (3, 4)]`", "`30 30 [(1, 1), (2, 2), (3, 3), (4, 4)]`",
-                        "`30 30 [(1, 2), (3, 4)]`", "`30 0 [(1, 1), (2, 2), (3, 3), (4, 4)]`"],
-            "answer": "A",
-            "solution": (
-                "Generators and iterators are **single-pass**: once consumed they yield nothing more.\n\n"
-                "- `a = sum(g)` consumes the generator: 0 + 1 + 4 + 9 + 16 = **30**.\n"
-                "- `b = sum(g)`: g is exhausted → sum of nothing = **0**.\n"
-                "- `zip(it, it)` pulls from the **same** iterator for both positions: first pair takes 1 "
-                "then 2, the next pair 3 then 4 → **[(1, 2), (3, 4)]**.\n\n"
-                "Output: **30 0 [(1, 2), (3, 4)]**.\n\n"
-                "- (B) treats g as re-iterable and `it` as two independent iterators.\n"
-                "- (C) gets zip right but assumes the generator restarts.\n"
-                "- (D) gets exhaustion right but treats the two `it` arguments as independent copies.\n\n"
-                "**Tip:** `zip(*[iter(seq)] * k)` is the standard idiom for chunking a sequence into "
-                "k-tuples — it works precisely because all k arguments are the same iterator."
-            ),
-            "verify": "assert OUTPUT.strip() == '30 0 [(1, 2), (3, 4)]' and ANSWER == 'A'",
+            'options': [
+                '`30 0 [(1, 1), (2, 2), (3, 3), (4, 4)]`',
+                '`30 30 [(1, 1), (2, 2), (3, 3), (4, 4)]`',
+                '`30 30 [(1, 2), (3, 4)]`',
+                '`30 0 [(1, 2), (3, 4)]`',
+            ],
+            'answer': 'D',
+            'solution': '''Generators and iterators are **single-pass**: once consumed they yield nothing more.
+
+- `a = sum(g)` consumes the generator: 0 + 1 + 4 + 9 + 16 = **30**.
+- `b = sum(g)`: g is exhausted → sum of nothing = **0**.
+- `zip(it, it)` pulls from the **same** iterator for both positions: first pair takes 1 then 2, the next pair 3 then 4 → **[(1, 2), (3, 4)]**.
+
+Output: **30 0 [(1, 2), (3, 4)]**.
+
+- (A) gets exhaustion right but treats the two `it` arguments as independent copies.
+- (B) treats g as re-iterable and `it` as two independent iterators.
+- (C) gets zip right but assumes the generator restarts.
+
+**Tip:** `zip(*[iter(seq)] * k)` is the standard idiom for chunking a sequence into k-tuples — it works precisely because all k arguments are the same iterator.''',
+            'verify': "ANSWER = {'A': 'D', 'D': 'A'}.get(ANSWER, ANSWER)\nassert OUTPUT.strip() == '30 0 [(1, 2), (3, 4)]' and ANSWER == 'A'",
         },
     ],
 }

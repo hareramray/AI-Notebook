@@ -114,9 +114,9 @@ assert ANSWER == 'C'
                 "(n/3 + 2n/3 = n). The shortest root-to-leaf path has log₃ n levels and the longest "
                 "log_{3/2} n, both Θ(log n), so T(n) = Θ(n log n). **Yes.**\n"
                 "- (D) a = b = 3 → n^{log₃3} = n; f(n) = n / log n is smaller than n only by a log factor, "
-                "so the master theorem does not apply. Level i of the tree costs n / log(n/3^i), and "
+                "so the master theorem does not apply. Level i of the tree costs n / log(n/3^{i}), and "
                 "summing gives n · ∑ 1/j = Θ(n log log n). **No.**\n\n"
-                "**Trap:** (D) ‘looks like’ case 2 — but f must be Θ(n^{log_b a} · log^k n) with k ≥ 0; "
+                "**Trap:** (D) ‘looks like’ case 2 — but f must be Θ(n^{log_b a} · log^{k} n) with k ≥ 0; "
                 "here k = −1, which gives n log log n."
             ),
             "verify": '''
@@ -807,7 +807,7 @@ def r(n):
                 "The while-loop doubles i until it reaches n: ⌈log₂ n⌉ iterations. Then two recursive calls "
                 "on √n. So\n\n"
                 "W(n) = 2W(√n) + Θ(log n).\n\n"
-                "**Change of variable:** put m = log₂ n, so √n = 2^{m/2}, and let S(m) = W(2^m):\n\n"
+                "**Change of variable:** put m = log₂ n, so √n = 2^{m/2}, and let S(m) = W(2^{m}):\n\n"
                 "S(m) = 2S(m/2) + Θ(m).\n\n"
                 "This is the merge-sort recurrence → S(m) = Θ(m log m). Returning to n: "
                 "W(n) = **Θ(log n · log log n)** → option (B).\n\n"

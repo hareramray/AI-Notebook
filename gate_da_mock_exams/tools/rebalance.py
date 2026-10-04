@@ -1,0 +1,144 @@
+"""Rebalance MCQ answer letters within a set by swapping option pairs.
+
+For each MCQ whose key must move from X to Y, options X and Y are swapped, and every letter
+reference to X/Y in text, solution, verify, etc. is swapped too. Each changed question is
+re-run through its verify block; on failure the change is reverted.  Option-by-option
+bullet lines ("- (B) ...") in solutions are re-sorted into A-D order afterwards.
+
+usage: python3 tools/rebalance.py sets/set_03.py [...]   (rewrites the files in place)
+"""
+import os
+import random
+import re
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from schema import load_set, run_snippet  # noqa: E402
+
+TEXT_FIELDS = ("text", "text2", "solution", "solution_after", "solution_code")
+
+
+def swap_letters_text(s, x, y):
+    if not s:
+        return s
+    pats = [r"(?<![\w(])\(%s\)", r"(?<=[Oo]ption )%s\b", r"(?<=[Oo]ption \*\*)%s\b",
+            r"(?<=[Oo]ptions )%s\b", r"(?<=[Aa]nswer: )%s\b", r"(?<=[Aa]nswer is )%s\b"]
+
+    def sw(m):
+        t = m.group(0)
+        return t.replace(x, "\0").replace(y, x).replace("\0", y)
+    big = "|".join("(?:%s)|(?:%s)" % (p % x, p % y) for p in pats)
+    return re.sub(big, sw, s)
+
+
+def swap_letters_code(s, x, y):
+    if not s:
+        return s
+
+    def sw(m):
+        t = m.group(0)
+        return t.replace(x, "\0").replace(y, x).replace("\0", y)
+    return re.sub(r"(['\"])(%s|%s)\1" % (x, y), sw, s)
+
+
+def sort_option_bullets(s):
+    if not s:
+        return s
+    lines = s.split("\n")
+    out, i = [], 0
+    pat = re.compile(r"^\s*- (\*\*)?\(?([A-D])\)")
+    while i < len(lines):
+        if pat.match(lines[i]):
+            j = i
+            while j < len(lines) and pat.match(lines[j]):
+                j += 1
+            block = lines[i:j]
+            letters = [pat.match(l).group(2) for l in block]
+            if len(set(letters)) == len(letters):
+                block = [l for _, l in sorted(zip(letters, block))]
+            out += block
+            i = j
+        else:
+            out.append(lines[i])
+            i += 1
+    return "\n".join(out)
+
+
+def apply_swap(q, x, y):
+    q = dict(q)
+    L = "ABCD"
+    opts = list(q["options"])
+    ix, iy = L.index(x), L.index(y)
+    opts[ix], opts[iy] = opts[iy], opts[ix]
+    q["options"] = opts
+    q["answer"] = y if q["answer"] == x else (x if q["answer"] == y else q["answer"])
+    for f in ("solution", "solution_after"):
+        if q.get(f):
+            q[f] = sort_option_bullets(swap_letters_text(q[f], x, y))
+    if q.get("verify"):
+        # verify was written against the original option order: map the key back first
+        q["verify"] = "ANSWER = {%r: %r, %r: %r}.get(ANSWER, ANSWER)\n" % (x, y, y, x) + q["verify"]
+    return q
+
+
+# ------------------------------------------------------------------ serialisation
+def s_str(v, ind):
+    if "\n" in v and "'''" not in v and not v.endswith("\\") and not v.endswith("'"):
+        body = v.replace("\\", "\\\\")
+        return "'''" + body + "'''"
+    return repr(v)
+
+
+def ser(v, ind=0):
+    pad = " " * ind
+    if isinstance(v, dict):
+        if not v:
+            return "{}"
+        items = ["%s    %r: %s," % (pad, k, ser(val, ind + 4)) for k, val in v.items()]
+        return "{\n" + "\n".join(items) + "\n" + pad + "}"
+    if isinstance(v, (list, tuple)):
+        if all(not isinstance(x, (dict, list, tuple)) and not (isinstance(x, str) and "\n" in x) for x in v):
+            r = "[" + ", ".join(ser(x) for x in v) + "]"
+            if len(r) + ind < 100:
+                return r
+        items = ["%s    %s," % (pad, ser(x, ind + 4)) for x in v]
+        return "[\n" + "\n".join(items) + "\n" + pad + "]"
+    if isinstance(v, str):
+        return s_str(v, ind)
+    return repr(v)
+
+
+def rebalance(path):
+    S = load_set(path)
+    qs = S["questions"]
+    mcq = [i for i, q in enumerate(qs) if q["type"] == "MCQ"]
+    rnd = random.Random(1000 + S["number"])
+    targets = ["ABCD"[k % 4] for k in range(len(mcq))]
+    rnd.shuffle(targets)
+    changed = 0
+    for i, tgt in zip(mcq, targets):
+        q = qs[i]
+        cur = q["answer"]
+        if cur == tgt:
+            continue
+        nq = apply_swap(q, cur, tgt)
+        code = nq.get("code") if nq.get("run_code", True) else None
+        if nq.get("verify"):
+            err = run_snippet(code, nq["verify"], nq["answer"])
+            if err:
+                print("  set %02d Q%d: swap %s->%s failed verify, kept original" % (S["number"], i + 1, cur, tgt))
+                continue
+        qs[i] = nq
+        changed += 1
+    src = open(path).read()
+    header = src[:src.index("SET =")] if "SET =" in src else ""
+    with open(path, "w") as f:
+        f.write(header + "SET = " + ser(S) + "\n")
+    load_set(path)  # sanity: still importable
+    print("%s: %d MCQ keys moved -> %s" % (path, changed, "".join(q["answer"] for q in qs if q["type"] == "MCQ")))
+
+
+if __name__ == "__main__":
+    for p in sys.argv[1:]:
+        rebalance(p)

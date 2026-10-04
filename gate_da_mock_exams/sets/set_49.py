@@ -178,7 +178,7 @@ print(out)''',
                 "n − 1 = n₁ + 2n₂ and n = n₀ + n₁ + n₂ ⇒ **n₀ = n₂ + 1**.\n\n"
                 "- (A) **True.** Full ⇒ n₁ = 0, so n₂ = 20 − 1 = 19 and n = 20 + 19 = 39.\n"
                 "- (B) **True.** n₂ = n₀ − 1 = 11 for *every* binary tree, regardless of n₁.\n"
-                "- (C) **False.** A complete tree of height h has between 2^h and 2^{h+1} − 1 nodes; "
+                "- (C) **False.** A complete tree of height h has between 2^{h} and 2^{h+1} − 1 nodes; "
                 "2⁶ = 64 ≤ 100 ≤ 127, so the height is ⌊log₂ 100⌋ = **6**.\n"
                 "- (D) **True.** n nodes have 2n child pointers, and exactly n − 1 of them are used "
                 "(one per non-root node), leaving 2n − (n − 1) = n + 1 empty.\n\n"
@@ -247,7 +247,7 @@ assert min(opts, key=lambda k: abs(opts[k] - p)) == ANSWER and abs(p - 21 / 32) 
                 "For n = 2¹⁰ − 1 the binary-search decision tree is **perfect** with 10 levels: level d "
                 "(d = 1 … 10) holds 2^{d−1} keys, each found with exactly d comparisons.\n\n"
                 "Total = ∑ d · 2^{d−1} for d = 1 … 10 = (10 − 1) · 2¹⁰ + 1 = 9 · 1024 + 1 = 9217.\n\n"
-                "(Identity: ∑_{d=1}^{k} d · 2^{d−1} = (k − 1) · 2^k + 1.)\n\n"
+                "(Identity: ∑_{d=1}^{k} d · 2^{d−1} = (k − 1) · 2^{k} + 1.)\n\n"
                 "Average = 9217 / 1023 ≈ **9.01**.\n\n"
                 "Note how close this is to the worst case (10): half of all keys sit on the bottom level, "
                 "so the average is only about one comparison below the maximum, roughly log₂ n − 1.\n\n"
@@ -558,8 +558,8 @@ assert sorted(k for k in res if res[k]) == sorted(ANSWER)
                 "Why tombstones matter: had the deletions simply emptied slots 1 and 3, a search for 24 "
                 "*before* the re-insertions would have stopped at the empty slot 3 and wrongly reported "
                 "24 as absent.\n\n"
-                "**Trap:** forgetting that 55 and 46 recycle the tombstones (then 46 would land in slot 5 "
-                "and the search for 35 would cost 5 probes)."
+                "**Trap:** forgetting that 55 and 46 recycle the tombstones — they would then land in slots "
+                "5 and 6, and the two searches would cost 3 + 6 = 9 probes."
             ),
             "solution_diagrams": [{"type": "hashtable", "size": 11,
                                    "slots": {0: 22, 1: "DEL", 2: 44, 3: "DEL", 4: 24},
@@ -639,3 +639,262 @@ assert r == 3 and A == [18, 9, 13, 26, 41, 37, 26, 52]
 assert max(A[:r + 1]) <= 26 <= min(A[r + 1:]) and ANSWER == 'C'
 ''',
         },
+        # ------------------------------------------------------------ Q16
+        {
+            "type": "MSQ", "marks": 2, "topic": "Shortest and longest paths in a DAG",
+            "text": ("Consider the weighted DAG below (note the negative edge B→C). Which of the following "
+                     "statements is/are TRUE?"),
+            "diagrams": [{"type": "graph", "directed": True,
+                          "nodes": ["S", "A", "B", "C", "D", "T"],
+                          "edges": [["S", "A", 3], ["S", "B", 6], ["A", "B", 2], ["A", "C", 7],
+                                    ["B", "C", -4], ["B", "D", 4], ["C", "D", 1], ["C", "T", 5],
+                                    ["D", "T", 2]],
+                          "pos": {"S": [0, 1], "A": [1.5, 2], "B": [1.5, 0], "C": [3, 2], "D": [3, 0],
+                                  "T": [4.5, 1]}}],
+            "options": [
+                "The shortest S→T distance is 4",
+                "The longest (maximum-weight) S→T path has weight 15",
+                "Textbook Dijkstra from S (a vertex is final once extracted; edges into extracted vertices "
+                "are ignored) computes the correct shortest distance for **every** vertex of this graph",
+                "The DAG has exactly 2 topological orderings",
+            ],
+            "answer": ["A", "B", "C"],
+            "solution": (
+                "In a DAG, shortest **and** longest paths are found by relaxing edges in topological order "
+                "(negative weights are fine). Here S→A→B→C→D→T is a Hamiltonian path, so the topological "
+                "order is forced: **S, A, B, C, D, T**.\n\n"
+                "Shortest distances in that order: A 3; B = min(6, 3+2) = 5; C = min(3+7, 5−4) = 1; "
+                "D = min(5+4, 1+1) = 2; T = min(1+5, 2+2) = 4.\n"
+                "Longest distances: A 3; B = max(6, 5) = 6; C = max(10, 2) = 10; D = max(10, 11) = 11; "
+                "T = max(10+5, 11+2) = 15.\n\n"
+                "- (A) **True** — 4 via S→A→B→C→D→T (3 + 2 − 4 + 1 + 2).\n"
+                "- (B) **True** — 15 via S→A→C→T (3 + 7 + 5).\n"
+                "- (C) **True**, surprisingly. Dijkstra: extract S → A 3, B 6; extract A → B 5, C 10; "
+                "extract B → C = 1, D 9; now the smallest label is C (1) → D 2, T 6; extract D → T 4; "
+                "extract T. The negative edge B→C is relaxed **before** C is extracted, so nothing goes "
+                "wrong. Negative edges *can* break Dijkstra, but they do not have to.\n"
+                "- (D) **False** — exactly one topological order.\n\n"
+                "**Trap:** rejecting (C) by reflex. Dijkstra fails only when a vertex is extracted before a "
+                "cheaper path through a negative edge reaches it."
+            ),
+            "verify": '''
+import itertools
+E = [("S","A",3),("S","B",6),("A","B",2),("A","C",7),("B","C",-4),("B","D",4),("C","D",1),
+     ("C","T",5),("D","T",2)]
+V = "SABCDT"
+orders = [p for p in itertools.permutations(V)
+          if all(p.index(u) < p.index(v) for u, v, _ in E)]
+INF = float('inf')
+sd = {v: INF for v in V}; ld = {v: -INF for v in V}; sd["S"] = ld["S"] = 0
+for u in orders[0]:
+    for a, b, w in E:
+        if a == u: sd[b] = min(sd[b], sd[u] + w); ld[b] = max(ld[b], ld[u] + w)
+G = {}
+for a, b, w in E: G.setdefault(a, []).append((b, w))
+dj = {v: INF for v in V}; dj["S"] = 0; done = []
+while len(done) < 6:
+    u = min((v for v in V if v not in done), key=lambda v: (dj[v], v)); done.append(u)
+    for b, w in G.get(u, []):
+        if b not in done and dj[u] + w < dj[b]: dj[b] = dj[u] + w
+res = {'A': sd["T"] == 4, 'B': ld["T"] == 15, 'C': dj == sd, 'D': len(orders) == 2}
+assert sorted(k for k in res if res[k]) == sorted(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q17
+        {
+            "type": "NAT", "marks": 2, "topic": "Divide and conquer — inversion counting",
+            "text": "Consider the following Python program. The value printed is ______.",
+            "code": '''def count(a):
+    if len(a) < 2:
+        return a, 0
+    m = len(a) // 2
+    L, x = count(a[:m])
+    R, y = count(a[m:])
+    out, i, j, inv = [], 0, 0, x + y
+    while i < len(L) and j < len(R):
+        if L[i] <= R[j]:
+            out.append(L[i]); i += 1
+        else:
+            out.append(R[j]); j += 1
+            inv += len(L) - i
+    out += L[i:] + R[j:]
+    return out, inv
+
+print(count([5, 3, 5, 1, 3, 5, 2, 2])[1])''',
+            "answer": "16",
+            "solution": (
+                "This is merge sort that counts **inversions** (pairs i < j with a[i] > a[j]): when R[j] "
+                "is output before the remaining L[i…], it forms an inversion with each of those "
+                "len(L) − i elements. Because the test is `L[i] <= R[j]`, **equal** keys are not counted "
+                "— exactly as the strict definition requires.\n\n"
+                "Count by levels for [5, 3, 5, 1 | 3, 5, 2, 2]:\n\n"
+                "- Pairs: [5,3] → 1; [5,1] → 1; [3,5] → 0; [2,2] → 0 (equal). Subtotal 2.\n"
+                "- Merge [3,5]+[1,5]: 1 jumps over 3, 5 → 2. Merge [3,5]+[2,2]: each 2 jumps over 3, 5 → 4. "
+                "Subtotal 6.\n"
+                "- Final merge [1,3,5,5] + [2,2,3,5]: each 2 jumps over 3, 5, 5 → 3 + 3; 3 jumps over 5, 5 "
+                "→ 2; the right 5 does not jump over the left 5s (equal). Subtotal 8.\n\n"
+                "Total = 2 + 6 + 8 = **16**.\n\n"
+                "Direct check: for each element count the smaller elements to its right — "
+                "5:5, 3:3, 5:4, 1:0, 3:2, 5:2, 2:0, 2:0 → 16.\n\n"
+                "Time: T(n) = 2T(n/2) + Θ(n) = Θ(n log n), versus Θ(n²) for checking all pairs.\n\n"
+                "**Trap:** counting equal pairs (using `<` instead of `<=` would also count 5-5, 3-3 and "
+                "2-2 crossings) or adding only 1 per jump instead of len(L) − i."
+            ),
+            "solution_diagrams": [{"type": "matrix", "title": "Inversions counted at each merge level",
+                                   "row_labels": ["level 1", "level 2", "level 3"],
+                                   "col_labels": ["merged runs", "count"],
+                                   "rows": [["35 | 15 | 35 | 22", "1+1+0+0 = 2"],
+                                            ["1355 | 2235", "2+4 = 6"],
+                                            ["12233555", "3+3+2 = 8"]]}],
+            "verify": '''
+a = [5, 3, 5, 1, 3, 5, 2, 2]
+brute = sum(1 for i in range(8) for j in range(i + 1, 8) if a[i] > a[j])
+assert int(OUTPUT) == brute == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q18
+        {
+            "type": "MCQ", "marks": 2, "topic": "Heaps — top-k of a stream",
+            "text": ("To keep the 3 largest values of a stream, a binary **min**-heap of capacity 3 is used "
+                     "(array, root at index 0). The first three values are inserted normally (append + "
+                     "sift-up). For each later value x: if x > root, the root is **replaced** by x and sifted "
+                     "down (swap with the smaller child while larger than it); otherwise x is discarded. "
+                     "For the stream\n\n"
+                     "15, 4, 22, 9, 31, 7, 18, 26, 3\n\n"
+                     "the final heap array is"),
+            "options": ["[22, 26, 31]", "[26, 31, 22]", "[18, 31, 26]", "[22, 31, 26]"],
+            "answer": "D",
+            "solution": (
+                "A min-heap of size k holds the k largest values seen so far; its root is the k-th largest, "
+                "the threshold a new value must beat. Each step costs O(log k).\n\n"
+                "- 15 → [15]; 4 → append, sift up → [4, 15]; 22 → [4, 15, 22].\n"
+                "- 9 > 4 → root := 9 → children 15, 22 → stays → [9, 15, 22].\n"
+                "- 31 > 9 → root := 31 → smaller child 15 → swap → [15, 31, 22].\n"
+                "- 7 < 15 → discard.\n"
+                "- 18 > 15 → root := 18 → 18 < 31, 22 → stays → [18, 31, 22].\n"
+                "- 26 > 18 → root := 26 → smaller child 22 → swap → [22, 31, 26].\n"
+                "- 3 < 22 → discard.\n\n"
+                "Final **[22, 31, 26]** → option (D); the three largest values are 31, 26, 22 and the root "
+                "22 is the 3rd largest.\n\n"
+                "- (A) is the sorted order — a heap array need not be sorted.\n"
+                "- (B) forgets to sift 26 down in the last replacement.\n"
+                "- (C) keeps 18 — i.e. ignores that 26 beats the root.\n\n"
+                "**Trap:** using a *max*-heap for ‘k largest’ — the min-heap is what lets the smallest of the "
+                "kept values be evicted in O(log k)."
+            ),
+            "solution_diagrams": [{"type": "heap", "values": [22, 31, 26], "caption": "Final min-heap"}],
+            "verify": '''
+def sd(h, i):
+    n = len(h)
+    while True:
+        l, r, m = 2*i + 1, 2*i + 2, i
+        if l < n and h[l] < h[m]: m = l
+        if r < n and h[r] < h[m]: m = r
+        if m == i: return
+        h[i], h[m] = h[m], h[i]; i = m
+h = []
+for x in [15, 4, 22, 9, 31, 7, 18, 26, 3]:
+    if len(h) < 3:
+        h.append(x); i = len(h) - 1
+        while i > 0 and h[(i - 1) // 2] > h[i]:
+            p = (i - 1) // 2; h[p], h[i] = h[i], h[p]; i = p
+    elif x > h[0]:
+        h[0] = x; sd(h, 0)
+opts = {'A': [22, 26, 31], 'B': [26, 31, 22], 'C': [18, 31, 26], 'D': [22, 31, 26]}
+assert [k for k in opts if opts[k] == h] == [ANSWER]
+''',
+        },
+        # ------------------------------------------------------------ Q19
+        {
+            "type": "NAT", "marks": 2, "topic": "Graph theory — maximum edges with components",
+            "text": ("A simple undirected graph has 15 vertices and exactly 3 connected components, and "
+                     "**each component has at least 3 vertices**. The maximum possible number of edges is "
+                     "______."),
+            "answer": "42",
+            "solution": (
+                "Within each component the edge count is maximised by making it complete, so with component "
+                "sizes a + b + c = 15 the maximum is C(a, 2) + C(b, 2) + C(c, 2). Since C(x, 2) is convex, "
+                "the sum is largest when the sizes are as **unbalanced** as allowed.\n\n"
+                "- Without the size restriction: 1 + 1 + 13 → C(13, 2) = 78 (the classic answer, "
+                "(n − k)(n − k + 1)/2).\n"
+                "- With every component ≥ 3: make two components as small as possible: 3 + 3 + 9 → "
+                "3 + 3 + C(9, 2) = 3 + 3 + 36 = **42**.\n\n"
+                "Check other splits: 3 + 4 + 8 → 3 + 6 + 28 = 37; 3 + 5 + 7 → 3 + 10 + 21 = 34; "
+                "5 + 5 + 5 → 30. Moving a vertex from a smaller to the largest component never decreases the "
+                "total, so 42 is the maximum.\n\n"
+                "**Trap:** answering 78 by applying the textbook formula without the extra constraint, or "
+                "choosing the balanced split (30) by intuition."
+            ),
+            "verify": '''
+from math import comb
+best = max(comb(a, 2) + comb(b, 2) + comb(15 - a - b, 2)
+           for a in range(3, 14) for b in range(3, 14) if 15 - a - b >= 3)
+assert best == int(ANSWER)
+''',
+        },
+        # ------------------------------------------------------------ Q20
+        {
+            "type": "MSQ", "marks": 2, "topic": "Binary search — counting occurrences",
+            "text": ("Consider the following functions, where `a` is a list sorted in non-decreasing order. "
+                     "Which of the following statements is/are TRUE?"),
+            "code": '''def first_ge(a, x):
+    lo, hi = 0, len(a)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if a[mid] < x:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo
+
+def count(a, x):
+    return first_ge(a, x + 1) - first_ge(a, x)''',
+            "options": [
+                "`count([1, 2, 2, 2, 5], 2)` returns 3",
+                "`count(a, x)` returns the number of occurrences of x for every sorted list of **floats** a "
+                "and float x",
+                "`first_ge([], 7)` returns 0",
+                "For a list of length 1000, the loop in `first_ge` executes at most 10 times",
+            ],
+            "answer": ["A", "C", "D"],
+            "solution": (
+                "`first_ge` is a lower-bound search on the half-open range [lo, hi): it returns the first "
+                "index whose element is ≥ x (len(a) if none).\n\n"
+                "- (A) **True.** first_ge(a, 3) = 4 (element 5) and first_ge(a, 2) = 1 → 4 − 1 = 3.\n"
+                "- (B) **False.** `x + 1` is the next value only for **integers**. For a = [1.5, 2.0, 2.5] "
+                "and x = 2.0: first_ge(a, 3.0) = 3 and first_ge(a, 2.0) = 1, giving 2 although 2.0 occurs "
+                "once (2.5 was counted). The robust version uses an upper-bound search "
+                "(first index with element > x) instead of x + 1.\n"
+                "- (C) **True.** lo = hi = 0 → loop skipped → 0.\n"
+                "- (D) **True.** The range size s = hi − lo shrinks to at most ⌊s/2⌋ each iteration "
+                "(either [lo, mid) or [mid + 1, hi)). Starting from 1000: 1000 → 500 → 250 → 125 → 62 → 31 → "
+                "15 → 7 → 3 → 1 → 0 is the slowest possible chain — exactly 10 iterations; in general "
+                "⌊log₂ n⌋ + 1.\n\n"
+                "Answer: (A), (C), (D).\n\n"
+                "**Trap:** (B) works on every integer test you try — the bug only appears when values can "
+                "lie strictly between x and x + 1."
+            ),
+            "verify": '''
+import random
+r = {}
+r['A'] = count([1, 2, 2, 2, 5], 2) == 3
+r['B'] = count([1.5, 2.0, 2.5], 2.0) == 1
+r['C'] = first_ge([], 7) == 0
+def iters(a, x):
+    lo, hi, c = 0, len(a), 0
+    while lo < hi:
+        c += 1; mid = (lo + hi) // 2
+        if a[mid] < x: lo = mid + 1
+        else: hi = mid
+    return c
+a = list(range(1000))
+r['D'] = max(iters(a, x + d) for x in range(1000) for d in (0, 0.5)) <= 10
+assert max(iters(a, x) for x in range(1001)) == 10
+for _ in range(200):
+    b = sorted(random.randint(0, 9) for _ in range(random.randint(0, 15)))
+    assert all(count(b, x) == b.count(x) for x in range(-1, 11))
+assert sorted(k for k in r if r[k]) == sorted(ANSWER)
+''',
+        },
+    ],
+}
