@@ -193,7 +193,7 @@ def set_intro(num, qs):
 def answer_key(num, qs):
     fl = [CondPageBreak(9 * cm), SetHeader(f"Mock Test {num:02d} · Answer Key", "Answer key", 1),
           Paragraph(f"Mock Test {num:02d} — Answer Key", S["h2"])]
-    rows = [["Q", "Type", "Marks", "Key", "Q", "Type", "Marks", "Key"]]
+    rows = [["Q", "Type", "M", "Key", "Q", "Type", "M", "Key"]]
     half = (len(qs) + 1) // 2
     for i in range(half):
         r = []
@@ -204,7 +204,7 @@ def answer_key(num, qs):
             else:
                 r += ["", "", "", ""]
         rows.append(r)
-    fl += [tbl(rows, [1.0, 1.3, 1.3, 4.4, 1.0, 1.3, 1.3, 4.4], zebra=True), Spacer(1, 8)]
+    fl += [tbl(rows, [0.9, 1.3, 1.4, 4.4, 0.9, 1.3, 1.4, 4.4], zebra=True), Spacer(1, 8)]
     # self-evaluation sheet
     fl.append(Paragraph("Self-evaluation (fill after checking)", S["h3"]))
     rows = [["Topic area", "Attempted", "Correct", "Wrong (MCQ)", "Marks scored", "Max"]]
@@ -262,7 +262,7 @@ def main():
     frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="f")
     cover_frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, A4[1] - 11 * cm - doc.bottomMargin, id="c")
     doc.addPageTemplates([PageTemplate("cover", [cover_frame], onPage=on_cover),
-                          PageTemplate("normal", [frame], onPage=on_page)])
+                          PageTemplate("normal", [frame], onPageEnd=on_page)])
 
     all_sets = []
     set_stories = []

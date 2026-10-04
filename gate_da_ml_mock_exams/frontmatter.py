@@ -512,17 +512,28 @@ def revision_story(SetHeader):
     return o
 
 
+def _short_key(q):
+    from core import LETTERS, fmt
+    if q.qtype == "MCQ":
+        return LETTERS[q.answer]
+    if q.qtype == "MSQ":
+        return ",".join(LETTERS[a] for a in q.answer)
+    lo, hi = q.answer
+    return fmt((lo + hi) / 2, 3)
+
+
 # ----------------------------------------------------------------------------
 # Master answer key
 # ----------------------------------------------------------------------------
 def master_key_story(all_sets, SetHeader, tbl):
     out = [SetHeader("Master answer key", "Master answer key", 0, key="master"),
            P("Master Answer Key: all tests", "h1"),
-           P("NAT answers are shown as accepted ranges. For MSQ, every listed option must be chosen.", "small"),
+           P("MCQ/MSQ show option letters (for MSQ, every listed option must be chosen). NAT shows the exact value; "
+             "the accepted range is given in each test's own answer key.", "small"),
            Spacer(1, 4)]
     for si, qs in enumerate(all_sets, 1):
         rows = [["Q"] + [str(i) for i in range(1, 13)]]
-        cells = [answer_text(q).replace(" to ", "–<br/>") for q in qs]
+        cells = [_short_key(q) for q in qs]
         for start in range(0, len(qs), 12):
             chunk = cells[start:start + 12]
             idx = [str(i + 1) for i in range(start, start + len(chunk))]
