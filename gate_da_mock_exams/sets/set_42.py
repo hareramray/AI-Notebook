@@ -610,8 +610,8 @@ while True:
         break
 print(slow.v)''',
             "run_code": False,
-            "diagrams": [{"type": "linkedlist", "values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "head": "head",
-                          "caption": "Node 10's next pointer goes back to node 4 (not drawn)"}],
+            "diagrams": [{"type": "linkedlist", "values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "head": "head", "loop_to": 3,
+                          "caption": "Node 10's next pointer goes back to node 4"}],
             "answer": "8",
             "solution": (
                 "**Concept:** let μ = number of nodes before the cycle and λ = cycle length. After k steps "

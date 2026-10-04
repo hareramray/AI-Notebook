@@ -99,18 +99,18 @@ def md(s):
     """Tiny markup: `code`, **bold**, x^{2}, a_{i}, single newline = line break."""
     if s is None:
         return ""
-    parts = _code_re.split(str(s))
-    out = []
-    for k, p in enumerate(parts):
-        if k % 2 == 1:
-            out.append('<font face="DejaVuSansMono" color="#7c2d12">%s</font>' % esc(p).replace(" ", "&nbsp;"))
-        else:
-            p = esc(p)
-            p = _bold_re.sub(r"<b>\1</b>", p)
-            p = _it_re.sub(r"<i>\1</i>", p)
-            p = _sup_re.sub(r"<super>\1</super>", p)
-            p = _sub_re.sub(r"<sub>\1</sub>", p)
-            out.append(p)
+    codes = []
+
+    def keep(m):
+        codes.append('<font face="DejaVuSansMono" color="#7c2d12">%s</font>' % esc(m.group(1)).replace(" ", "&nbsp;"))
+        return "\x00%d\x00" % (len(codes) - 1)
+    p = esc(_code_re.sub(keep, str(s)))
+    p = _bold_re.sub(r"<b>\1</b>", p)
+    p = _it_re.sub(r"<i>\1</i>", p)
+    p = _sup_re.sub(r"<super>\1</super>", p)
+    p = _sub_re.sub(r"<sub>\1</sub>", p)
+    p = re.sub("\x00(\\d+)\x00", lambda m: codes[int(m.group(1))], p)
+    out = [p]
     return "".join(out).replace("\n", "<br/>")
 
 

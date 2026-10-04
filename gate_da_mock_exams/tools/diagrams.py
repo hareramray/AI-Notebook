@@ -11,6 +11,7 @@ Every diagram is a plain dict with a "type" key. Supported types:
   array      {"type":"array", "values":[...], "start":0, "show_index":True,
               optional "highlight":[idx], "pointers":{"name":idx}, "label":"A"}
   linkedlist {"type":"linkedlist", "values":[...], "doubly":False, "circular":False,
+              optional "loop_to": idx  (last node points back to node at index idx — a cycle),
               optional "head":"head", "tail":None}
   hashtable  {"type":"hashtable", "size":m, "slots":{idx: value | [chain values]}}
   stack      {"type":"stack", "values":[bottom ... top], "label":"S"}
@@ -336,7 +337,8 @@ def draw_array(spec):
 def draw_linkedlist(spec):
     vals = spec["values"]
     doubly = spec.get("doubly", False)
-    circular = spec.get("circular", False)
+    loop_to = spec.get("loop_to")
+    circular = spec.get("circular", False) or loop_to is not None
     head = spec.get("head", "head")
     tail = spec.get("tail")
     dw = _cellw(vals, 10, 28)
@@ -373,8 +375,10 @@ def draw_linkedlist(spec):
         if circular:
             sx = lastx - pw / 2
             d.add(Line(sx, y0, sx, y0 - 14, strokeColor=EDGE))
-            d.add(Line(sx, y0 - 14, xs[0] + 8, y0 - 14, strokeColor=EDGE))
-            _arrow(d, xs[0] + 8, y0 - 14, xs[0] + 8, y0, EDGE, 1, 5)
+            d.add(Line(sx, y0 - 14, xs[loop_to if loop_to is not None else 0] + 8, y0 - 14, strokeColor=EDGE))
+            tgt = xs[loop_to if loop_to is not None else 0] + 8
+            d.add(Line(tgt, y0 - 14, tgt, y0 - 14, strokeColor=EDGE))
+            _arrow(d, tgt, y0 - 14, tgt, y0, EDGE, 1, 5)
         else:
             _center_string(d, lastx + 14, y0 + bh / 2, "∅", 11, FONT_B)
         if tail:
