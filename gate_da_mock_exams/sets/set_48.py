@@ -157,8 +157,8 @@ print(back)''',
         # ------------------------------------------------------------ Q5
         {
             "type": "MCQ", "marks": 1, "topic": "Linked lists — split, reverse and interleave",
-            "text": ("`reorder` is applied to the list 1 → 2 → … → 7 (shown). What does `show` print "
-                     "for the result?"),
+            "text": ("`reorder` is applied to the list 1 → 2 → … → 7 (shown). Reading the returned list "
+                     "from its head, the sequence of values is:"),
             "code": '''def reorder(h):
     slow, fast = h, h.nxt
     while fast and fast.nxt:

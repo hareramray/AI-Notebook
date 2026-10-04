@@ -703,23 +703,22 @@ assert len(orders) == int(ANSWER)
             "options": ["4, 2, 1, 3", "3, 1, 2, 4", "4, 1, 3, 2", "1, 4, 2, 3"],
             "answer": "C",
             "solution": (
-                "Since 4 arrives last, a sequence starting with 4 needs **all of 1, 2, 3 inside the deque** in "
-                "exactly the order they will be output (front to rear), and that arrangement must be buildable by "
-                "adding 1, then 2, then 3 at either end. Adding at the ends means 1, 2, 3 form a sequence in which "
-                "each new value is at an end, i.e. the deque reads as something like 3 2 1, 2 1 3, 1 2 3, 3 1 2 "
-                "— the value 1 is always 'inside' a run that grows outward.\n\n"
+                "Key invariant: every arriving value is **larger** than everything already in the deque and is "
+                "placed at an end. Hence the deque contents are always **valley-shaped** — reading front to rear, "
+                "the values decrease to a minimum and then increase (removing from the front keeps this shape). "
+                "A sequence starting with 4 needs 1, 2, 3 to be inside the deque, front to rear, in exactly their "
+                "output order before 4 is added.\n\n"
                 "- (A) 4, 2, 1, 3: insert 1; 2 at front → [2, 1]; 3 at rear → [2, 1, 3]; 4 at front → output "
                 "4, 2, 1, 3. **Possible.**\n"
                 "- (B) 3, 1, 2, 4: [1], 2 at rear → [1, 2], 3 at front → [3, 1, 2]; output 3, 1, 2; then 4. "
                 "**Possible.**\n"
-                "- (C) 4, 1, 3, 2: the deque must read 1, 3, 2 (front to rear) before 4 is added. But 2 arrived "
-                "*before* 3, and it would have to be adjacent to 1 at insertion time — in 1, 3, 2 it is not "
-                "(3 sits between them, yet 3 could only have been added at an end). **Impossible.**\n"
+                "- (C) 4, 1, 3, 2: the deque would have to read 1, 3, 2 (front to rear) — up then down, a "
+                "**peak**, not a valley. It can never be built. **Impossible.**\n"
                 "- (D) 1, 4, 2, 3: insert 1, output 1; [2], 3 at rear → [2, 3], 4 at front → 4, 2, 3. "
                 "**Possible.**\n\n"
                 "(The only impossible output sequences of length 4 are 4, 1, 3, 2 and 4, 2, 3, 1.)\n\n"
-                "**Tip:** for a deque fed in order, the contents always form a 'unimodal' arrangement: decreasing "
-                "towards the most recent insertions at each end."
+                "**Tip:** the valley invariant immediately rules out any sequence 4, a, b, c with a < b > c, "
+                "which is why 4, 2, 3, 1 is the other impossible sequence."
             ),
             "verify": '''
 from functools import lru_cache

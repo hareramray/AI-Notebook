@@ -467,8 +467,8 @@ print(next(g), list(g))''',
                 "- (B) **True** — C was relaxed from B while d[B] was still 2, and the improvement of B never "
                 "propagated: d[C] = 5 vs 4.\n"
                 "- (C) **False** — both C (5 vs 4) and D (7 vs 6) are wrong.\n"
-                "- (D) **False** — the only cycle-free structure here has no cycles at all, so there is no "
-                "negative cycle; Bellman–Ford returns the true distances.\n\n"
+                "- (D) **False** — the graph has no directed cycle at all, so there is no negative cycle; "
+                "Bellman–Ford simply returns the true distances.\n\n"
                 "**Trap:** believing Dijkstra fails only at the endpoint of the negative edge — the damage is "
                 "in everything *downstream* of it."
             ),
@@ -706,8 +706,8 @@ print(a * 100 + b)''',
                 "Printed: 11 × 100 + 16 = **1116**.\n\n"
                 "Without memoisation f(10) alone would make 177 calls (2·F(11) − 1 with F(11) = 89); memoisation "
                 "reduces this to linear.\n\n"
-                "**Trap:** expecting the memo to reset between calls (b = 16 + … would become 16 on its own, "
-                "giving 1127), or counting cache hits as calls."
+                "**Trap:** expecting the memo to reset between calls (then f(15) would add 16 more misses, "
+                "b = 27, printing 1127), or counting cache hits as calls."
             ),
             "verify": '''
 assert OUTPUT.strip() == ANSWER
