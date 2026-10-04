@@ -717,7 +717,6 @@ def bv_curve_points(rng):
     names = ["P", "Q", "R"]
     perm = rng.permutation(3)
     assign = dict(zip(["under", "best", "over"], [names[i] for i in perm]))
-    swap_labels = rng.random() < 0.5
     v_ = int(rng.integers(3))
     want = ["over", "under", "best"][v_]
     ask = ["overfitting (low bias, high variance)", "underfitting (high bias, low variance)",
@@ -729,14 +728,14 @@ def bv_curve_points(rng):
         ax.plot(c, test, color=C2, lw=1.5, ls="--", label="test error")
         for k, xv in pos.items():
             ax.axvline(xv, color=C4, lw=0.8, ls=":")
-            ax.text(xv, test.max() * 1.02, assign[k], ha="center", fontsize=8,
+            ax.text(xv, test.max() * 1.03, assign[k], ha="center", fontsize=8,
                     fontweight="bold")
         ax.set_xlabel("model complexity (flexibility)")
         ax.set_ylabel("error")
         ax.set_yticks([])
         ax.set_xticks([])
-        ax.legend(loc="upper center" if swap_labels else "upper right", frameon=False)
-        ax.set_ylim(0, test.max() * 1.12)
+        ax.legend(loc="upper center", ncol=2, frameon=False)
+        ax.set_ylim(0, test.max() * 1.32)
 
     correct = assign[want]
     opts, a = mcq(rng, correct, [x for x in names if x != correct] + ["None of P, Q, R"])
@@ -1024,10 +1023,9 @@ def poly_feature_count(rng):
     tot = comb(p + d, d)
     if v == 0:
         ans = tot
-        q = (f"A full polynomial regression of degree {d} in {p} input variables includes every monomial "
-             f"x<sub>1</sub><super>a<sub>1</sub></super>⋯x<sub>{p}</sub><super>a<sub>{p}</sub></super> with total degree "
-             f"a<sub>1</sub> + ⋯ + a<sub>{p}</sub> ≤ {d} (including the constant term). The number of regression "
-             "coefficients is")
+        q = (f"A full polynomial regression of degree {d} in {p} input variables x<sub>1</sub>, …, x<sub>{p}</sub> "
+             f"includes every monomial in these variables of total degree at most {d} (including the constant term "
+             f"and all interaction terms). The number of regression coefficients is")
         sol = [f"Number of monomials of degree ≤ d in p variables = C(p + d, d) = C({p + d}, {d}) = <b>{ans}</b>."]
     elif v == 1:
         ans = tot - 1
@@ -1503,7 +1501,7 @@ def ridge_closed_form(rng):
     if v == 2:
         sol.append(f"ŷ = {fmt(xn[0])}×{fmt(beta[0], 4)} + {fmt(xn[1])}×{fmt(beta[1], 4)} = {fmt(ans, 4)}.")
     if v == 3:
-        sol.append(f"‖β̂‖² = {fmt(beta[0], 4)}² + {fmt(beta[1], 4)}² = {fmt(ans, 4)}.")
+        sol.append(f"‖β̂‖² = ({fmt(beta[0], 4)})² + ({fmt(beta[1], 4)})² = {fmt(ans, 4)}.")
     sol.append(f"Answer: <b>{fmt(ans, 3)}</b>.")
     return Q(text=f"Ridge regression without intercept minimises ‖y − Xβ‖²<sub>2</sub> + λ‖β‖²<sub>2</sub> with "
                   f"λ = {fmt(lam)}, for the data below (β = (β<sub>1</sub>, β<sub>2</sub>)ᵀ). The value of {q} is "
@@ -1532,7 +1530,7 @@ def ridge_lasso_orthonormal(rng):
         q = "the number of non-zero coefficients in the lasso solution is"
     elif v == 1:
         ans = lasso.sum()
-        q = "the sum β̂<sub>1</sub> + ⋯ + β̂<sub>5</sub> of the lasso coefficients is"
+        q = "the sum β̂<sub>1</sub> + … + β̂<sub>5</sub> of the lasso coefficients is"
     elif v == 2:
         ans = np.linalg.norm(ridge)
         q = "the Euclidean norm ‖β̂<sub>ridge</sub>‖<sub>2</sub> is"
@@ -1639,7 +1637,7 @@ def coefficient_path(rng):
         ax.set_ylabel("coefficient estimate")
         ax.set_xticks(np.arange(0, Lmax + 0.01, 0.5 if Lmax <= 5 else 1))
         ax.grid(alpha=.3)
-        ax.legend(frameon=False, fontsize=7, ncol=4, loc="upper right")
+        ax.legend(frameon=False, fontsize=7, loc="upper left", bbox_to_anchor=(1.0, 1.0))
 
     return Q(text="For a design with orthonormal columns (XᵀX = I), the figure shows the coefficient paths "
                   "β̂<sub>j</sub>(λ) of a penalised least-squares estimator that minimises ½‖y − Xβ‖² + P<sub>λ</sub>(β), "
@@ -1689,7 +1687,7 @@ def bv_decomposition_numbers(rng):
     shift = float(rng.choice([-1, 1]) * rng.integers(3, 16) / 10)
     while True:
         preds = np.round(f0 + shift + rng.normal(0, rng.uniform(0.4, 1.2), M), 1)
-        if np.ptp(preds) > 0.5:
+        if np.ptp(preds) > 0.5 and abs(preds.mean() - f0) >= 0.3:
             break
     s2 = float(rng.choice([0.25, 0.5, 1.0, 1.5, 2.0]))
     mbar = preds.mean()
@@ -2017,7 +2015,11 @@ def gd_two_steps(rng):
         eta = float(rng.choice([0.01, 0.02, 0.05, 0.1]))
         if eta * np.linalg.eigvalsh(Hm).max() < 1.6 and np.ptp(y) > 1:
             break
-    w = np.array([float(rng.integers(-1, 2)), float(rng.integers(-1, 2))])
+    while True:
+        w = np.array([float(rng.integers(-1, 2)), float(rng.integers(-1, 2))])
+        g1 = c * X.T @ (X @ w - y)
+        if np.all(np.abs(g1) > 0.4):
+            break
     hist = [w.copy()]
     grads = []
     for _ in range(2):
@@ -2326,3 +2328,40 @@ def feature_rescaling(rng):
                   f"{'+' if b >= 0 else '−'} {fmt(abs(b))}x. {q} _______ {nat_hint(d)}",
              qtype="NAT", marks=2, answer=nat_range(ans, d, max(10 ** (-d), 0.002 * abs(ans))), nat_hint=nat_hint(d),
              solution=sol)
+
+
+@template(TOPIC, S_CV, marks=2, qtype="MCQ")
+def one_standard_error_rule(rng):
+    while True:
+        lams = [0.01, 0.1, 0.3, 1, 3, 10]
+        K = len(lams)
+        imin = int(rng.integers(1, 4))
+        cv = np.empty(K)
+        cv[imin] = round(float(rng.uniform(3, 6)), 2)
+        for i in range(imin - 1, -1, -1):
+            cv[i] = round(cv[i + 1] + float(rng.uniform(0.05, 0.5)), 2)
+        for i in range(imin + 1, K):
+            cv[i] = round(cv[i - 1] + float(rng.uniform(0.05, 0.6)) * (1 + 0.6 * (i - imin)), 2)
+        se = np.round(rng.uniform(0.15, 0.5, K), 2)
+        thr = cv[imin] + se[imin]
+        within = [i for i in range(K) if cv[i] <= thr]
+        pick = max(within)  # largest λ = simplest model
+        if pick != imin and all(abs(cv[i] - thr) > 0.03 for i in range(K)):
+            break
+    rule = rng.random() < 0.75
+    ans_i = pick if rule else imin
+    labels = [f"λ = {fmt(l)}" for l in lams]
+    opts, a = mcq(rng, labels[ans_i], [labels[i] for i in range(K) if i != ans_i])
+    rows = [["λ"] + [fmt(l) for l in lams], ["CV MSE"] + [fmt(c) for c in cv], ["SE"] + [fmt(s) for s in se]]
+    q = ("the <b>one-standard-error rule</b> (choose the most regularised model whose CV error is within one standard "
+         "error of the minimum CV error)" if rule else "the rule <b>minimum CV error</b>")
+    sol = [f"Minimum CV MSE = {fmt(cv[imin])} at λ = {fmt(lams[imin])}, with SE = {fmt(se[imin])}.",
+           f"One-SE threshold = {fmt(cv[imin])} + {fmt(se[imin])} = {fmt(thr)}.",
+           "Models within the threshold: " + ", ".join(f"λ = {fmt(lams[i])} ({fmt(cv[i])})" for i in within) + ".",
+           f"The one-SE rule picks the largest such λ (simplest model): λ = {fmt(lams[pick])}; the minimum-CV rule "
+           f"picks λ = {fmt(lams[imin])}.",
+           f"Answer: <b>{labels[ans_i]}</b>."]
+    return Q(text="Ridge regression is tuned by 10-fold cross-validation. For each λ the table gives the mean CV MSE "
+                  "and its standard error (SE) across folds. (Larger λ means a simpler, more regularised model.) "
+                  f"Using {q}, the selected value is",
+             qtype="MCQ", marks=2, options=opts, answer=a, blocks=[Table(rows, header=False)], solution=sol)

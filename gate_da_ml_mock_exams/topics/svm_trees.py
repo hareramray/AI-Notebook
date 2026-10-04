@@ -136,7 +136,8 @@ def _draw_tree(ax, root, fs=7.0, leaf_fc="#e6e6e6"):
                         arrowprops=dict(arrowstyle="-|>", color="#333333", lw=0.8, shrinkA=7, shrinkB=9),
                         zorder=1)
             if lab:
-                ax.text(x + 0.6 * (cx - x), y + 0.6 * (cy - y), lab, fontsize=fs - 0.6, ha="center", va="center",
+                fr = 0.5 if len(n["children"]) <= 2 else 0.74
+                ax.text(x + fr * (cx - x), y + fr * (cy - y), lab, fontsize=fs - 0.6, ha="center", va="center",
                         color="#111111", zorder=4,
                         bbox=dict(boxstyle="round,pad=0.12", fc="white", ec="none"))
             rec(c)
@@ -1373,9 +1374,14 @@ def _rand_tree_mixed(rng):
     if shape == 0:
         # numeric root -> (numeric -> 2 leaves) | (categorical -> 3 leaves)
         def classify(r):
-            if r[nums[0][0]] <= thr[0]:
-                return labels[0] if r[nums[1][0]] <= thr[1] else labels[1]
-            return labels[2 + vals.index(r[cat])]
+            n0, n1 = nums[0][0], nums[1][0]
+            if r[n0] <= thr[0]:
+                st = [f"{n0} = {r[n0]} ≤ {thr[0]} → Yes."]
+                ok = r[n1] <= thr[1]
+                st.append(f"{n1} = {r[n1]} {'≤' if ok else '&gt;'} {thr[1]} → {'Yes' if ok else 'No'}.")
+                return (labels[0] if ok else labels[1]), st
+            st = [f"{n0} = {r[n0]} &gt; {thr[0]} → No.", f"{cat} = {r[cat]} → branch {r[cat]}."]
+            return labels[2 + vals.index(r[cat])], st
         root = _node(f"{nums[0][0]} ≤ {thr[0]}?", [
             ("Yes", _node(f"{nums[1][0]} ≤ {thr[1]}?", [("Yes", _node(labels[0])), ("No", _node(labels[1]))])),
             ("No", _node(cat, [(vals[0], _node(labels[2])), (vals[1], _node(labels[3])), (vals[2], _node(labels[4]))]))])
@@ -1383,11 +1389,15 @@ def _rand_tree_mixed(rng):
         # categorical root -> leaf | numeric(2 leaves) | numeric(2 leaves)
         def classify(r):
             k = vals.index(r[cat])
+            st = [f"{cat} = {r[cat]} → branch {r[cat]}."]
             if k == 0:
-                return labels[0]
+                return labels[0], st
+            nm, t = (nums[0][0], thr[0]) if k == 1 else (nums[1][0], thr[1])
+            ok = r[nm] <= t
+            st.append(f"{nm} = {r[nm]} {'≤' if ok else '&gt;'} {t} → {'Yes' if ok else 'No'}.")
             if k == 1:
-                return labels[1] if r[nums[0][0]] <= thr[0] else labels[2]
-            return labels[3] if r[nums[1][0]] <= thr[1] else labels[4]
+                return (labels[1] if ok else labels[2]), st
+            return (labels[3] if ok else labels[4]), st
         root = _node(cat, [(vals[0], _node(labels[0])),
                            (vals[1], _node(f"{nums[0][0]} ≤ {thr[0]}?", [("Yes", _node(labels[1])),
                                                                          ("No", _node(labels[2]))])),
@@ -1405,7 +1415,7 @@ def tree_traverse(rng):
         if rng.random() < 0.35:
             rec[nm] = t + int(rng.choice([0, 1, -1]))
     rec[cat] = _pick(rng, vals)
-    pred = classify(rec)
+    pred, path = classify(rec)
     opts, a = mcq(rng, pred, [c for c in dom["classes"] if c != pred])
     head = [nm for (nm, *_r) in nums] + [cat]
     tbl = Table([head, [str(rec[h]) for h in head]], header=True)
@@ -1414,14 +1424,6 @@ def tree_traverse(rng):
         ax = fig.add_subplot(111)
         _draw_tree(ax, root)
 
-    path = []
-    if root["text"] == cat:
-        path.append(f"Root tests {cat} = {rec[cat]}.")
-    else:
-        path.append(f"Root: {nums[0][0]} = {rec[nums[0][0]]} ≤ {thr[0]}? "
-                    f"{'Yes' if rec[nums[0][0]] <= thr[0] else 'No'}.")
-    for (nm, *_r), t in zip(nums[:2], thr[:2]):
-        path.append(f"{nm} = {rec[nm]} vs threshold {t}: {'≤' if rec[nm] <= t else '&gt;'}.")
     return Q(text=f"The decision tree below predicts the {dom['noun']}. Edges labelled Yes/No answer the test in the "
                   f"node. What is the prediction for the record shown in the table?",
              qtype="MCQ", marks=1, options=opts, answer=a, blocks=[Figure(draw, 10, 6.2), tbl],
@@ -1789,7 +1791,7 @@ def tree_continuous_threshold(rng):
             ax.annotate(str(int(xi)), (xi, 0), textcoords="offset points", xytext=(0, -13 if k_ % 2 == 0 else 7),
                         ha="center", fontsize=6.5)
         ax.set_yticks([])
-        ax.set_ylim(-1, 1)
+        ax.set_ylim(-0.55, 0.75)
         ax.spines["left"].set_visible(False)
         ax.spines["bottom"].set_visible(False)
         ax.set_xticks([])
@@ -1799,7 +1801,7 @@ def tree_continuous_threshold(rng):
     return Q(text=f"The continuous attribute {nm} and the class label of {n} training records are given below "
                   f"(unsorted). A binary split “{nm} ≤ t” is chosen to maximise information gain, with t restricted "
                   f"to midpoints between consecutive sorted values. Find {ask}. {nat_hint(d)}",
-             qtype="NAT", marks=2, answer=ansr, nat_hint=nat_hint(d), blocks=[tbl, Figure(draw, 10, 3.0)],
+             qtype="NAT", marks=2, answer=ansr, nat_hint=nat_hint(d), blocks=[tbl, Figure(draw, 10, 2.6)],
              solution=["Sort the values: " + ", ".join(f"{int(a)}({'Y' if b_ else 'N'})" for a, b_ in zip(x, lab)) + ".",
                        f"Parent [{par[0]} Yes, {par[1]} No], H = {fmt(_H(par), 4)}. The optimal threshold always lies "
                        f"where the class changes between neighbours (Fayyad–Irani), giving {len(cands)} candidates:",
@@ -2081,20 +2083,20 @@ def tree_criteria_compare(rng):
 def adaboost_alpha(rng):
     v = int(rng.integers(3))
     if v == 0:
-        eps = _pick(rng, [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.12, 0.18, 0.22])
+        eps = int(rng.integers(5, 46)) / 100
         ans = 0.5 * math.log((1 - eps) / eps)
         text = (f"In AdaBoost, a weak learner has weighted training error ε = {fmt(eps)}. Its vote weight "
                 f"α = ½ ln((1 − ε)/ε) is ______")
         sol = [f"α = ½ ln({fmt(1 - eps)}/{fmt(eps)}) = ½ ln({fmt((1 - eps) / eps, 4)}) = <b>{fmt(ans, 2)}</b>."]
     elif v == 1:
-        al = _pick(rng, [0.2, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2])
+        al = int(rng.integers(2, 16)) / 10
         ans = 1 / (1 + math.exp(2 * al))
         text = (f"In AdaBoost (α<sub>t</sub> = ½ ln((1 − ε<sub>t</sub>)/ε<sub>t</sub>)), a weak learner received "
                 f"weight α<sub>t</sub> = {fmt(al)}. Its weighted error ε<sub>t</sub> was ______")
         sol = [f"(1 − ε)/ε = e<super>2α</super> = e<super>{fmt(2 * al)}</super> = {fmt(math.exp(2 * al), 4)} ⇒ "
                f"ε = 1/(1 + e<super>2α</super>) = <b>{fmt(ans, 2)}</b>."]
     else:
-        eps = _pick(rng, [0.1, 0.2, 0.25, 0.3, 0.4, 0.125])
+        eps = _pick(rng, [0.1, 0.2, 0.25, 0.3, 0.4, 0.125, 0.15, 0.35, 0.05, 0.45])
         ans = math.sqrt((1 - eps) / eps)
         text = (f"In AdaBoost with ε<sub>t</sub> = {fmt(eps, 3)}, before normalisation each misclassified example's "
                 f"weight is multiplied by e<super>α<sub>t</sub></super>, where α<sub>t</sub> = ½ ln((1 − ε<sub>t</sub>)/"
@@ -2182,7 +2184,7 @@ def adaboost_reweight(rng):
 def bagging_oob(rng):
     v = int(rng.integers(4))
     if v == 0:
-        n = int(_pick(rng, [3, 4, 5, 6, 8, 10]))
+        n = int(rng.integers(3, 21))
         ans = (1 - 1 / n) ** n
         text = (f"A bootstrap sample of size n = {n} is drawn with replacement from a training set of {n} distinct "
                 f"points. The probability that a particular point is NOT in the sample (i.e. is out-of-bag) is ______")
@@ -2190,7 +2192,7 @@ def bagging_oob(rng):
                f"(1 − 1/{n})<super>{n}</super> = <b>{fmt(ans, 3)}</b> (→ 1/e ≈ 0.368 as n → ∞)."]
         d = 3
     elif v == 1:
-        n = int(_pick(rng, [4, 5, 6, 10]))
+        n = int(rng.integers(3, 13))
         ans = n * (1 - (1 - 1 / n) ** n)
         text = (f"A bootstrap sample of size {n} is drawn with replacement from {n} distinct training points. The "
                 f"expected number of distinct points appearing in the sample is ______")
@@ -2206,7 +2208,7 @@ def bagging_oob(rng):
         sol = [f"m = ⌊√{p}⌋ = {m}. P(feature selected) = m/p = {m}/{p} = <b>{fmt(ans, 3)}</b>."]
         d = 3
     else:
-        N = int(_pick(rng, [500, 1000, 2000, 5000, 10000]))
+        N = int(rng.integers(5, 101)) * 100
         ans = N * math.exp(-1)
         text = (f"A bagged ensemble is trained on N = {N} points. Using the large-N approximation, the expected "
                 f"number of training points that are out-of-bag for a single bootstrap sample of size N is ______")

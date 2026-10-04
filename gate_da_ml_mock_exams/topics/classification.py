@@ -380,28 +380,28 @@ def lr_boundary_threshold(rng):
             x1v = float(rng.integers(-2, 3))
             ans = (L - w0 - w1 * x1v) / w2
             ask = f"the value of x<sub>2</sub> on the decision boundary at x<sub>1</sub> = {fmt(x1v)}"
-            last = (f"x<sub>2</sub> = (ℓ − w<sub>0</sub> − w<sub>1</sub>x<sub>1</sub>)/w<sub>2</sub> = "
+            last = (f"x<sub>2</sub> = (c − w<sub>0</sub> − w<sub>1</sub>x<sub>1</sub>)/w<sub>2</sub> = "
                     f"({fmt(L, 4)} − ({fmt(w0)}) − ({fmt(w1)})({fmt(x1v)}))/({fmt(w2)})")
         elif var == 1:
             ans = (L - w0) / w1
             ask = "the x<sub>1</sub>-intercept of the decision boundary (the value of x<sub>1</sub> where it meets x<sub>2</sub> = 0)"
-            last = f"x<sub>1</sub> = (ℓ − w<sub>0</sub>)/w<sub>1</sub> = ({fmt(L, 4)} − ({fmt(w0)}))/({fmt(w1)})"
+            last = f"x<sub>1</sub> = (c − w<sub>0</sub>)/w<sub>1</sub> = ({fmt(L, 4)} − ({fmt(w0)}))/({fmt(w1)})"
         else:
             ans = abs(L - w0) / math.hypot(w1, w2)
             ask = "the perpendicular distance of the decision boundary from the origin"
-            last = (f"distance = |w<sub>0</sub> − ℓ|/‖(w<sub>1</sub>, w<sub>2</sub>)‖ = |{fmt(w0)} − {fmt(L, 4)}|/"
+            last = (f"distance = |w<sub>0</sub> − c|/‖(w<sub>1</sub>, w<sub>2</sub>)‖ = |{fmt(w0)} − {fmt(L, 4)}|/"
                     f"√({fmt(w1 * w1 + w2 * w2)})")
         if abs(ans) <= 8 and (var != 2 or ans > 0.05):
             break
     text = (f"A logistic regression classifier has P(y = 1 | <b>x</b>) = σ({fmt(w0)} + ({fmt(w1)})x<sub>1</sub> + "
             f"({fmt(w2)})x<sub>2</sub>). An input is labelled y = 1 if and only if P(y = 1 | <b>x</b>) ≥ {fmt(p0)}. "
             f"For this rule, {ask} is ______")
-    sol = [f"P(y=1|x) ≥ {fmt(p0)} ⇔ z ≥ ℓ, where ℓ = ln({fmt(p0)}/{fmt(1 - p0)}) = {fmt(L, 4)}.",
+    sol = [f"P(y=1|x) ≥ {fmt(p0)} ⇔ z ≥ c, where c = ln({fmt(p0)}/{fmt(1 - p0)}) = {fmt(L, 4)}.",
            f"Decision boundary: {fmt(w0)} + ({fmt(w1)})x<sub>1</sub> + ({fmt(w2)})x<sub>2</sub> = {fmt(L, 4)} "
            "(a straight line; changing the threshold only shifts it parallel to the 0.5 boundary).",
            last + f" = <b>{fmt(ans, 2)}</b>."]
     if p0 == 0.5:
-        sol.insert(1, "Here ℓ = 0 because the threshold is 0.5.")
+        sol.insert(1, "Here c = 0 because the threshold is 0.5.")
     return Q(text=text, qtype="NAT", marks=2, answer=nat_range(ans, 2), nat_hint=nat_hint(2), solution=sol)
 
 
@@ -437,11 +437,11 @@ def lr_cross_entropy(rng):
     ans = total / n if mean_mode else total
     what = "the <b>average</b> binary cross-entropy loss" if mean_mode else "the <b>total</b> (summed) binary cross-entropy loss"
     text = (intro + f" Using natural logarithms, {what} −[y ln p̂ + (1 − y) ln(1 − p̂)] over these examples is ______")
-    sol = extra + ["Per-example loss ℓ<sub>i</sub> = −ln p̂<sub>i</sub> if y<sub>i</sub> = 1 and −ln(1 − p̂<sub>i</sub>) if "
+    sol = extra + ["Per-example loss L<sub>i</sub> = −ln p̂<sub>i</sub> if y<sub>i</sub> = 1 and −ln(1 − p̂<sub>i</sub>) if "
                    "y<sub>i</sub> = 0:",
-                   Table([["i", "y", "p̂", "ℓ<sub>i</sub>"]] +
+                   Table([["i", "y", "p̂", "L<sub>i</sub>"]] +
                          [[str(i + 1), str(y[i]), fmt(p[i], 4), fmt(loss_i[i], 4)] for i in range(n)])]
-    sol.append(f"Σℓ<sub>i</sub> = {fmt(total, 4)}" + (f"; average = {fmt(total, 4)}/{n} = <b>{fmt(ans, 2)}</b>."
+    sol.append(f"ΣL<sub>i</sub> = {fmt(total, 4)}" + (f"; average = {fmt(total, 4)}/{n} = <b>{fmt(ans, 2)}</b>."
                                                        if mean_mode else f" = <b>{fmt(ans, 2)}</b>."))
     sol.append("Common mistakes: using ln p̂ for y = 0 examples, or log<sub>10</sub> instead of ln.")
     return Q(text=text, qtype="NAT", marks=2, answer=nat_range(ans, 2), nat_hint=nat_hint(2),
@@ -552,7 +552,7 @@ def _knn1d_fig(xs, ys, q):
         for a, b in zip(xs, ys):
             ax.annotate(fmt(b), (a, b), xytext=(3, 4), textcoords="offset points", fontsize=6.5)
         ax.axvline(q, ls="--", color=MID, lw=1)
-        ax.text(q, ax.get_ylim()[1], f" query x = {fmt(q)}", fontsize=7, va="top", color=MID)
+        ax.text(q, ax.get_ylim()[0], f" query x = {fmt(q)}", fontsize=7, va="bottom", color=MID)
         ax.set_xticks(range(0, 21, 2))
         ax.set_xlabel("x")
         ax.set_ylabel("y")
@@ -619,7 +619,7 @@ def knn_weighted(rng):
                 ax.annotate(f"P{i + 1} (y={fmt(yc[i])})", (a, b), xytext=(3, 4), textcoords="offset points",
                             fontsize=6.5)
             ax.scatter([qc[0]], [qc[1]], marker="*", s=110, color=MID, zorder=4)
-            ax.annotate("query", (qc[0], qc[1]), xytext=(4, -9), textcoords="offset points", fontsize=7)
+            ax.annotate("query", (qc[0], qc[1]), xytext=(5, -10), textcoords="offset points", fontsize=7, color=MID)
             ax.set_xlim(-0.5, 8.5)
             ax.set_ylim(-0.5, 8.5)
             ax.set_xticks(range(0, 9))
@@ -697,7 +697,7 @@ def knn_classify_figure(rng):
     rows = [["#"] + [str(i + 1) for i in range(n)], ["x<sub>1</sub>"] + [fmt(v) for v in X[:, 0]],
             ["x<sub>2</sub>"] + [fmt(v) for v in X[:, 1]], ["class"] + [cname[v] for v in lab]]
     text = (f"The figure and table show 12 labelled training points (class A: filled circles, class B: open "
-            f"triangles) and a query point ★ at ({fmt(q[0])}, {fmt(q[1])}). A k-NN classifier with "
+            f"triangles) and a query point (star) at ({fmt(q[0])}, {fmt(q[1])}). A k-NN classifier with "
             f"<b>{METRIC_NAME[metric]}</b> distance and majority vote is used. Which of the following statements "
             f"is/are CORRECT?")
     sol = ["Distances from the query, sorted:",
@@ -752,9 +752,27 @@ def knn_metric_compare(rng):
            f" ⇒ <b>{cn[res['E'][2]]}</b>.",
            "Manhattan 3 nearest: " + ", ".join(f"P{i + 1}({cn[lab[i]]})" for i in res["M"][1][:3]) +
            f" ⇒ <b>{cn[res['M'][2]]}</b>.",
-           f"Answer: <b>{corr}</b>. The two metrics rank points differently because L<sub>1</sub> penalises diagonal "
-           "offsets more than L<sub>2</sub>."]
-    return Q(text=text, qtype="MCQ", marks=2, options=opts, answer=ans, blocks=[Table(rows)], solution=sol)
+           f"Answer: <b>{corr}</b>." + (" The two metrics disagree because L<sub>1</sub> penalises diagonal "
+                                         "offsets more than L<sub>2</sub>, changing the neighbour set."
+                                         if res["E"][2] != res["M"][2] else
+                                         " Here both metrics lead to the same vote.")]
+    Xc, lc, qc = X.copy(), lab.copy(), q.copy()
+
+    def draw(fig):
+        ax = fig.add_subplot(111)
+        _scatter_classes(ax, Xc, lc, annotate=[f"P{i + 1}" for i in range(n)])
+        ax.scatter([qc[0]], [qc[1]], marker="*", s=120, color=MID, zorder=4, label="q")
+        ax.set_xlim(-0.5, 10.5)
+        ax.set_ylim(-0.5, 10.5)
+        ax.set_xticks(range(11))
+        ax.set_yticks(range(11))
+        ax.set_aspect("equal")
+        ax.grid(alpha=.35)
+        ax.set_xlabel("x$_1$")
+        ax.set_ylabel("x$_2$")
+        ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1), frameon=False)
+    return Q(text=text, qtype="MCQ", marks=2, options=opts, answer=ans, blocks=[Table(rows), Figure(draw, 8.5, 6.5)],
+             solution=sol)
 
 
 @template(TOPIC, KNN, marks=2, qtype="NAT")
@@ -800,12 +818,12 @@ def knn_loocv(rng):
         ax.spines["left"].set_visible(False)
         ax.set_xlim(-1, 31)
         ax.set_xlabel("x")
-        ax.legend(loc="lower right", ncol=2, frameon=False)
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.45), ncol=2, frameon=False)
 
     tab = [["x", "true", f"{k} nearest (excluding itself)", "LOO prediction", ""]]
     for i, nbr, pred in det:
         tab.append([fmt(xs[i]), str(lab[i]), ", ".join(f"{fmt(xs[j])}({lab[j]})" for j in nbr), str(pred),
-                    "✗" if pred != lab[i] else ""])
+                    "wrong" if pred != lab[i] else ""])
     text = (f"Ten or fewer one-dimensional points with binary labels are shown on the number line (filled circle = "
             f"class 1, open square = class 0). A {k}-NN classifier (absolute distance, majority vote) is evaluated by "
             f"leave-one-out cross-validation: each point is classified using all the <i>other</i> points. "
@@ -857,7 +875,22 @@ def knn_scaling(rng):
            f"Nearest after scaling: <b>P{sc_nn + 1}</b>.",
            f"Without scaling the nearest point would be P{raw_nn + 1}, because income differences (tens of thousands) "
            "dominate the age differences — exactly why k-NN needs feature scaling."]
-    return Q(text=text, qtype="MCQ", marks=2, options=opts, answer=ans, blocks=[Table(rows)], solution=sol)
+    Xc, qc = X.copy(), q.copy()
+
+    def draw(fig):
+        ax = fig.add_subplot(111)
+        ax.scatter(Xc[:, 0], Xc[:, 1], color=DARK, s=26, zorder=3)
+        for i, (a, b) in enumerate(Xc):
+            ax.annotate(f"P{i + 1}", (a, b), xytext=(4, 3), textcoords="offset points", fontsize=7)
+        ax.scatter([qc[0]], [qc[1]], marker="*", s=120, color=MID, zorder=4)
+        ax.annotate("query", (qc[0], qc[1]), xytext=(5, -10), textcoords="offset points", fontsize=7, color=MID)
+        ax.set_xlim(15, 65)
+        ax.set_ylim(10, 160)
+        ax.set_xlabel("Age (years)")
+        ax.set_ylabel("Income (₹ thousand)")
+        ax.grid(alpha=.3)
+    return Q(text=text, qtype="MCQ", marks=2, options=opts, answer=ans, blocks=[Table(rows), Figure(draw, 8, 5)],
+             solution=sol)
 
 
 @template(TOPIC, KNN, marks=1, qtype="NAT")
@@ -1507,7 +1540,7 @@ def fisher_given_sw(rng):
             f"(μ<sub>1</sub> − μ<sub>0</sub>). Then {ask} is ______")
     det = np.linalg.det(Sw)
     sol = [f"μ<sub>1</sub> − μ<sub>0</sub> = ({fmt(dm[0])}, {fmt(dm[1])})ᵀ; det S<sub>W</sub> = {fmt(det, 3)}.",
-           Matrix("S_W⁻¹", np.linalg.inv(Sw), 4),
+           Matrix("S<sub>W</sub>⁻¹", np.linalg.inv(Sw), 4),
            f"<b>w</b> = S<sub>W</sub><super>−1</super>(μ<sub>1</sub>−μ<sub>0</sub>) = ({fmt(w[0], 4)}, {fmt(w[1], 4)})ᵀ."]
     if var == 0:
         sol.append(f"w<sub>2</sub>/w<sub>1</sub> = {fmt(w[1], 4)}/{fmt(w[0], 4)} = <b>{fmt(ans, 2)}</b>. "
@@ -1521,7 +1554,7 @@ def fisher_given_sw(rng):
     sol.append("Note: using μ<sub>1</sub> − μ<sub>0</sub> without S<sub>W</sub><super>−1</super> is correct only when "
                "S<sub>W</sub> ∝ I.")
     return Q(text=text, qtype="NAT", marks=2, answer=nat_range(ans, 2), nat_hint=nat_hint(2),
-             blocks=[Matrix("S_W", Sw, 1)], solution=sol)
+             blocks=[Matrix("S<sub>W</sub>", Sw, 1)], solution=sol)
 
 
 @template(TOPIC, LDA, marks=2, qtype="NAT")
@@ -1559,7 +1592,7 @@ def fisher_from_data(rng):
     SA = (A - mA).T @ (A - mA)
     SB = (B - mB).T @ (B - mB)
     sol = [f"<b>m</b><sub>1</sub> = ({fmt(mA[0], 3)}, {fmt(mA[1], 3)}), <b>m</b><sub>2</sub> = ({fmt(mB[0], 3)}, "
-           f"{fmt(mB[1], 3)}).", Matrix("S_1", SA, 3), Matrix("S_2", SB, 3), Matrix("S_W", S, 3),
+           f"{fmt(mB[1], 3)}).", Matrix("S<sub>1</sub>", SA, 3), Matrix("S<sub>2</sub>", SB, 3), Matrix("S<sub>W</sub>", S, 3),
            f"<b>m</b><sub>2</sub> − <b>m</b><sub>1</sub> = ({fmt(dm[0], 3)}, {fmt(dm[1], 3)}).",
            f"<b>w</b> = S<sub>W</sub><super>−1</super>(<b>m</b><sub>2</sub> − <b>m</b><sub>1</sub>) = "
            f"({fmt(w[0], 4)}, {fmt(w[1], 4)}).",
@@ -2102,18 +2135,21 @@ def _score_fig(sc, y, t=None):
         m = y == 1
         ax.scatter(sc[m], np.ones(m.sum()), marker="o", s=40, color=DARK, zorder=3)
         ax.scatter(sc[~m], np.zeros((~m).sum()), marker="s", s=36, facecolor="white", edgecolor=DARK, zorder=3)
-        for s_, yy in zip(sc, y):
-            ax.annotate(fmt(s_), (s_, yy), xytext=(0, 7), textcoords="offset points", ha="center", fontsize=6.5)
+        for cls in (0, 1):
+            vals = np.sort(sc[y == cls])
+            for r, s_ in enumerate(vals):
+                ax.annotate(fmt(s_), (s_, cls), xytext=(0, 6 if r % 2 == 0 else 15), textcoords="offset points",
+                            ha="center", fontsize=6.5)
         if t is not None:
             ax.axvline(t, ls="--", color=MID, lw=1.2)
-            ax.text(t, 1.45, f" t = {fmt(t)}", fontsize=7, color=MID)
+            ax.text(t, 1.55, f" t = {fmt(t)}", fontsize=7, color=MID)
         ax.set_yticks([0, 1])
         ax.set_yticklabels(["negatives", "positives"])
-        ax.set_ylim(-0.5, 1.6)
+        ax.set_ylim(-0.5, 1.75)
         ax.set_xlim(0, 1)
         ax.set_xlabel("classifier score")
         ax.grid(alpha=.3, axis="x")
-    return Figure(draw, 10, 3.6)
+    return Figure(draw, 10, 4)
 
 
 @template(TOPIC, MET, marks=2, qtype="NAT")
@@ -2155,6 +2191,9 @@ def metric_roc_figure(rng):
         if 0.55 < auc < 0.97:
             break
     var = int(rng.integers(3))
+    cands = [jf for jf in range(1, N) if tpr[fpr <= jf / N + 1e-12].max() < 1]
+    if var == 2 and not cands:
+        var = 0
     if var == 0:
         ans, ask = auc, "the area under this ROC curve (AUC)"
         sol = ["The ROC curve is a staircase: each vertical step is a positive and each horizontal step a negative.",
@@ -2170,12 +2209,9 @@ def metric_roc_figure(rng):
                ", ".join(f"({fmt(fpr[k], 2)}, {fmt(tpr[k], 2)})→{fmt(J[k], 2)}" for k in range(len(J))) + ".",
                f"Maximum at FPR = {fmt(fpr[i], 2)}, TPR = {fmt(tpr[i], 2)}: J = <b>{fmt(ans, 2)}</b>."]
     else:
-        while True:
-            jf = int(rng.integers(1, N))
-            f = jf / N
-            ans = tpr[fpr <= f + 1e-12].max()
-            if ans < 1:
-                break
+        jf = int(_pick(rng, cands))
+        f = jf / N
+        ans = tpr[fpr <= f + 1e-12].max()
         ask = f"the highest TPR attainable at FPR ≤ {fmt(f, 2)}"
         sol = [f"Among the operating points with FPR ≤ {fmt(f, 2)}, take the highest point of the curve (the top of "
                f"the vertical segment at FPR = {fmt(f, 2)}).", f"TPR = <b>{fmt(ans, 2)}</b>."]
