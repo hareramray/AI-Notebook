@@ -291,15 +291,37 @@ assert (x, 8 - cyc) == (9, 5) and ANSWER == 'A'
         # ---------------------------------------------------------------- Q9
         {
             "type": "MSQ", "marks": 1, "topic": "Python — scoping errors",
-            "text": "Which of the following Python snippets raise an exception when run?",
-            "options": ["`x = 5` / `def f():` / `    print(x)` / `    x = 6` / `f()`",
-                        "`def g():` / `    total = 0` / `    def add(v):` / `        total += v` / `    add(3)` / "
-                        "`    return total` / `g()`",
-                        "`fs = [lambda: i for i in range(3)]` / `fs[0]()`",
-                        "`def h(a, b=2, *args, c, **kw):` / `    return a + b + c + len(kw)` / `h(1, c=3, d=4)`"],
+            "text": ("Each of the four snippets below is run **separately**, in a fresh interpreter. Which of them "
+                     "raise an exception?"),
+            "code": '''# Snippet (A)
+x = 5
+def f():
+    print(x)
+    x = 6
+f()
+
+# Snippet (B)
+def g():
+    total = 0
+    def add(v):
+        total += v
+    add(3)
+    return total
+g()
+
+# Snippet (C)
+fs = [lambda: i for i in range(3)]
+fs[0]()
+
+# Snippet (D)
+def h(a, b=2, *args, c, **kw):
+    return a + b + c + len(kw)
+h(1, c=3, d=4)''',
+            "run_code": False,
+            "options": ["Snippet (A)", "Snippet (B)", "Snippet (C)", "Snippet (D)"],
             "answer": ["A", "B"],
             "solution": (
-                "(Each `/` separates lines.) A name that is **assigned anywhere** in a function body is local "
+                "A name that is **assigned anywhere** in a function body is local "
                 "to that function for the whole body (decided at compile time).\n\n"
                 "- (A) `x = 6` makes x local to f, so `print(x)` reads an unassigned local → "
                 "**UnboundLocalError.**\n"
@@ -777,7 +799,7 @@ assert int(OUTPUT.strip()) == int(ANSWER) == 2 * 3 ** 4 - 2 ** 4
             "type": "MSQ", "marks": 2, "topic": "Reversing a linked list that contains a cycle",
             "text": ("A singly linked list has nodes with values 1, 2, 3, 4, 5, 6 linked in this order, and node 6 "
                      "points back to node 3 (see figure). The standard iterative reversal below is applied with "
-                     "`cur` = node 1. Which of the following statements is/are TRUE?"),
+                     "`head` = node 1. Which of the following statements is/are TRUE?"),
             "code": '''prev, cur, steps = None, head, 0
 while cur:
     cur.nxt, prev, cur = prev, cur, cur.nxt
