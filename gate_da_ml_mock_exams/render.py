@@ -134,7 +134,9 @@ def matrix_flowable(m: Matrix):
         row += [Paragraph(fmt(M[i, j], m.digits), S["cell"]) for j in range(c)]
         data.append(row)
     namew = max(1.2, 0.22 * len(m.name) + 0.7)
-    tbl = RLTable(data, colWidths=[namew * cm] + [1.25 * cm] * c, hAlign="LEFT")
+    maxlen = max(len(fmt(v, m.digits)) for v in M.ravel())
+    cellw = max(1.25, 0.2 * maxlen + 0.5)
+    tbl = RLTable(data, colWidths=[namew * cm] + [cellw * cm] * c, hAlign="LEFT")
     tbl.setStyle(TableStyle([
         ("LINEBEFORE", (1, 0), (1, -1), 0.9, INK), ("LINEAFTER", (-1, 0), (-1, -1), 0.9, INK),
         ("LINEABOVE", (1, 0), (1, 0), 0.9, INK), ("LINEBELOW", (1, -1), (1, -1), 0.9, INK),
