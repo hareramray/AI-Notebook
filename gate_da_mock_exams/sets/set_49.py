@@ -78,7 +78,7 @@ print(outer() + x)''',
                      "left**. `^` is exponentiation and `/` is exact division.\n\n"
                      "− / 8 ^ 2 2 * + 4 2 3\n\n"
                      "The value of the expression is"),
-            "options": ["−16", "16", "2", "−2"],
+            "options": ["−16", "16", "2", "17.5"],
             "answer": "A",
             "solution": (
                 "Scanning a prefix expression right to left, operands are pushed; for an operator the "
@@ -92,7 +92,7 @@ print(outer() + x)''',
                 "Infix: (8 / 2²) − ((4 + 2) × 3) = 2 − 18 = −16 → option (A).\n\n"
                 "- (B) 16 uses the postfix pop order for the final `−` (18 − 2).\n"
                 "- (C) 2 is just the left operand 8 / 4.\n"
-                "- (D) −2 comes from 4/8-style reversed division and similar slips.\n\n"
+                "- (D) 17.5 applies the postfix pop order to *every* operator: 4 / 8 = 0.5 and 18 − 0.5.\n\n"
                 "**Trap:** in prefix the operator's left operand is the one nearer to it, which ends up on "
                 "**top** of the stack."
             ),
@@ -331,9 +331,9 @@ assert [k for k in opts if opts[k] == " ".join(t for _, t in a)] == [ANSWER]
                 "- (C) G–H: colours 1 and 0 → **still bipartite** (new cycle G-A-B-C-D-H-G has length 6).\n"
                 "- (D) F–G: both 1 → triangle A-F-G → **not** bipartite.\n\n"
                 "Answer: (A), (C).\n\n"
-                "**Trap:** judging by the picture — B–E crosses the hexagon ‘diagonally’ like A–D would, "
-                "but what matters is the parity of the distance between the endpoints (odd distance ⇒ the "
-                "new cycle is even)."
+                "**Trap:** judging by the picture — B–E and A–C both look like chords of the hexagon, but "
+                "B–E joins vertices at odd distance 3 (closing even cycles) while A–C joins vertices at "
+                "even distance 2 (closing a triangle)."
             ),
             "verify": '''
 from collections import deque

@@ -705,9 +705,9 @@ assert rep == int(ANSWER) and h[0] == 12
                 "Also note: an endpoint of a bridge is a cut vertex unless it has degree 1 (H is not a cut "
                 "vertex).\n\n"
                 "**Method tip:** for small graphs, first mark every edge that lies on a cycle (here the six "
-                "triangle edges); the remaining edges are exactly the bridges. Then a vertex is a cut vertex "
-                "iff it is an endpoint of a bridge with degree ≥ 2, or it joins two cycles that share only "
-                "that vertex."
+                "triangle edges); the remaining edges are exactly the bridges. Here every endpoint of a bridge "
+                "that has degree ≥ 2 (C, D, F, G) is a cut vertex; in general you can also confirm a cut "
+                "vertex by deleting it and checking connectivity."
             ),
             "verify": '''
 E = [('A','B'),('A','C'),('B','C'),('C','D'),('D','E'),('D','F'),('E','F'),('F','G'),('G','H')]
