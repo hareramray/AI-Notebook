@@ -416,6 +416,13 @@ def set_summary(SET):
     return one, two, total, by
 
 
+def _page_break(story):
+    """Drop trailing spacers (they can spill onto an otherwise blank page) and break."""
+    while story and isinstance(story[-1], Spacer):
+        story.pop()
+    story.append(PageBreak())
+
+
 def set_story(SET, set_no, register=None):
     """Story for one complete mock test: instructions, questions, key, solutions."""
     qs = SET["questions"]
@@ -456,7 +463,7 @@ def set_story(SET, set_no, register=None):
         "right — for the alternative methods and traps.",
     ]:
         story.append(Paragraph(fix_text(b), S["bullet"], bulletText="•"))
-    story.append(PageBreak())
+    _page_break(story)
 
     story.append(P(f"Mock Test {set_no:02d} · Question Paper", "h2"))
     q_sorted = list(qs)  # authors already order 1-mark first
@@ -467,21 +474,21 @@ def set_story(SET, set_no, register=None):
         elif i == 1:
             story.append(P("1-mark questions", "h3"))
         story += question_flowables(q, i)
-    story.append(PageBreak())
+    _page_break(story)
 
     story.append(P(f"Mock Test {set_no:02d} · Answer Key", "h2"))
     story.append(answer_key_table(q_sorted))
     story.append(Spacer(1, 10))
-    story.append(P("<b>Score tracker</b>", "h3"))
     trk = [["", "Attempted", "Correct", "Wrong (MCQ)", "Marks"],
            ["1-mark", "", "", "", ""], ["2-mark", "", "", "", ""], ["Total", "", "", "", f"/ {total}"]]
-    story.append(make_table(trk, col_widths=[80] + [(FRAME_W - 80) / 4] * 4, zebra=False))
-    story.append(PageBreak())
+    story.append(KeepTogether([P("<b>Score tracker</b>", "h3"),
+                               make_table(trk, col_widths=[80] + [(FRAME_W - 80) / 4] * 4, zebra=False)]))
+    _page_break(story)
 
     story.append(P(f"Mock Test {set_no:02d} · Detailed Solutions", "h2"))
     for i, q in enumerate(q_sorted, 1):
         story += solution_flowables(q, i)
-    story.append(PageBreak())
+    _page_break(story)
     return story
 
 

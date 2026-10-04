@@ -628,8 +628,8 @@ SET = {
                 f"$$SE = \\sqrt{{\\dfrac{{0.85(0.15)}}{{400}}}} = \\sqrt{{0.00031875}} \\approx {Q17_SE:.5f}",
                 f"$$\\text{{margin}} = 1.96({Q17_SE:.5f}) \\approx {Q17_M:.4f}",
                 f"$$0.85 \\pm {Q17_M:.3f} \\Rightarrow ({0.85 - Q17_M:.3f},\\ {0.85 + Q17_M:.3f})",
-                "(A) uses the margin 1 × SE (≈ 68% interval). (B) uses SE = √(0.85·0.15/100)·… i.e. a wrong n. "
-                "(D) uses the conservative p = 0.5 with n = 100.",
+                "(A) uses the margin 1 × SE (≈ 68% interval). (B) uses z = 2.576 (a 99% interval, margin ≈ 0.046). "
+                "(D) uses n = 100 instead of 400: 1.96√(0.85·0.15/100) ≈ 0.070.",
                 ("note", "To halve the margin (≈ 0.035 → 0.0175) you need 4× as many test examples (1600).",
                  "Shortcut"),
             ],
