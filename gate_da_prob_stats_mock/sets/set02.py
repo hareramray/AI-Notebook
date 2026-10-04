@@ -246,8 +246,8 @@ SET = {
             qtype="MCQ", marks=1, topic="Counting: card hands", difficulty="Easy",
             text="The number of 5-card hands that can be dealt from a standard 52-card deck containing "
                  "<b>exactly</b> two aces is",
-            options=["103 776", "132 600", "117 600", "622 656"],
-            answer="A",
+            options=["132 600", "117 600", "622 656", "103 776"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> Multiplication principle for unordered selections: choose the aces, then choose "
                 "the non-aces.",
@@ -263,8 +263,8 @@ SET = {
             qtype="MCQ", marks=1, topic="Sample space, union of events", difficulty="Easy",
             text="A fair coin is tossed three times. Let A = 'at least two heads' and B = 'the first toss is a "
                  "tail'. P(A ∪ B) equals",
-            options=["7/8", "1/2", "3/4", "5/8"],
-            answer="A",
+            options=["1/2", "3/4", "7/8", "5/8"],
+            answer="C",
             solution=[
                 "<b>Concept:</b> List the 8 equally likely outcomes and use P(A ∪ B) = P(A) + P(B) − P(A ∩ B).",
                 "A = {HHH, HHT, HTH, THH} (4 outcomes); B = {THH, THT, TTH, TTT} (4 outcomes); A ∩ B = {THH}.",
@@ -335,8 +335,8 @@ SET = {
             qtype="MCQ", marks=1, topic="Binomial mean and variance", difficulty="Easy",
             text="In a series of independent free throws, the number of successes X follows a binomial "
                  "distribution with mean 6 and variance 2.4. The parameters (n, p) are",
-            options=["(10, 0.6)", "(15, 0.4)", "(12, 0.5)", "(10, 0.4)"],
-            answer="A",
+            options=["(15, 0.4)", "(12, 0.5)", "(10, 0.6)", "(10, 0.4)"],
+            answer="C",
             solution=[
                 "<b>Concept:</b> X ∼ Bin(n, p) ⇒ E[X] = np, Var(X) = np(1 − p).",
                 r"$$1-p=\dfrac{np(1-p)}{np}=\dfrac{2.4}{6}=0.4\ \Rightarrow\ p=0.6",
@@ -351,13 +351,13 @@ SET = {
             qtype="MSQ", marks=1, topic="Properties of a PDF (concept check)", difficulty="Easy",
             text="Let f be the probability density function of a continuous random variable X. Which of the "
                  "following is/are necessarily TRUE?",
-            options=["f(x) ≥ 0 for all x", "f(x) ≤ 1 for all x", "P(X = c) = 0 for every real c",
+            options=["f(x) ≤ 1 for all x", "f(x) ≥ 0 for all x", "P(X = c) = 0 for every real c",
                      "∫<sub>−∞</sub><super>∞</super> f(x) dx = 1"],
-            answer="A, C, D",
+            answer="B, C, D",
             solution=[
                 "<b>Concept:</b> A PDF is non-negative and integrates to 1; it is a density, not a probability.",
-                "<b>(A) TRUE.</b> Otherwise some interval would get negative probability.",
-                "<b>(B) FALSE.</b> X ∼ U(0, 0.5) has f(x) = 2 on (0, 0.5). Only areas must be ≤ 1, not heights.",
+                "<b>(A) FALSE.</b> X ∼ U(0, 0.5) has f(x) = 2 on (0, 0.5). Only areas must be ≤ 1, not heights.",
+                "<b>(B) TRUE.</b> Otherwise some interval would get negative probability.",
                 "<b>(C) TRUE.</b> P(X = c) = ∫<sub>c</sub><super>c</super> f(x) dx = 0.",
                 "<b>(D) TRUE.</b> Total probability is 1.",
                 ("note", "f(x) is probability per unit length; a narrow distribution must have a tall density.",
@@ -431,15 +431,15 @@ SET = {
             qtype="MSQ", marks=1, topic="Expectation rules (concept check)", difficulty="Easy",
             text="Let X and Y be random variables with finite means (and X &gt; 0 where 1/X appears). Which of the "
                  "following is/are TRUE <b>in general</b>?",
-            options=["E[X + Y] = E[X] + E[Y]", "E[XY] = E[X] E[Y]", "E[ E[X | Y] ] = E[X]",
+            options=["E[XY] = E[X] E[Y]", "E[X + Y] = E[X] + E[Y]", "E[ E[X | Y] ] = E[X]",
                      "E[1/X] = 1/E[X]"],
-            answer="A, C",
+            answer="B, C",
             solution=[
                 "<b>Concept:</b> Linearity of expectation needs no independence; products and non-linear functions "
                 "do not pass through E.",
-                "<b>(A) TRUE.</b> Linearity holds for any X, Y (dependent or not).",
-                "<b>(B) FALSE.</b> Needs uncorrelatedness. Take Y = X with X ∼ Bernoulli(1/2): E[X²] = 1/2 but "
+                "<b>(A) FALSE.</b> Needs uncorrelatedness. Take Y = X with X ∼ Bernoulli(1/2): E[X²] = 1/2 but "
                 "(E[X])² = 1/4.",
+                "<b>(B) TRUE.</b> Linearity holds for any X, Y (dependent or not).",
                 "<b>(C) TRUE.</b> Law of total expectation (tower property).",
                 "<b>(D) FALSE.</b> X uniform on {1, 2}:",
                 r"$$E\left[\dfrac{1}{X}\right]=\dfrac{1}{2}\left(1+\dfrac{1}{2}\right)=0.75\ \neq\ \dfrac{1}{E[X]}=\dfrac{1}{1.5}\approx 0.667",
@@ -613,8 +613,8 @@ SET = {
             qtype="MCQ", marks=2, topic="Variance of a linear combination", difficulty="Medium",
             text="Daily rainfalls X and Y (in cm) at two nearby stations have Var(X) = 4, Var(Y) = 9 and correlation "
                  "coefficient 0.5. Var(2X − Y) equals",
-            options=["13", "25", "37", "19"],
-            answer="A",
+            options=["25", "37", "19", "13"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> Var(aX + bY) = a²Var(X) + b²Var(Y) + 2ab Cov(X, Y), with Cov = ρσ<sub>X</sub>σ<sub>Y</sub>.",
                 r"$$\mathrm{Cov}(X,Y)=0.5\times 2\times 3=3",
@@ -760,9 +760,9 @@ SET = {
                   "Assume the differences (After − Before) are normal. For H<sub>0</sub>: μ<sub>d</sub> = 0 vs "
                   "H<sub>1</sub>: μ<sub>d</sub> &gt; 0 at the 5% level (t<sub>0.05, 5</sub> = 2.015), which is "
                   "correct?"],
-            options=["t ≈ 3.22; reject H<sub>0</sub>", "t ≈ 3.22; do not reject H<sub>0</sub>",
-                     "t ≈ 1.32; do not reject H<sub>0</sub>", "t ≈ 3.53; reject H<sub>0</sub>"],
-            answer="A",
+            options=["t ≈ 3.53; reject H<sub>0</sub>", "t ≈ 3.22; do not reject H<sub>0</sub>",
+                     "t ≈ 1.32; do not reject H<sub>0</sub>", "t ≈ 3.22; reject H<sub>0</sub>"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> Paired data ⇒ one-sample t-test on the differences: t = d̄/(s<sub>d</sub>/√n), "
                 "n − 1 df.",
@@ -773,8 +773,8 @@ SET = {
                 r"$$t=\dfrac{3}{%.4f/\sqrt{6}}=\dfrac{3}{%.4f}\approx %.3f" % (Q28_s, Q28_s / sqrt(6), Q28),
                 "With 5 df, critical value 2.015. Since 3.22 &gt; 2.015, reject H<sub>0</sub>: the workshop improves "
                 "scores on average.",
-                "(C) forgets √n (3/2.28); (D) uses divisor n for s<sub>d</sub> (√(26/6) = 2.08) — the conclusion "
-                "agrees but the statistic is wrong.",
+                "t ≈ 1.32 forgets √n (3/2.28); t ≈ 3.53 uses divisor n for s<sub>d</sub> (√(26/6) = 2.08) — the "
+                "conclusion agrees but the statistic is wrong; (B) has the right statistic but the wrong decision.",
                 ("note", "Do not run a two-sample test on paired data — pairing removes student-to-student "
                          "variation, which is exactly why it is powerful.", "Key idea"),
             ],

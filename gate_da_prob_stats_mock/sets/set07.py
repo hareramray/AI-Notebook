@@ -280,7 +280,7 @@ def fig_q27():
     ax.plot(x, N.pdf(x, 100, 12.5), color=BLUE)
     m = x < 90
     ax.fill_between(x[m], N.pdf(x[m], 100, 12.5), color=MAROON, alpha=0.35)
-    ax.text(72, 0.012, f"≈ {Q27_p:.4f}", color=MAROON)
+    ax.text(58, 0.02, f"≈ {Q27_p:.4f}", color=MAROON)
     ax.set_xlabel("X̄ (hours) ≈ N(100, 12.5²) by CLT")
     _clean(ax)
     return fig
@@ -293,7 +293,7 @@ def fig_q28():
     for m in (x < -2.17, x > 2.17):
         ax.fill_between(x[m], N.pdf(x[m]), color=MAROON, alpha=0.45)
     ax.axvline(-2.17, color="k", lw=1)
-    ax.text(-2.12, 0.25, "observed z = −2.17", fontsize=8)
+    ax.text(-4.0, 0.3, "observed z = −2.17 →", fontsize=8)
     ax.text(-3.6, 0.04, "0.015", color=MAROON, fontsize=8)
     ax.text(2.9, 0.04, "0.015", color=MAROON, fontsize=8)
     ax.set_xlabel("z  (two-sided p-value = sum of both tails ≈ 0.030)")

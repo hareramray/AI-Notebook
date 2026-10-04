@@ -300,8 +300,8 @@ SET = {
             text="Six friends, including Asha and Bimal, sit around a circular table (only relative positions "
                  "matter). The number of seating arrangements in which Asha and Bimal do <b>not</b> sit next "
                  "to each other is",
-            options=["72", "48", "120", "480"],
-            answer="A",
+            options=["48", "120", "480", "72"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> n distinct people can sit around a circle in (n − 1)! ways; count the complement "
                 "(A and B together) by gluing them into one block.",
@@ -323,15 +323,15 @@ SET = {
             text="For a weekend, let A = 'it rains on Saturday' and B = 'it rains on Sunday'. Suppose "
                  "P(A) = 0.6, P(B) = 0.5 and P(A ∪ B) = 0.8. The probability that it rains on <b>exactly one</b> "
                  "of the two days is",
-            options=["0.5", "0.3", "0.2", "0.8"],
-            answer="A",
+            options=["0.3", "0.2", "0.5", "0.8"],
+            answer="C",
             solution=[
                 "<b>Concept:</b> Inclusion–exclusion gives P(A ∩ B); 'exactly one' = union minus intersection.",
                 r"$$P(A\cap B)=P(A)+P(B)-P(A\cup B)=0.6+0.5-0.8=0.3",
                 r"$$P(\text{exactly one})=P(A\cup B)-P(A\cap B)=0.8-0.3=0.5",
                 "Equivalently P(A only) + P(B only) = (0.6 − 0.3) + (0.5 − 0.3) = 0.3 + 0.2 = 0.5.",
                 ("fig", fig_venn_q2),
-                "Option (B) 0.3 is P(both); (C) 0.2 is P(neither) = 1 − 0.8; (D) 0.8 is P(at least one).",
+                "0.3 is P(both); 0.2 is P(neither) = 1 − 0.8; 0.8 is P(at least one).",
                 ("note", "Fill a Venn diagram from the inside out: intersection first, then the 'only' "
                          "regions, then the outside.", "Key idea"),
             ],
@@ -341,19 +341,19 @@ SET = {
             qtype="MSQ", marks=1, topic="Independence vs mutual exclusivity (concept check)", difficulty="Easy",
             text="Let A and B be events in a probability space. Which of the following statements is/are "
                  "<b>always TRUE</b>?",
-            options=["If P(A) &gt; 0, P(B) &gt; 0 and A, B are mutually exclusive, then A and B are NOT independent.",
+            options=["If P(A ∩ B) = 0, then A and B are independent.",
                      "If A and B are independent, then A and B<super>c</super> are independent.",
-                     "If P(A ∩ B) = 0, then A and B are independent.",
+                     "If P(A) &gt; 0, P(B) &gt; 0 and A, B are mutually exclusive, then A and B are NOT independent.",
                      "An event A with P(A) = 1 is independent of every event B."],
-            answer="A, B, D",
+            answer="B, C, D",
             solution=[
                 "<b>Concept:</b> Independence means P(A ∩ B) = P(A)P(B); mutual exclusivity means A ∩ B = Ø.",
-                "<b>(A) TRUE.</b> Mutually exclusive ⇒ P(A ∩ B) = 0, but P(A)P(B) &gt; 0. The product rule fails, "
-                "so they are dependent (knowing A happened tells you B did not).",
+                "<b>(A) FALSE.</b> Counter-example with one die: A = {1}, B = {2}. P(A ∩ B) = 0 but "
+                "P(A)P(B) = 1/36 ≠ 0. (It would be true only if P(A) = 0 or P(B) = 0.)",
                 "<b>(B) TRUE.</b>",
                 r"$$P(A\cap B^c)=P(A)-P(A\cap B)=P(A)-P(A)P(B)=P(A)\,P(B^c)",
-                "<b>(C) FALSE.</b> Counter-example with one die: A = {1}, B = {2}. P(A ∩ B) = 0 but "
-                "P(A)P(B) = 1/36 ≠ 0. (It would be true only if P(A) = 0 or P(B) = 0.)",
+                "<b>(C) TRUE.</b> Mutually exclusive ⇒ P(A ∩ B) = 0, but P(A)P(B) &gt; 0. The product rule fails, "
+                "so they are dependent (knowing A happened tells you B did not).",
                 "<b>(D) TRUE.</b> P(A<super>c</super> ∩ B) ≤ P(A<super>c</super>) = 0, so "
                 "P(A ∩ B) = P(B) − 0 = P(B) = 1 · P(B) = P(A)P(B).",
                 ("note", "Mutually exclusive events with positive probabilities are the <i>most</i> dependent "
@@ -459,8 +459,8 @@ SET = {
             qtype="MCQ", marks=1, topic="Continuous uniform, conditional probability", difficulty="Easy",
             text="The daily rainfall X (in mm) at a hill station on a rainy day is modelled as uniform on [2, 10]. "
                  "Given that the rainfall on a day exceeds 4 mm, the probability that it exceeds 7 mm is",
-            options=["0.375", "0.500", "0.625", "0.750"],
-            answer="B",
+            options=["0.500", "0.375", "0.625", "0.750"],
+            answer="A",
             solution=[
                 "<b>Concept:</b> For X ∼ U(a, b), probabilities are proportional to lengths; conditioning on an "
                 "interval gives another uniform.",
@@ -477,8 +477,8 @@ SET = {
             qtype="MCQ", marks=1, topic="Exponential distribution, memorylessness", difficulty="Easy",
             text="The lifetime of a bulb is exponentially distributed with mean 400 hours. Given that a bulb has "
                  "already worked for 200 hours, the probability that it works for at least another 400 hours is",
-            options=["e<super>−1</super>", "e<super>−1.5</super>", "e<super>−0.5</super>", "1 − e<super>−1</super>"],
-            answer="A",
+            options=["e<super>−1.5</super>", "1 − e<super>−1</super>", "e<super>−0.5</super>", "e<super>−1</super>"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> X ∼ Exp(λ) with mean 1/λ has P(X &gt; t) = e<super>−λt</super> and is memoryless: "
                 "P(X &gt; s + t | X &gt; s) = P(X &gt; t).",
@@ -512,16 +512,16 @@ SET = {
             qtype="MSQ", marks=1, topic="Variance rules (concept check)", difficulty="Easy",
             text="Let X and Y be random variables with finite variances and let a, b be constants. Which of the "
                  "following is/are TRUE?",
-            options=["Var(aX + b) = a<super>2</super> Var(X)",
-                     "Var(X + Y) = Var(X) + Var(Y) for all X and Y",
+            options=["Var(X + Y) = Var(X) + Var(Y) for all X and Y",
+                     "Var(aX + b) = a<super>2</super> Var(X)",
                      "If X and Y are independent, Var(X − Y) = Var(X) + Var(Y)",
                      "Var(X) = E[X<super>2</super>] − (E[X])<super>2</super>"],
-            answer="A, C, D",
+            answer="B, C, D",
             solution=[
                 "<b>Concept:</b> Var(X ± Y) = Var(X) + Var(Y) ± 2Cov(X, Y); shifting does not change spread; "
                 "scaling by a multiplies variance by a².",
-                "<b>(A) TRUE.</b> Var(aX + b) = E[(aX + b − aμ − b)<super>2</super>] = a<super>2</super>E[(X − μ)<super>2</super>].",
-                "<b>(B) FALSE.</b> It needs Cov(X, Y) = 0. E.g. Y = X gives Var(2X) = 4Var(X) ≠ 2Var(X).",
+                "<b>(A) FALSE.</b> It needs Cov(X, Y) = 0. E.g. Y = X gives Var(2X) = 4Var(X) ≠ 2Var(X).",
+                "<b>(B) TRUE.</b> Var(aX + b) = E[(aX + b − aμ − b)<super>2</super>] = a<super>2</super>E[(X − μ)<super>2</super>].",
                 "<b>(C) TRUE.</b> Independence ⇒ Cov = 0, and Var(−Y) = (−1)<super>2</super>Var(Y):",
                 r"$$\mathrm{Var}(X-Y)=\mathrm{Var}(X)+\mathrm{Var}(Y)-2\,\mathrm{Cov}(X,Y)=\mathrm{Var}(X)+\mathrm{Var}(Y)",
                 "<b>(D) TRUE.</b> Expand E[(X − μ)<super>2</super>] = E[X<super>2</super>] − 2μE[X] + μ<super>2</super> "
@@ -584,8 +584,8 @@ SET = {
             text="An urn contains 4 red and 6 blue balls. Two balls are drawn one after another without "
                  "replacement. Given that the <b>second</b> ball drawn is red, the probability that the "
                  "<b>first</b> ball drawn was red is",
-            options=["1/3", "2/5", "4/9", "2/15"],
-            answer="A",
+            options=["2/5", "2/15", "1/3", "4/9"],
+            answer="C",
             solution=[
                 "<b>Concept:</b> P(R<sub>1</sub> | R<sub>2</sub>) = P(R<sub>1</sub> ∩ R<sub>2</sub>)/P(R<sub>2</sub>), "
                 "with P(R<sub>2</sub>) from the law of total probability.",
@@ -762,8 +762,8 @@ SET = {
             text="Daily rainfall readings at a station during the monsoon have mean 50 mm and standard deviation 15 mm "
                  "(distribution unknown). For a random sample of 36 independent days, the probability that the sample "
                  "mean exceeds 54 mm is approximately [Φ(1.6) = 0.9452, Φ(0.27) = 0.6064]",
-            options=["0.0548", "0.3936", "0.9452", "0.1096"],
-            answer="A",
+            options=["0.3936", "0.9452", "0.1096", "0.0548"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> CLT: X̄ ≈ N(μ, σ²/n) for large n, whatever the population shape.",
                 r"$$\mathrm{SE}=\dfrac{\sigma}{\sqrt{n}}=\dfrac{15}{\sqrt{36}}=2.5",
@@ -848,11 +848,11 @@ SET = {
                              ["Observed", "15", "25", "18", "22", "16", "24"]]),
                   "Using the χ² goodness-of-fit test at the 5% level (χ²<sub>0.05, 5</sub> = 11.07, "
                   "χ²<sub>0.05, 6</sub> = 12.59), which is correct?"],
-            options=["χ² = 4.5 with 5 df; do not reject fairness",
+            options=["χ² = 4.5 with 5 df; reject fairness",
                      "χ² = 4.5 with 6 df; do not reject fairness",
                      "χ² = 90 with 5 df; reject fairness",
-                     "χ² = 4.5 with 5 df; reject fairness"],
-            answer="A",
+                     "χ² = 4.5 with 5 df; do not reject fairness"],
+            answer="D",
             solution=[
                 "<b>Concept:</b> χ² = ∑(O − E)²/E with k − 1 df (no parameters estimated).",
                 "Under H<sub>0</sub> (fair die), E = 120/6 = 20 for each face.",
@@ -863,7 +863,7 @@ SET = {
                 "df = 6 − 1 = 5; critical value 11.07. Since 4.5 &lt; 11.07, do not reject H<sub>0</sub>.",
                 ("fig", fig_chi_q27),
                 "(C) forgets to divide by E; (B) uses k instead of k − 1 df (the conclusion happens to agree but the df "
-                "is wrong).",
+                "is wrong); (A) has the right statistic but the wrong decision.",
                 ("note", "The counts must total n, which costs one degree of freedom: df = k − 1 − (number of "
                          "estimated parameters).", "Key idea"),
             ],

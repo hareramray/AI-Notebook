@@ -261,7 +261,7 @@ SET = {
              "geometric count, joint PMF tables, non-uniform joint pdfs over sub-regions, queue waiting times "
              "via minima of exponentials, hypergeometric variance through indicator covariances, Poisson "
              "thinning, a two-proportion z-test for A/B testing, t-test/CI duality, Poisson-mixture Bayes, "
-             "pooled standard deviations, CLT sample-size design, carrier-risk genetics, and χ² tests of "
+             "pooled standard deviations, CLT sample-size design, carrier-risk genetics, and χ<super>2</super> tests of "
              "independence and goodness of fit with model-derived expected counts. Score above 60% here and "
              "you are exam-ready; anything less tells you exactly which chapters to revisit.",
     "minutes": 90,
@@ -400,7 +400,7 @@ SET = {
             ],
         ),
         dict(
-            qtype="MCQ", marks=1, topic="χ² distribution (scaling)", difficulty="Medium",
+            qtype="MCQ", marks=1, topic="Chi-squared distribution (scaling)", difficulty="Medium",
             text="Z<sub>1</sub>, …, Z<sub>4</sub> are i.i.d. N(0, 4) (variance 4). Let Y = Z<sub>1</sub><super>2</super> "
                  "+ … + Z<sub>4</sub><super>2</super>. Var(Y) equals",
             options=["8", "32", "64", "128"],
@@ -550,8 +550,9 @@ SET = {
                 r"$$\int_{2x}^{1}(x+y)\,dy=x(1-2x)+\dfrac{1-4x^2}{2}=\dfrac{1}{2}+x-4x^2",
                 r"$$P=\left[\dfrac{x}{2}+\dfrac{x^2}{2}-\dfrac{4x^3}{3}\right]_0^{1/2}=\dfrac{1}{4}+\dfrac{1}{8}-\dfrac{1}{6}=\dfrac{5}{24}",
                 r"$$P=\dfrac{5}{24}\approx " + f"{_q16:.4f}",
-                "Note the region has area 1/4 but probability only 5/24 &lt; 1/4: the density is small near the "
-                "origin where the region is thick.",
+                "Check: f is linear, so P = (area) × f(centroid). The triangle has area 1/4 and centroid (1/6, 2/3), "
+                "where f = 5/6; hence P = (1/4)(5/6) = 5/24. The region lies where x is small, so the density "
+                "there is below its average value 1.",
                 ("note", "Using area alone (0.25) is valid only for UNIFORM joint pdfs.", "Trap"),
             ],
         ),
@@ -575,7 +576,7 @@ SET = {
             ],
         ),
         dict(
-            qtype="NAT", marks=2, topic="χ² test of independence", difficulty="Hard",
+            qtype="NAT", marks=2, topic="Chi-squared test of independence", difficulty="Hard",
             text=["Two classifiers are evaluated on 100 hold-out samples each; errors are graded as follows:",
                   ("table", [["Model", "Correct", "Minor error", "Major error", "Total"],
                              ["A", "60", "25", "15", "100"],
@@ -825,7 +826,7 @@ SET = {
             ],
         ),
         dict(
-            qtype="NAT", marks=2, topic="χ² goodness of fit to a Poisson model", difficulty="Hard",
+            qtype="NAT", marks=2, topic="Chi-squared goodness of fit to a Poisson model", difficulty="Hard",
             text=["The number of goals per match in 100 league matches is summarised below. A pundit claims "
                   "goals per match follow a Poisson distribution with mean 1.5.",
                   ("table", [["Goals", "0", "1", "2", "3 or more", "Total"],

@@ -176,9 +176,8 @@ def fig_q8():
     fig, ax = plt.subplots(figsize=(5.4, 2.5))
     ax.plot(x, d.pdf(x), color=BLUE)
     for v, lab, c in ((d.mean(), "mean", MAROON), (d.median(), "median", GOLD), ((a - 1) * 12, "mode", "k")):
-        ax.axvline(v, color=c, ls="--", lw=1.2)
-        ax.text(v + 1, d.pdf(x).max() * (0.95 if lab == "mode" else 0.75 if lab == "median" else 0.55),
-                lab, color=c, fontsize=9)
+        ax.axvline(v, color=c, ls="--", lw=1.4, label=f"{lab} ≈ {v:.0f}")
+    ax.legend(frameon=False, fontsize=8.5)
     ax.set_xlabel("right (positive) skew: long right tail pulls mean > median > mode")
     _clean(ax)
     return fig
@@ -609,7 +608,7 @@ Q.append(dict(
         ("fig", fig_q14),
         f"(B) uses (n + 1)/2 = 30.5 — the ungrouped-data rule. (C) is the grouped MODE "
         f"30 + 8/(44 − 14 − 12) × 10 = {Q14_mode:.2f}. (D) is the grouped MEAN.",
-        ("note", "Mean (35.0) &gt; median (34.55) &gt; mode (34.44): a mild positive skew.", "Key idea"),
+        ("note", f"Mean ({Q14_mean:.2f}) &gt; median ({Q14_median:.2f}) &gt; mode ({Q14_mode:.2f}): a mild positive skew.", "Key idea"),
     ],
 ))
 
@@ -626,7 +625,8 @@ Q.append(dict(
         ("table", [["x − x̄"] + [f"{v:g}" for v in Q15_x - Q15_x.mean()],
                    ["y − ȳ"] + [f"{v:.3f}" for v in Q15_y - Q15_y.mean()]]),
         f"$$S_{{xx}}={Q15_Sxx:g},\\quad S_{{yy}}={Q15_Syy:.3f},\\quad S_{{xy}}={Q15_Sxy:g}",
-        "(S<sub>xy</sub> = ∑xy − n x̄ ȳ = 2512 − 6 · 6 · 65.667 = 148; S<sub>xx</sub> = ∑x² − n x̄² = 258 − 216 = 42.)",
+        f"(Shortcut: S<sub>xy</sub> = ∑xy − n x̄ ȳ = {int((Q15_x*Q15_y).sum())} − 6 · 6 · {Q15_y.mean():.4f} = {Q15_Sxy:g}; "
+        f"S<sub>xx</sub> = ∑x² − n x̄² = {int((Q15_x**2).sum())} − 216 = {Q15_Sxx:g}.)",
         f"$$r=\\dfrac{{{Q15_Sxy:g}}}{{\\sqrt{{{Q15_Sxx:g}\\times {Q15_Syy:.3f}}}}}=\\dfrac{{{Q15_Sxy:g}}}"
         f"{{{math.sqrt(Q15_Sxx*Q15_Syy):.4f}}}={Q15_r:.4f}",
         ("fig", fig_q15),
@@ -651,7 +651,7 @@ Q.append(dict(
         "$$r=\\dfrac{12}{\\sqrt{8}\\times\\sqrt{25}}=\\dfrac{12}{14.142}=0.849",
         "(B) uses Cov/Var(Y) = 0.48 — the slope of the regression of X on Y. (C) divides Cov by "
         "Var(X)·SD(Y) instead of SD(X)·SD(Y). (D) uses the covariance itself as slope.",
-        "Consistency check: b<sub>YX</sub> = r σ<sub>Y</sub>/σ<sub>X</sub> = 0.849 × 5/2.828 = 1.5. ✓",
+        "Consistency check: b<sub>YX</sub> = r σ<sub>Y</sub>/σ<sub>X</sub> = 0.849 × 5/2.828 = 1.5. (verified)",
         ("note", "Slope of Y on X divides by Var(X) — the variance of the PREDICTOR.", "Trap"),
     ],
 ))
@@ -808,7 +808,7 @@ Q.append(dict(
         "$$E[10X(1-X)]=10\\left(E[X]-E[X^2]\\right)=10\\left(\\dfrac{1}{2}-\\dfrac{1}{3}\\right)=\\dfrac{10}{6}",
         "$$\\mathrm{Var}(10X)=100\\times\\dfrac{1}{12}=\\dfrac{100}{12}",
         "$$\\mathrm{Var}(Y)=\\dfrac{10}{6}+\\dfrac{100}{12}=\\dfrac{20+100}{12}=10",
-        "Also E(Y) = E[10X] = 5. (In fact Y is uniform on {0, 1, …, 10}, whose variance is (11² − 1)/12 = 10. ✓)",
+        "Also E(Y) = E[10X] = 5. (In fact Y is uniform on {0, 1, …, 10}, whose variance is (11² − 1)/12 = 10. (verified))",
         "A Monte Carlo simulation with 400 000 draws gives Var(Y) ≈ 10.0.",
         ("note", "Plugging in E(X) = 0.5 to get Bin(10, 0.5) variance 2.5 ignores the uncertainty in X — the "
                  "between-batch term Var(E[Y|X]) dominates.", "Trap"),

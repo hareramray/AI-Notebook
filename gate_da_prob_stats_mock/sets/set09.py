@@ -361,7 +361,7 @@ SET = {
             ],
         ),
         dict(
-            qtype="MSQ", marks=1, topic="χ<super>2</super>, t and normal relationships", difficulty="Medium",
+            qtype="MSQ", marks=1, topic="Chi-squared, t and normal relationships", difficulty="Medium",
             text="Which of the following statements is/are TRUE?",
             options=["If Z<sub>1</sub>, …, Z<sub>k</sub> are i.i.d. N(0, 1), then ∑Z<sub>i</sub><super>2</super> "
                      "has mean k and variance 2k",
@@ -624,7 +624,7 @@ SET = {
             ],
         ),
         dict(
-            qtype="NAT", marks=2, topic="χ<super>2</super> goodness of fit with estimated parameter (genetics)",
+            qtype="NAT", marks=2, topic="Chi-squared goodness of fit with estimated parameter (genetics)",
             difficulty="Hard",
             text=["Genotypes at a locus with alleles A and a are recorded for 100 individuals:",
                   ("table", [["Genotype", "AA", "Aa", "aa", "Total"], ["Count", "50", "30", "20", "100"]]),
@@ -865,7 +865,7 @@ SET = {
             ],
         ),
         dict(
-            qtype="MSQ", marks=2, topic="Sampling distributions & χ<super>2</super> / t tests", difficulty="Hard",
+            qtype="MSQ", marks=2, topic="Sampling distributions & Chi-squared / t tests", difficulty="Hard",
             text="Which of the following statements is/are TRUE?",
             options=["For a χ<super>2</super> test of independence on a 3 × 4 contingency table, the degrees of freedom are 6",
                      "A Pearson χ<super>2</super> goodness-of-fit statistic can be negative when observed counts are below expected counts",
