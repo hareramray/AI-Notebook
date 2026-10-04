@@ -33,7 +33,7 @@ print(list(d))''',
                 "- (A) correct.\n"
                 "- (B) appends the two removed values in the wrong order (pop before popleft).\n"
                 "- (C) assumes the rotations cancel and extend re-adds the same ends — ignores the "
-                "first `rotate(2)`.\n\n"
+                "first `rotate(2)`.\n"
                 "- (D) treats `rotate(2)` as a left rotation.\n\n"
                 "**Trap:** the list literal `[d.popleft(), d.pop()]` is fully built before `extend` runs, "
                 "so both removals happen first. **Tip:** `appendleft(pop())` ≡ `rotate(1)`."
@@ -134,7 +134,7 @@ print(ev("3 8 - 2 / 4 6 * -"))''',
                 "negative step the defaults are start = last, stop = before-the-first.\n\n"
                 "- (A) step −2 from index 5: indices 5, 3, 1 → `[60, 40, 20]`. **True.**\n"
                 "- (B) indices 4, 3, 2 (index 1 is the excluded stop) → `[50, 40, 30]`. **False** — "
-                "the stop bound is exclusive in both directions.\n\n"
+                "the stop bound is exclusive in both directions.\n"
                 "- (C) −3 → index 3, −1 → index 5 (excluded) → indices 3, 4 → `[40, 50]`. **True.**\n"
                 "- (D) start index 5, stop index 2, step +1 (default): you cannot move forward from 5 "
                 "to 2, so the result is `[]`. **False.**\n\n"
@@ -236,7 +236,7 @@ assert seen == [31, 51, 40, 35] and ANSWER == "A"
                 "- dequeue B → enqueue D, E → [C, D, E]\n"
                 "- dequeue C → enqueue F (no left child) → [D, E, F]\n"
                 "- dequeue D (leaf) → [E, F]\n"
-                "- dequeue E → enqueue H → **[F, H]**\n\n"
+                "- dequeue E → enqueue H → **[F, H]**\n"
                 "- (B) reverses FIFO order — that would be a stack.\n"
                 "- (C) adds I, J which are enqueued only when F is dequeued.\n"
                 "- (D) forgets F, which was enqueued when C was processed.\n\n"
@@ -300,7 +300,7 @@ assert T[3] == [52, 45, 17, 24] and ANSWER == "A"
                 "- 5: 0; 2: 1 (5); 8: 0; 1: 3 (5, 2, 8); 9: 0; 3: 3 (5, 8, 9); 7: 2 (8, 9)\n\n"
                 "Total = 0 + 1 + 0 + 3 + 0 + 3 + 2 = **9**.\n\n"
                 "- (B) 7 comes from missing that 3 has **three** larger predecessors (5, 8, 9), "
-                "counting only 8 and 9.\n\n"
+                "counting only 8 and 9.\n"
                 "- (C) 11 over-counts — typically by counting the comparison that ends each pass as a shift.\n"
                 "- (D) 6 is just the number of passes (n − 1).\n\n"
                 "**Trap:** shifts ≠ comparisons. Comparisons = shifts + (number of passes in which the "
@@ -341,9 +341,9 @@ assert s == 9 and ANSWER == "A"
                 "follows the order in which parents were dequeued (FIFO). Levels: {P}, {Q, R}, {S, T}, {U}.\n\n"
                 "- (A) Q dequeued first discovers S; then R discovers T → S before T. **Valid.**\n"
                 "- (B) R dequeued first discovers S and T (any order, here T then S); Q adds nothing new. "
-                "**Valid.**\n\n"
+                "**Valid.**\n"
                 "- (C) Q is before R, so S (discovered by Q) must precede T (discovered only by R). "
-                "**Invalid.**\n\n"
+                "**Invalid.**\n"
                 "- (D) U (distance 3) appears before T (distance 2). **Invalid.**\n\n"
                 "**Trap:** being level-consistent is necessary but not sufficient — (C) respects levels but "
                 "violates the FIFO parent order."
@@ -476,7 +476,7 @@ assert out == [1, 2, 3, 4, 5, 6] and c == int(ANSWER)
                 "- Enqueue 10…50 into slots 0–4 → front 0, rear 5 (5 elements).\n"
                 "- Three dequeues → front 3 (2 elements: 40, 50).\n"
                 "- 60 → slot 5, 70 → slot 6, 80 → slot 0, 90 → slot 1 → rear 2, count (2 − 3 + 7) mod 7 = 6 "
-                "→ **full**.\n\n"
+                "→ **full**.\n"
                 "- 100: (2 + 1) mod 7 = 3 = front → full → **ignored**.\n"
                 "- Two dequeues remove 40, 50 → front 5.\n"
                 "- 110 → slot 2 → rear 3.\n\n"
@@ -572,40 +572,40 @@ assert sorted(ANSWER) == [c for c, t in zip("ABCD", truth) if t]
                      "decrease from ∞ to a finite value). The total number of such events is ______."),
             "diagrams": [{"type": "graph", "directed": True,
                           "nodes": ["S", "A", "B", "C", "D", "E"],
-                          "edges": [["S", "A", 7], ["S", "B", 2], ["S", "C", 9], ["B", "A", 3],
-                                    ["B", "D", 8], ["B", "C", 10], ["A", "C", 1], ["A", "D", 4],
+                          "edges": [["S", "A", 7], ["S", "B", 2], ["B", "A", 3], ["B", "D", 8],
+                                    ["B", "C", 7], ["A", "C", 1], ["A", "D", 4], ["C", "D", 5],
                                     ["C", "E", 6], ["D", "E", 1]],
-                          "pos": {"S": [0, 1], "A": [2, 2], "B": [2, 0], "C": [4, 2], "D": [4, 0],
-                                  "E": [6, 1]}}],
+                          "pos": {"S": [0, 1], "A": [2, 2], "B": [2, 0], "C": [4, 2], "D": [5, 0],
+                                  "E": [6.5, 1.2]}}],
             "answer": "9",
             "solution": (
                 "Dijkstra extracts the vertex with the smallest tentative distance and relaxes its out-edges; "
                 "a relaxation succeeds when d[u] + w < d[v].\n\n"
-                "- Extract S (0): A ∞→7, B ∞→2, C ∞→9 — **3** decreases\n"
-                "- Extract B (2): A 7→5, D ∞→10; C: 2+10 = 12 > 9 ✗ — **2**\n"
+                "- Extract S (0): A ∞→7, B ∞→2 — **2** decreases\n"
+                "- Extract B (2): A 7→5, D ∞→10, C ∞→9 — **3**\n"
                 "- Extract A (5): C 9→6, D 10→9 — **2**\n"
-                "- Extract C (6): E ∞→12 — **1**\n"
+                "- Extract C (6): E ∞→12; D: 6 + 5 = 11 > 9 ✗ — **1**\n"
                 "- Extract D (9): E 12→10 — **1**\n"
                 "- Extract E (10): no out-edges\n\n"
-                "Total = 3 + 2 + 2 + 1 + 1 = **9**. Final distances: A 5, B 2, C 6, D 9, E 10.\n\n"
+                "Total = 2 + 3 + 2 + 1 + 1 = **9**. Final distances: A 5, B 2, C 6, D 9, E 10.\n\n"
                 "**Trap:** counting every edge examination (10 edges) instead of only successful ones; the "
-                "relaxation of B→C fails. **Tip:** with a binary-heap PQ each successful relaxation is one "
+                "relaxation of C→D fails. **Tip:** with a binary-heap PQ each successful relaxation is one "
                 "decrease-key, so this count drives the O((V + E) log V) bound."
             ),
             "solution_diagrams": [{"type": "graph", "directed": True,
                                    "nodes": ["S", "A", "B", "C", "D", "E"],
-                                   "edges": [["S", "A", 7], ["S", "B", 2], ["S", "C", 9], ["B", "A", 3],
-                                             ["B", "D", 8], ["B", "C", 10], ["A", "C", 1], ["A", "D", 4],
+                                   "edges": [["S", "A", 7], ["S", "B", 2], ["B", "A", 3], ["B", "D", 8],
+                                             ["B", "C", 7], ["A", "C", 1], ["A", "D", 4], ["C", "D", 5],
                                              ["C", "E", 6], ["D", "E", 1]],
-                                   "pos": {"S": [0, 1], "A": [2, 2], "B": [2, 0], "C": [4, 2], "D": [4, 0],
-                                           "E": [6, 1]},
+                                   "pos": {"S": [0, 1], "A": [2, 2], "B": [2, 0], "C": [4, 2], "D": [5, 0],
+                                           "E": [6.5, 1.2]},
                                    "highlight_edges": [["S", "B"], ["B", "A"], ["A", "C"], ["A", "D"],
                                                        ["D", "E"]],
                                    "caption": "Shortest-path tree"}],
             "verify": '''
 import heapq
-G = {"S": [("A", 7), ("B", 2), ("C", 9)], "B": [("A", 3), ("D", 8), ("C", 10)],
-     "A": [("C", 1), ("D", 4)], "C": [("E", 6)], "D": [("E", 1)], "E": []}
+G = {"S": [("A", 7), ("B", 2)], "B": [("A", 3), ("D", 8), ("C", 7)],
+     "A": [("C", 1), ("D", 4)], "C": [("D", 5), ("E", 6)], "D": [("E", 1)], "E": []}
 d = {v: float("inf") for v in G}; d["S"] = 0; pq = [(0, "S")]; cnt = 0; done = set()
 while pq:
     du, u = heapq.heappop(pq)
@@ -654,7 +654,7 @@ print(walk('a'))''',
                 "- pop e; f unseen → push f → [b, d, f]; order ace\n"
                 "- pop f → [b, d]; order acef\n"
                 "- pop d (f already seen) → [b]; order acefd\n"
-                "- pop b (d seen) → order **acefdb**\n\n"
+                "- pop b (d seen) → order **acefdb**\n"
                 "- (B) `abcdef` is the BFS order you would get with `todo.pop(0)`.\n"
                 "- (C) `abdfce` is the recursive DFS order (visit neighbours in list order).\n"
                 "- (D) `acedfb` would arise if d were popped before f — impossible since f was pushed last.\n\n"
@@ -733,11 +733,11 @@ assert Q[0] == sorted(Q[0]) and tot == int(ANSWER)
                 "- j=3 (4): i=1, swap A1↔A3 → [2, 4, 9, 7, 3, 8, 6]\n"
                 "- j=4 (3): i=2, swap A2↔A4 → [2, 4, 3, 7, 9, 8, 6]\n"
                 "- j=5 (8) skip\n"
-                "- final swap A3↔A6 → [2, 4, 3, 6, 9, 8, 7], return 3\n\n"
+                "- final swap A3↔A6 → [2, 4, 3, 6, 9, 8, 7], return 3\n"
                 "- (A) **True.**\n"
                 "- (B) **True.**\n"
                 "- (C) left part is [2, 4, 3] — not sorted. **False.** Partition only guarantees ≤ pivot, "
-                "not order.\n\n"
+                "not order.\n"
                 "- (D) on sorted input the last element is the maximum, every split is (n−1, 0), "
                 "T(n) = T(n−1) + Θ(n) = Θ(n²). **True.**\n\n"
                 "**Trap:** partitioning is not sorting, and Lomuto is not stable: the right part was "
@@ -833,7 +833,7 @@ assert OUTPUT.strip() == ANSWER == str(6 + sum(r2))
                 "- (A) 4 1 3 2 → would need deque 1 3 2 with 3 in the middle. **Cannot.**\n"
                 "- (B) 4 3 1 2 → deque 3 1 2 (1; 2 at rear; 3 at front). **Can.**\n"
                 "- (C) insert 1, insert 2 at the rear → [1 2]; insert 3 at front → [3 1 2]; delete 3, "
-                "delete 1; insert 4 at front → [4 2]; delete 4, delete 2 → 3 1 4 2. **Can.**\n\n"
+                "delete 1; insert 4 at front → [4 2]; delete 4, delete 2 → 3 1 4 2. **Can.**\n"
                 "- (D) 4 2 3 1 → deque 2 3 1 with 3 in the middle, but 3 was the last of the three inserted. "
                 "**Cannot.**\n\n"
                 "Of the 24 permutations exactly 22 are achievable; the only two impossible ones are (A) and (D).\n\n"

@@ -13,12 +13,12 @@ SET = {
                      "- in-order traversal: A, C, E, G, H, K, T, V, X\n\n"
                      "Which of the following is its post-order traversal?"),
             "options": [
-                "A, E, H, G, C, V, X, T, K",
-                "A, E, H, G, C, X, V, T, K",
                 "A, E, G, H, C, V, X, T, K",
+                "A, E, H, G, C, X, V, T, K",
+                "A, E, H, G, C, V, X, T, K",
                 "E, H, G, A, C, V, X, T, K",
             ],
-            "answer": "A",
+            "answer": "C",
             "solution": (
                 "**Concept.** The first pre-order symbol is the root; its position in the in-order "
                 "sequence splits the remaining symbols into the left and right subtrees. Recurse.\n\n"
@@ -29,10 +29,10 @@ SET = {
                 "- Right part, pre-order T, X, V → root T; in-order T, V, X has nothing left of T, so "
                 "T has only a right subtree {V, X} with root X; V lies left of X in in-order, so V "
                 "is X's **left** child.\n\n"
-                "Post-order (left, right, root): A, E, H, G, C, V, X, T, K → option (A).\n\n"
+                "Post-order (left, right, root): A, E, H, G, C, V, X, T, K → option (C).\n\n"
                 "- (B) puts X before V, i.e. treats V as a child *after* X — wrong because V is "
                 "X's left child and post-order lists children before the parent.\n"
-                "- (C) swaps G and H: G is the parent of H, so G must follow H.\n"
+                "- (A) swaps G and H: G is the parent of H, so G must follow H.\n"
                 "- (D) moves A after E, H, G: A is in the left subtree of C, visited first.\n\n"
                 "**Tip:** always verify by re-deriving the in-order of the reconstructed tree."
             ),
@@ -48,7 +48,7 @@ def build(pre, ino):
 def post(t): return [] if t is None else post(t[1]) + post(t[2]) + [t[0]]
 t = build(list("KCAGEHTXV"), list("ACEGHKTVX"))
 P = post(t)
-opts = {"A": "AEHGCVXTK", "B": "AEHGCXVTK", "C": "AEGHCVXTK", "D": "EHGACVXTK"}
+opts = {"C": "AEHGCVXTK", "B": "AEHGCXVTK", "A": "AEGHCVXTK", "D": "EHGACVXTK"}
 assert [k for k, v in opts.items() if list(v) == P] == [ANSWER]
 ''',
         },
@@ -84,9 +84,13 @@ assert sols == [int(ANSWER)]
             "text": "Consider the following Python program. What is printed?",
             "code": '''s = "TRAVERSAL"
 print(s[::-2], s[-3:1:-1], s[1::3])''',
-            "options": ["`LSEAT SREVA REA`", "`LSEAT SREV REA`",
-                        "`LAEST SREVA REA`", "`LSEAT SREVAR RVA`"],
-            "answer": "A",
+            "options": [
+                "`LSEAT SREVAR RVA`",
+                "`LSEAT SREV REA`",
+                "`LAEST SREVA REA`",
+                "`LSEAT SREVA REA`",
+            ],
+            "answer": "D",
             "solution": (
                 "**Concept.** `s[start:stop:step]` includes `start`, excludes `stop`; a negative "
                 "step walks right-to-left, and omitted bounds default to the appropriate end.\n\n"
@@ -95,10 +99,10 @@ print(s[::-2], s[-3:1:-1], s[1::3])''',
                 "- `s[-3:1:-1]`: −3 means index 6; go down while index > 1 → 6, 5, 4, 3, 2 → "
                 "S, R, E, V, A = `SREVA`.\n"
                 "- `s[1::3]`: 1, 4, 7 → R, E, A = `REA`.\n\n"
-                "Output: `LSEAT SREVA REA` → (A).\n\n"
+                "Output: `LSEAT SREVA REA` → (D).\n\n"
                 "- (B) stops one early, as if the stop index 1 were index 2.\n"
                 "- (C) reads the even-indexed characters left to right and then reverses wrongly.\n"
-                "- (D) includes index 1 (R) in the second slice and uses step 2 in the third.\n\n"
+                "- (A) includes index 1 (R) in the second slice and uses step 2 in the third.\n\n"
                 "**Trap:** the stop index is excluded even when stepping backwards."
             ),
             "verify": "assert OUTPUT.strip() == 'LSEAT SREVA REA'",
@@ -337,8 +341,13 @@ assert sum(1 for v in d if d[v] == 2) == int(ANSWER)
 T = (1, (2, (4, None, None), (5, (8, None, None), None)),
         (3, None, (6, (9, None, None), (7, None, None))))
 print(f(T))''',
-            "options": ["`-20`", "`20`", "`-12`", "`4`"],
-            "answer": "A",
+            "options": [
+                "`4`",
+                "`20`",
+                "`-12`",
+                "`-20`",
+            ],
+            "answer": "D",
             "solution": (
                 "**Concept.** `f` adds the values of **leaves only**, with sign + at even depth and "
                 "− at odd depth (root depth 0). Internal nodes contribute nothing; `None` children "
@@ -348,10 +357,10 @@ print(f(T))''',
                 "- 8: depth 3 (1→2→5→8) → −8\n"
                 "- 9: depth 3 (1→3→6→9) → −9\n"
                 "- 7: depth 3 (1→3→6→7) → −7\n\n"
-                "Sum = 4 − 8 − 9 − 7 = **−20** → (A).\n\n"
+                "Sum = 4 − 8 − 9 − 7 = **−20** → (D).\n\n"
                 "- (B) 20 results from counting the root at depth 1, which flips every sign.\n"
                 "- (C) −12 = 4 − 9 − 7 misses leaf 8 (it hangs below the one-child node 5).\n"
-                "- (D) 4 counts only even-depth leaves.\n\n"
+                "- (A) 4 counts only even-depth leaves.\n\n"
                 "**Trap:** a node with one child (5 and 3) is *not* a leaf, and the depth passed to "
                 "children is `d + 1` regardless of which side they are on."
             ),
@@ -475,8 +484,13 @@ for i in range(4):
     fs.append(lambda x, i=i: x * i if i % 2 else x + i)
 gs = [lambda x: x * i for i in range(4)]
 print(sum(f(3) for f in fs), sum(g(3) for g in gs))''',
-            "options": ["`20 36`", "`20 18`", "`18 36`", "`36 36`"],
-            "answer": "A",
+            "options": [
+                "`18 36`",
+                "`20 18`",
+                "`20 36`",
+                "`36 36`",
+            ],
+            "answer": "C",
             "solution": (
                 "**Concept.** A lambda's free variable is looked up **when the lambda is called** "
                 "(late binding). A default argument (`i=i`) is evaluated **when the lambda is "
@@ -488,9 +502,9 @@ print(sum(f(3) for f in fs), sum(g(3) for g in gs))''',
                 "- total = 20\n\n"
                 "Second sum (`gs`): all four lambdas share the comprehension's variable `i`, which "
                 "is 3 once the comprehension finishes. Each call returns 3 × 3 = 9 → 4 × 9 = 36.\n\n"
-                "Output: `20 36` → (A).\n\n"
+                "Output: `20 36` → (C).\n\n"
                 "- (B) assumes `gs` captured 0, 1, 2, 3 → 0 + 3 + 6 + 9 = 18 (no late binding).\n"
-                "- (C) mis-evaluates the conditional as always `x*i` for `fs` (0+3+6+9 = 18).\n"
+                "- (A) mis-evaluates the conditional as always `x*i` for `fs` (0+3+6+9 = 18).\n"
                 "- (D) applies late binding to `fs` as well, ignoring the default argument.\n\n"
                 "**Trap:** the comprehension has its own scope, but the closures still see the "
                 "*final* value of that scope's `i`."

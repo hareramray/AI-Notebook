@@ -79,8 +79,8 @@ print(len(a) + len(b) + len(c))''',
                      "The final contents of S, bottom → top, are"),
             "diagrams": [{"type": "stack", "values": [4, 9, 2], "label": "S",
                           "caption": "Initial stack (top = 2)"}],
-            "options": ["4, 7, 49", "4, −7, 49", "4, 7, 14", "4, 15, 8, 49"],
-            "answer": "A",
+            "options": ["4, 7, 14", "4, −7, 49", "4, 7, 49", "4, 15, 8, 49"],
+            "answer": "C",
             "solution": (
                 "Simulate carefully, remembering that TOP() does **not** remove anything.\n\n"
                 "- Start: [4, 9, 2].\n"
@@ -90,9 +90,9 @@ print(len(a) + len(b) + len(c))''',
                 "- Op 4: t = 8; POP() = 15; push 15 − 8 = 7 → [4, 7].\n"
                 "- Op 5: TOP() = 7 twice (no removal), push 49 → [4, 7, 49].\n\n"
                 "Option analysis:\n\n"
-                "- (A) 4, 7, 49 — matches the trace. **Correct.**\n"
+                "- (A) treats TOP() × TOP() as 7 + 7 or as 2 × TOP(); wrong.\n"
                 "- (B) computes t − POP() = 8 − 15 = −7 in step 4 (operand order reversed).\n"
-                "- (C) treats TOP() × TOP() as 7 + 7 or as 2 × TOP(); wrong.\n"
+                "- (C) 4, 7, 49 — matches the trace. **Correct.**\n"
                 "- (D) forgets that op 4 pops two elements and pushes one.\n\n"
                 "**Tip:** for non-commutative operations (−, ÷) write down which popped value is the "
                 "left operand; it is the classic source of errors in postfix evaluation too."
@@ -106,7 +106,7 @@ x = S.pop(); y = S.pop(); S.append(x + y)
 S.append(8)
 t = S.pop(); S.append(S.pop() - t)
 S.append(S[-1] * S[-1])
-assert S == [4, 7, 49] and ANSWER == 'A'
+assert S == [4, 7, 49] and ANSWER == 'C'
 ''',
         },
         # ------------------------------------------------------------ Q4
@@ -133,8 +133,8 @@ while q:
     out.append(q.v)
     q = q.next
 print(out)''',
-            "options": ["`[3, 1, 4]`", "`[3, 8, 1]`", "`[8, 6]`", "`[3, 1, 6, 4]`"],
-            "answer": "A",
+            "options": ["`[3, 8, 1]`", "`[3, 1, 4]`", "`[8, 6]`", "`[3, 1, 6, 4]`"],
+            "answer": "B",
             "solution": (
                 "Building by inserting at the head in the order 4, 6, 1, 8, 3 yields "
                 "3 → 8 → 1 → 6 → 4 (the reverse of the insertion order), as in the figure.\n\n"
@@ -142,16 +142,16 @@ print(out)''',
                 "- p = 3: p.next (8) and p.next.next (1) exist → 3.next = 1; p = 1.\n"
                 "- p = 1: p.next (6) and p.next.next (4) exist → 1.next = 4; p = 4.\n"
                 "- p = 4: p.next is None → loop ends.\n\n"
-                "The list is now 3 → 1 → 4; output `[3, 1, 4]`. Every node at an odd position "
+                "The list is now 3 → 1 → 4; output `[3, 1, 4]` → (B). Every node at an odd position "
                 "(2nd, 4th, …) has been unlinked.\n\n"
-                "- (B) keeps the first three nodes — that is truncation, not alternate deletion.\n"
+                "- (A) keeps the first three nodes — that is truncation, not alternate deletion.\n"
                 "- (C) lists the deleted nodes.\n"
                 "- (D) assumes only one bypass happens.\n\n"
                 "**Trap:** forgetting that head insertion reverses the order of the input loop."
             ),
             "solution_diagrams": [{"type": "linkedlist", "values": [3, 1, 4], "head": "head",
                                    "caption": "After the loop"}],
-            "verify": "assert OUTPUT.strip() == '[3, 1, 4]' and ANSWER == 'A'",
+            "verify": "assert OUTPUT.strip() == '[3, 1, 4]' and ANSWER == 'B'",
         },
         # ------------------------------------------------------------ Q5
         {
@@ -283,12 +283,12 @@ assert col == int(ANSWER) and T.index(2) == 8
                      "an initially empty binary search tree. The post-order traversal of the "
                      "resulting tree is"),
             "options": [
-                "18, 29, 36, 33, 25, 55, 52, 70, 61, 40",
+                "29, 36, 18, 33, 25, 52, 55, 70, 61, 40",
                 "18, 25, 29, 33, 36, 40, 52, 55, 61, 70",
                 "18, 36, 29, 33, 25, 55, 52, 70, 61, 40",
-                "29, 36, 18, 33, 25, 52, 55, 70, 61, 40",
+                "18, 29, 36, 33, 25, 55, 52, 70, 61, 40",
             ],
-            "answer": "A",
+            "answer": "D",
             "solution": (
                 "Each insertion walks from the root, going left for smaller keys and right for larger "
                 "ones. The resulting tree is shown in the solution figure: 40 has children 25 and 61; "
@@ -299,10 +299,11 @@ assert col == int(ANSWER) and T.index(2) == 8
                 "- Right subtree of 40: post(52-subtree) = 55, 52; post(70) = 70; then 61 → "
                 "55, 52, 70, 61.\n"
                 "- Finally 40.\n\n"
-                "Result: 18, 29, 36, 33, 25, 55, 52, 70, 61, 40 → (A).\n\n"
+                "Result: 18, 29, 36, 33, 25, 55, 52, 70, 61, 40 → (D).\n\n"
+                "- (A) visits 18 after the 33-subtree and puts 52 before its child 55.\n"
                 "- (B) is the in-order (sorted) sequence.\n"
                 "- (C) swaps 29 and 36 — the left child must come before the right child.\n"
-                "- (D) visits 18 after the 33-subtree and puts 52 before its child 55.\n\n"
+                "- (D) correct.\n\n"
                 "**Tip:** in a post-order listing every node appears after all its descendants; "
                 "use that to eliminate options quickly."
             ),
@@ -319,7 +320,7 @@ def ins(t, k):
 def post(t): return [] if t is None else post(t[1]) + post(t[2]) + [t[0]]
 T = None
 for k in [40, 25, 61, 18, 33, 52, 70, 29, 36, 55]: T = ins(T, k)
-assert post(T) == [18, 29, 36, 33, 25, 55, 52, 70, 61, 40] and ANSWER == 'A'
+assert post(T) == [18, 29, 36, 33, 25, 55, 52, 70, 61, 40] and ANSWER == 'D'
 ''',
         },
         # ------------------------------------------------------------ Q9
@@ -327,9 +328,9 @@ assert post(T) == [18, 29, 36, 33, 25, 55, 52, 70, 61, 40] and ANSWER == 'A'
             "type": "MCQ", "marks": 1, "topic": "Python — floor division and modulo with negatives",
             "text": "Consider the following Python program. What is printed?",
             "code": '''print(-17 // 5, -17 % 5, 17 // -5, 17 % -5, int(-17 / 5))''',
-            "options": ["`-4 3 -4 -3 -3`", "`-3 -2 -3 2 -3`", "`-4 3 -4 3 -4`",
+            "options": ["`-3 -2 -3 2 -3`", "`-4 3 -4 -3 -3`", "`-4 3 -4 3 -4`",
                         "`-4 -2 -3 -3 -3`"],
-            "answer": "A",
+            "answer": "B",
             "solution": (
                 "Python's `//` is **floor** division (rounds toward −∞) and `%` is defined so that "
                 "`a == (a // b) * b + a % b`; hence the remainder takes the sign of the **divisor**. "
@@ -339,13 +340,13 @@ assert post(T) == [18, 29, 36, 33, 25, 55, 52, 70, 61, 40] and ANSWER == 'A'
                 "- 17 // −5 = ⌊−3.4⌋ = −4.\n"
                 "- 17 % −5 = 17 − (−4)(−5) = −3.\n"
                 "- int(−17 / 5) = int(−3.4) = −3.\n\n"
-                "Output: `-4 3 -4 -3 -3` → (A).\n\n"
-                "- (B) is what C/Java would print (truncating division).\n"
+                "Output: `-4 3 -4 -3 -3` → (B).\n\n"
+                "- (A) is what C/Java would print (truncating division).\n"
                 "- (C) gives the remainder the sign of the dividend for `17 % -5`, and floors in `int()`.\n"
                 "- (D) mixes the two conventions.\n\n"
                 "**Trap:** `int(x / y)` and `x // y` differ for negative operands."
             ),
-            "verify": "assert OUTPUT.strip() == '-4 3 -4 -3 -3' and ANSWER == 'A'",
+            "verify": "assert OUTPUT.strip() == '-4 3 -4 -3 -3' and ANSWER == 'B'",
         },
         # ------------------------------------------------------------ Q10
         {
@@ -463,9 +464,9 @@ print(total)''',
 
 r = encode("aaabccddddae")
 print(r, len(r), r[::-2])''',
-            "options": ["`a3bc2d4ae 9 e42ba`", "`a3b1c2d4a1e1 12 1a1d2b3`",
-                        "`a3bc2d4ae 9 ea4dc`", "`a3bc2d5e 8 e5c3`"],
-            "answer": "A",
+            "options": ["`a3bc2d4ae 9 ea4dc`", "`a3b1c2d4a1e1 12 1a1d2b3`",
+                        "`a3bc2d4ae 9 e42ba`", "`a3bc2d5e 8 e5c3`"],
+            "answer": "C",
             "solution": (
                 "`encode` is run-length encoding: for each maximal run of equal characters it emits the "
                 "character, followed by the run length only when the run is longer than 1.\n\n"
@@ -475,15 +476,15 @@ print(r, len(r), r[::-2])''',
                 "takes every second character backwards: indices 8, 6, 4, 2, 0 → `e`, `4`, `2`, `b`, `a` "
                 "→ `e42ba`.\n\n"
                 "Option analysis:\n\n"
-                "- (A) `a3bc2d4ae 9 e42ba` — correct.\n"
+                "- (A) `ea4dc` takes indices 8, 7, 6, 5, 3 — irregular; with step −2 starting at "
+                "index 8 only the even indices 8, 6, 4, 2, 0 are taken.\n"
                 "- (B) appends counts of 1 as well; the conditional expression suppresses them.\n"
-                "- (C) takes indices 8, 7, 5, 3, 0 — a step of −2 from the end hits only even indices "
-                "here because len(r) − 1 = 8 is even.\n"
+                "- (C) `a3bc2d4ae 9 e42ba` — correct.\n"
                 "- (D) merges the final `a` into the `d` run; a run stops at the first different character.\n\n"
                 "**Trap:** the conditional expression `X if cond else Y` binds looser than `+`, so "
                 "`s[i] + str(run) if run > 1 else s[i]` means `(s[i] + str(run)) if run > 1 else s[i]`."
             ),
-            "verify": "assert OUTPUT.strip() == 'a3bc2d4ae 9 e42ba' and ANSWER == 'A'",
+            "verify": "assert OUTPUT.strip() == 'a3bc2d4ae 9 e42ba' and ANSWER == 'C'",
         },
         # ------------------------------------------------------------ Q13
         {
@@ -616,8 +617,8 @@ assert sorted(ANSWER) == ["A", "B"]
                      "The total number of element comparisons made by all merges is"),
             "diagrams": [{"type": "array", "values": [38, 12, 55, 7, 41, 29, 63, 18],
                           "label": "A"}],
-            "options": ["17", "16", "12", "24"],
-            "answer": "A",
+            "options": ["12", "16", "17", "24"],
+            "answer": "C",
             "solution": (
                 "Merging runs of lengths p and q needs between min(p, q) and p + q − 1 comparisons; the "
                 "exact count depends on when one run is exhausted.\n\n"
@@ -629,9 +630,9 @@ assert sorted(ANSWER) == ["A", "B"]
                 "- [29, 41] + [18, 63]: 29 vs 18 → 18; 29 vs 63 → 29; 41 vs 63 → 41; copy 63. 3 comparisons.\n\n"
                 "Level 3: [7, 12, 38, 55] + [18, 29, 41, 63]: 7|18, 12|18, 38|18, 38|29, 38|41, 55|41, "
                 "55|63 → 7 comparisons, then 63 is copied.\n\n"
-                "Total = 4 + 3 + 3 + 7 = **17** → (A).\n\n"
+                "Total = 4 + 3 + 3 + 7 = **17** → (C).\n\n"
+                "- (A) 12 is the best-case count (n/2 · log₂ n = 4 · 3).\n"
                 "- (B) 16 forgets one comparison in the final merge.\n"
-                "- (C) 12 is the best-case count (n/2 · log₂ n = 4 · 3).\n"
                 "- (D) 24 = n log₂ n is only an upper-bound estimate; the worst case for n = 8 is 17 "
                 "as well (each merge using p + q − 1), so this input happens to be a worst case.\n\n"
                 "**Tip:** worst-case comparisons for n = 2^k is n·k − n + 1 = 8·3 − 8 + 1 = 17."
@@ -653,7 +654,7 @@ def ms(a, c):
         else: out.append(R[j]); j += 1
     return out + L[i:] + R[j:]
 c = [0]; ms([38, 12, 55, 7, 41, 29, 63, 18], c)
-assert c[0] == 17 and ANSWER == "A"
+assert c[0] == 17 and ANSWER == "C"
 ''',
         },
         # ------------------------------------------------------------ Q16
@@ -828,9 +829,9 @@ assert sorted(ANSWER) == ["A", "B", "D"]
     return i + 1''',
             "diagrams": [{"type": "array", "values": [14, 3, 22, 9, 17, 5, 11], "label": "A",
                           "pointers": {"pivot": 6}}],
-            "options": ["[3, 9, 5, 11, 17, 22, 14]", "[3, 9, 5, 11, 14, 17, 22]",
-                        "[5, 3, 9, 11, 17, 22, 14]", "[3, 9, 5, 11, 22, 17, 14]"],
-            "answer": "A",
+            "options": ["[3, 9, 5, 11, 22, 17, 14]", "[3, 9, 5, 11, 14, 17, 22]",
+                        "[5, 3, 9, 11, 17, 22, 14]", "[3, 9, 5, 11, 17, 22, 14]"],
+            "answer": "D",
             "solution": (
                 "Lomuto keeps the invariant A[lo … i] ≤ pivot < A[i+1 … j−1]. Whenever A[j] ≤ pivot, "
                 "i advances and A[i] ↔ A[j]. Finally the pivot is swapped into position i + 1.\n\n"
@@ -842,18 +843,18 @@ assert sorted(ANSWER) == ["A", "B", "D"]
                 "- j = 4 (17): nothing.\n"
                 "- j = 5 (5): i = 2, swap A[2] ↔ A[5] → [3, 9, 5, 14, 17, 22, 11].\n"
                 "- Final: swap A[3] ↔ A[6] → [3, 9, 5, 11, 17, 22, 14]; returns 3.\n\n"
-                "- (A) correct.\n"
+                "- (A) puts 22 before 17; but only 14 (displaced by the final pivot swap) moves — to "
+                "index 6 — while 17 and 22 keep their positions 4 and 5.\n"
                 "- (B) has a sorted right part — partition does not sort the sides.\n"
-                "- (C) would come from a stable (order-preserving) partition with 5 first; Lomuto keeps "
-                "the left side in order of discovery: 3, 9, 5.\n"
-                "- (D) puts 22 before 17; but 14 (displaced by the final pivot swap) goes to index 6, "
-                "and 17, 22 keep their positions 4, 5.\n\n"
+                "- (C) moves 5 to the front; Lomuto keeps the elements ≤ pivot in the order they are "
+                "discovered: 3, 9, 5.\n"
+                "- (D) correct.\n\n"
                 "**Tip:** the element originally at index i + 1 is the one sent to the pivot's old slot."
             ),
             "verify": '''
 A = [14, 3, 22, 9, 17, 5, 11]
 k = partition(A, 0, 6)
-assert A == [3, 9, 5, 11, 17, 22, 14] and k == 3 and ANSWER == "A"
+assert A == [3, 9, 5, 11, 17, 22, 14] and k == 3 and ANSWER == "D"
 ''',
         },
         # ------------------------------------------------------------ Q20
